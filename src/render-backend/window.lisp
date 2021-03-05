@@ -42,15 +42,16 @@
   ;; the window appropriately.
   (gl-context::prepare-context :anti-alias-p anti-alias-p)
   ;; Create the window, along with the OpenGL context and monitor associations.
-  (let* ((window-handle (sdl2:create-window :w width :h height :title title :flags '(:opengl)))
-         (monitor (mon::make-monitor window-handle))
-         (gl-context (gl-context::make-context window-handle)))
+  (let ((window-handle (sdl2:create-window :w width :h height :title title :flags '(:opengl))))
     (%make-window :handle window-handle
-                  :monitor monitor
-                  :gl-context gl-context
+                  :monitor (mon::make-monitor window-handle)
+                  :gl-context (gl-context::make-context window-handle)
                   :width width
                   :height height
                   :title title)))
+
+(defun draw (window)
+  (sdl2:gl-swap-window (handle window)))
 
 (defun destroy (window)
   (unwind-protect

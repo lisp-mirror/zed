@@ -7,7 +7,8 @@
   :depends-on (#:cl-opengl
                #:golden-utils
                #:origin
-               #:sdl2)
+               #:sdl2
+               #:trivial-garbage)
   :pathname "src"
   :serial t
   :components
@@ -16,4 +17,12 @@
     :components
     ((:file "monitor")
      (:file "gl-context")
-     (:file "window")))))
+     (:file "window")))
+   (:module "core"
+    :components
+    ((:file "clock")
+     (:file "live-coding")
+     (:file "config")
+     (:file "context")
+     (:file "game-loop")
+     (:file "core")))))
