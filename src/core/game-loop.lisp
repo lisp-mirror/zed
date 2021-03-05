@@ -8,6 +8,7 @@
   (:local-nicknames
    (#:clock #:%zed.core.clock)
    (#:ctx #:%zed.core.context)
+   (#:in #:%zed.input)
    (#:live #:%zed.core.live-coding)
    (#:mon #:%zed.render-backend.monitor)
    (#:win #:%zed.render-backend.window))
@@ -27,6 +28,7 @@
   ;; iteration and won't change. This way we won't have to look them up in a busy loop.
   (let* ((clock (ctx::clock context))
          (window (ctx::window context))
+         (input-manager (ctx::input-manager context))
          (refresh-rate (mon::get-refresh-rate (win::monitor window)))
          (periodic-func (make-periodic-update-function context)))
     ;; Request the Lisp implementation to perform a full garbage collection immediately before we
@@ -36,9 +38,18 @@
     ;; Actually start the main game loop.
     (u:while (ctx::running-p context)
       (live::with-continuable (clock)
+        (in::handle-events input-manager window)
+        ;; HACK: Remove this later when possible. This is just so we can easily stop the engine with
+        ;; the Escape key.
+        ;; (when (%zed.protocol.input:on-button-enter context :key :escape)
+        ;;   (%zed.protocol.core::stop context))
+        ;; Perform one clock tick.
         (clock::tick clock
                      refresh-rate
+                     ;; TODO: Add physics update function
                      (constantly nil)
                      periodic-func)
+        ;; Draw this frame to the window.
         (win::draw window)
+        ;; Increment the frame counter at the end of the frame.
         (clock::count-frame clock)))))

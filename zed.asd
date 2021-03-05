@@ -18,11 +18,22 @@
     ((:file "monitor")
      (:file "gl-context")
      (:file "window")))
+   (:module "input"
+    :components
+    ((:file "manager")
+     (:file "transition")
+     (:file "keyboard")
+     (:file "mouse")
+     (:file "window")
+     (:file "input")))
    (:module "core"
     :components
     ((:file "clock")
      (:file "live-coding")
      (:file "config")
      (:file "context")
-     (:file "game-loop")
+     (:file "game-loop")))
+   (:module "protocol"
+    :components
+    ((:file "input")
      (:file "core")))))

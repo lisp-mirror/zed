@@ -1,16 +1,18 @@
 (in-package #:cl-user)
 
 ;;;; This package contains the infrastructure for starting and stopping the engine.
-(defpackage #:%zed.core
+
+(defpackage #:%zed.protocol.core
   (:local-nicknames
    (#:cfg #:%zed.core.config)
    (#:ctx #:%zed.core.context)
    (#:loop #:%zed.core.game-loop))
   (:use #:cl)
   (:export
-   #:start))
+   #:start
+   #:stop))
 
-(in-package #:%zed.core)
+(in-package #:%zed.protocol.core)
 
 ;; The entry point of the engine. This constructs a context using any of the optional user-supplied
 ;; arguments, and then enters the main game loop.
