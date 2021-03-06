@@ -7,7 +7,9 @@
   ;; Internal aliases
   (:local-nicknames
    (#:man #:%zed.input.manager)
-   (#:tr #:%zed.input.transition))
+   (#:mon #:%zed.render-backend.monitor)
+   (#:tr #:%zed.input.transition)
+   (#:win #:%zed.render-backend.window))
   (:use #:cl)
   (:shadow
    #:close))
@@ -28,15 +30,18 @@
   (declare (optimize speed))
   (tr::out manager :window :visible))
 
-;; TODO: Implement
-(defun move (manager x y)
+;; TODO: Currently we only set the window's position, but if it is moved to a different monitor, we
+;; also want to update the window's monitor reference, since it could have a different resolution,
+;; refresh rate, etc.
+(defun move (manager window x y)
   (declare (optimize speed)
-           (ignore manager x y)))
+           (ignore manager))
+  (win::move window x y))
 
-;; TODO: Implement
-(defun resize (manager width height)
+(defun resize (manager window width height)
   (declare (optimize speed)
-           (ignore manager width height)))
+           (ignore manager))
+  (win::resize window width height))
 
 (defun minimize (manager)
   (declare (optimize speed))

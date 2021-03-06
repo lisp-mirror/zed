@@ -15,8 +15,8 @@
   ((:file "package")
    (:module "render-backend"
     :components
-    ((:file "monitor")
-     (:file "gl-context")
+    ((:file "gl-context")
+     (:file "monitor")
      (:file "window")))
    (:module "input"
     :components
@@ -24,6 +24,7 @@
      (:file "transition")
      (:file "keyboard")
      (:file "mouse")
+     (:file "gamepad")
      (:file "window")
      (:file "input")))
    (:module "core"

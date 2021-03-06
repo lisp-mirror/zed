@@ -41,8 +41,8 @@
         (in::handle-events input-manager window)
         ;; HACK: Remove this later when possible. This is just so we can easily stop the engine with
         ;; the Escape key.
-        ;; (when (%zed.protocol.input:on-button-enter context :key :escape)
-        ;;   (%zed.protocol.core::stop context))
+        (when (in::on-button-enter input-manager :key :escape)
+          (ctx::shutdown context))
         ;; Perform one clock tick.
         (clock::tick clock
                      refresh-rate

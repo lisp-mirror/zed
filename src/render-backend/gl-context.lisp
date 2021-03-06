@@ -8,8 +8,6 @@
 
 (in-package #:%zed.render-backend.gl-context)
 
-;;; TODO: Split this file up to separate context from other OpenGL functionality.
-
 (u:define-constant +enabled-capabilities+ '(:blend :cull-face :depth-test :dither :multisample)
   :test #'equal)
 

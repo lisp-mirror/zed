@@ -57,9 +57,18 @@
                    :window window
                    :input-manager input-manager)))
 
+;; This is called when the main game loop exits to destroy the context. All code should call
+;; #'shutdown instead, which initiates a graceful shutdown of the context.
 (defun destroy (context)
+  ;; Destroy the input manager.
+  (in::destroy (input-manager context))
   ;; Destroy the window, which takes care of cleaning up any foreign resources for the window and
   ;; associated OpenGL context.
   (win::destroy (window context))
   ;; Force the Lisp implementation to perform a full garbage collection.
   (tg:gc :full t))
+
+;; Gracefully shut down the context. This instructs the main game loop to exit at the right time
+;; (not mid-iteration), and initiates the graceful destruction of the context.
+(defun shutdown (context)
+  (setf (running-p context) nil))

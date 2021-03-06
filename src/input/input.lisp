@@ -8,6 +8,7 @@
   (:local-nicknames
    (#:in.kb #:%zed.input.keyboard)
    (#:in.mouse #:%zed.input.mouse)
+   (#:in.gp #:%zed.input.gamepad)
    (#:in.win #:%zed.input.window)
    (#:man #:%zed.input.manager)
    (#:tr #:%zed.input.transition)
@@ -20,8 +21,12 @@
 (defun make-input-manager ()
   (let ((manager (man::make-manager))
         (mouse-state (in.mouse::make-state)))
+    (in.gp::prepare-gamepads)
     (setf (u:href (man::states manager) '(:mouse :motion)) mouse-state)
     manager))
+
+(defun destroy (manager)
+  (in.gp::shutdown-gamepads manager))
 
 (defmacro event-case ((event) &body handlers)
   (let (events)
@@ -43,8 +48,8 @@
      (case (aref in.win::+event-names+ event-type)
        (:show (in.win::show manager))
        (:hide (in.win::hide manager))
-       (:move (in.win::move manager data1 data2))
-       (:resize (in.win::resize manager data1 data2))
+       (:move (in.win::move manager window data1 data2))
+       (:resize (in.win::resize manager window data1 data2))
        (:minimize (in.win::minimize manager))
        (:maximize (in.win::maximize manager))
        (:restore (in.win::restore manager))
@@ -75,7 +80,23 @@
     (:keydown
      (:keysym keysym :repeat repeat)
      (when (zerop repeat)
-       (in.kb::down manager (sdl2:scancode-value keysym))))))
+       (in.kb::down manager (sdl2:scancode-value keysym))))
+    ;;; Gamepad events.
+    (:controllerdeviceadded
+     (:which id)
+     (in.gp::attach manager id))
+    (:controllerdeviceremoved
+     (:which id)
+     (in.gp::detach manager id))
+    (:controlleraxismotion
+     (:which id :axis axis :value value)
+     (in.gp::analog-move manager id axis value))
+    (:controllerbuttonup
+     (:which id :button button)
+     (in.gp::button-up manager id button))
+    (:controllerbuttondown
+     (:which id :button button)
+     (in.gp::button-down manager id button))))
 
 ;; Listen for any user input. This is called early in the main game loop.
 (defun handle-events (manager window)
@@ -87,3 +108,18 @@
         :until (zerop (the u:ub32 (sdl2:next-event event :poll)))
         :do (dispatch-event manager window event)
         :finally (sdl2:free-event event)))
+
+(defun on-button-enter (manager &rest args)
+  (declare (optimize speed))
+  (u:when-let ((state (u:href (man::states manager) args)))
+    (tr::enter state)))
+
+(defun on-button-enabled (manager &rest args)
+  (declare (optimize speed))
+  (u:when-let ((state (u:href (man::states manager) args)))
+    (tr::enabled state)))
+
+(defun on-button-exit (manager &rest args)
+  (declare (optimize speed))
+  (u:when-let ((state (u:href (man::states manager) args)))
+    (tr::exit state)))

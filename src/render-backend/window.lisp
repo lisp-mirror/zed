@@ -50,6 +50,15 @@
                   :height height
                   :title title)))
 
+(defun move (window x y)
+  (u:mvlet ((monitor-x monitor-y (mon::get-position (monitor window))))
+    (setf (x window) (- x monitor-x)
+          (y window) (- y monitor-y))))
+
+(defun resize (window width height)
+  (setf (width window) width
+        (height window) height))
+
 (defun draw (window)
   (sdl2:gl-swap-window (handle window)))
 

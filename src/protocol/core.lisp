@@ -26,7 +26,6 @@
       ;; and shut everything down.
       (ctx::destroy context))))
 
+;; Stop the currently running context.
 (defun stop (context)
-  ;; The main game loop iterates continuously as long as `running-p` is non-NIL, so setting this
-  ;; to NIL will cause the engine to gracefully shutdown on it's own.
-  (setf (ctx::running-p context) nil))
+  (ctx::shutdown context))

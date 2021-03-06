@@ -7,6 +7,7 @@
   ;; Internal aliases
   (:local-nicknames
    (#:ctx #:%zed.core.context)
+   (#:in #:%zed.input)
    (#:man #:%zed.input.manager)
    (#:mouse #:%zed.input.mouse)
    (#:tr #:%zed.input.transition)
@@ -28,19 +29,13 @@
 (in-package #:%zed.protocol.input)
 
 (defun on-button-enter (context &rest args)
-  (declare (optimize speed))
-  (u:when-let ((state (u:href (man::states (ctx::input-manager context)) args)))
-    (tr::enter state)))
+  (apply #'in::on-button-enter (ctx::input-manager context) args))
 
 (defun on-button-enabled (context &rest args)
-  (declare (optimize speed))
-  (u:when-let ((state (u:href (man::states (ctx::input-manager context)) args)))
-    (tr::enabled state)))
+  (apply #'in::on-button-enabled (ctx::input-manager context) args))
 
 (defun on-button-exit (context &rest args)
-  (declare (optimize speed))
-  (u:when-let ((state (u:href (man::states (ctx::input-manager context)) args)))
-    (tr::exit state)))
+  (apply #'in::on-button-exit (ctx::input-manager context) args))
 
 (defun on-window-event-enter (context event)
   (declare (optimize speed))
