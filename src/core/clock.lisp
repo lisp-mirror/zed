@@ -3,8 +3,7 @@
 (defpackage #:%zed.core.clock
   (:local-nicknames
    (#:u #:golden-utils))
-  (:use #:cl)
-  (:export))
+  (:use #:cl))
 
 (in-package #:%zed.core.clock)
 

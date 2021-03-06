@@ -6,6 +6,7 @@
 
 (defpackage #:%zed.core.context
   (:local-nicknames
+   (#:actor #:%zed.game-object.actor)
    (#:cfg #:%zed.core.config)
    (#:clock #:%zed.core.clock)
    (#:in #:%zed.input)
@@ -25,7 +26,8 @@
   (running-p nil :type boolean)
   (clock nil :type clock::clock)
   (window nil :type win::window)
-  (input-manager nil :type in.man::manager))
+  (input-manager nil :type in.man::manager)
+  (scene-tree nil :type actor::actor))
 
 ;;; The current context is bound to this variable throughout the lifetime of the game. However, this
 ;;; should not be used in code. This only exists for internal debugging purposes. It is a core
@@ -48,14 +50,17 @@
          (clock (clock::make-clock (or (cfg::delta-time config)
                                        (/ (mon::get-refresh-rate (win::monitor window))))))
          ;; Initialize the input manager.
-         (input-manager (in::make-input-manager)))
+         (input-manager (in::make-input-manager))
+         ;; Create the root actor of the scene tree
+         (scene-tree (actor::make-root)))
     ;; Setup live coding support. This instructs SLIME or Sly's REPL to run inside our game loop.
     (live::setup-repl)
     ;; Construct the context with references to the previously constructed state.
     (%make-context :running-p t
                    :clock clock
                    :window window
-                   :input-manager input-manager)))
+                   :input-manager input-manager
+                   :scene-tree scene-tree)))
 
 ;; This is called when the main game loop exits to destroy the context. All code should call
 ;; #'shutdown instead, which initiates a graceful shutdown of the context.

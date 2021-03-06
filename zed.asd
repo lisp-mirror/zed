@@ -27,6 +27,9 @@
      (:file "gamepad")
      (:file "window")
      (:file "input")))
+   (:module "game-object"
+    :components
+    ((:file "actor")))
    (:module "core"
     :components
     ((:file "clock")
@@ -37,4 +40,5 @@
    (:module "protocol"
     :components
     ((:file "input")
+     (:file "actor")
      (:file "core")))))

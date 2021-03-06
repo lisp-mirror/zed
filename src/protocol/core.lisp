@@ -1,7 +1,5 @@
 (in-package #:cl-user)
 
-;;;; This package contains the infrastructure for starting and stopping the engine.
-
 (defpackage #:%zed.protocol.core
   (:local-nicknames
    (#:cfg #:%zed.core.config)

@@ -3,8 +3,7 @@
 (defpackage #:%zed.render-backend.gl-context
   (:local-nicknames
    (#:u #:golden-utils))
-  (:use #:cl)
-  (:export))
+  (:use #:cl))
 
 (in-package #:%zed.render-backend.gl-context)
 

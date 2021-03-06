@@ -8,8 +8,7 @@
   (:local-nicknames
    (#:gl-context #:%zed.render-backend.gl-context)
    (#:mon #:%zed.render-backend.monitor))
-  (:use #:cl)
-  (:export))
+  (:use #:cl))
 
 (in-package #:%zed.render-backend.window)
 
