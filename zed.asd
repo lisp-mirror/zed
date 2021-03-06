@@ -12,7 +12,10 @@
   :pathname "src"
   :serial t
   :components
-  ((:file "package")
+  ((:module "base"
+    :components
+    ((:file "package")
+     (:file "debug")))
    (:module "render-backend"
     :components
     ((:file "gl-context")

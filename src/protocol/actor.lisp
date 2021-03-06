@@ -6,6 +6,7 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
+   (#:base #:%zed.base)
    (#:ctx #:%zed.core.context)
    (#:actor #:%zed.game-object.actor))
   (:use #:cl)
@@ -34,22 +35,28 @@
   (actor::make-actor :label label :enabled-p (not disabled-p) :pause-mode pause-mode))
 
 (defun reparent-actor (context actor &optional parent)
+  (declare (optimize speed))
   (let ((parent (or parent (ctx::scene-tree context))))
     (actor::reparent actor parent)))
 
 (defun insert-actor (context actor &optional parent)
+  (declare (optimize speed))
   (let ((parent (or parent (ctx::scene-tree context))))
     (actor::insert actor parent)))
 
 (defun actor-enabled-p (actor)
+  (declare (optimize speed))
   (actor::enabled-p actor))
 
 (defun pause-actor (actor)
-  ;; TODO: Add debug mode check for root actor.
+  (declare (optimize speed))
+  (base::debug-check (not (actor::root-p actor)))
   (setf (actor::paused-p actor) t))
 
 (defun unpause-actor (actor)
+  (declare (optimize speed))
   (setf (actor::paused-p actor) nil))
 
 (defun actor-paused-p (actor)
+  (declare (optimize speed))
   (actor::paused-p actor))

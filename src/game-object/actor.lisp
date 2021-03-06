@@ -4,6 +4,9 @@
   ;; Third-party aliases
   (:local-nicknames
    (#:u #:golden-utils))
+  ;; Internal aliases
+  (:local-nicknames
+   (#:base #:%zed.base))
   (:use #:cl))
 
 (in-package #:%zed.game-object.actor)
@@ -19,6 +22,8 @@
   ;; A string denoting the path into the scene tree for this actor. This is built by appending the
   ;; labels of each actor from the root, and is used for the actor's printed representation.
   (path "[UN-ROOTED]" :type string)
+  ;; Whether the actor is the root of the scene tree or not.
+  (root-p nil :type boolean)
   ;; A reference to this actor's parent actor, or NIL if it is the root actor.
   (parent nil :type (or actor null))
   ;; A list of references of this actor's children.
@@ -39,7 +44,7 @@
   (format stream "ACTOR ~a" (path actor)))
 
 (defun make-root ()
-  (make-actor :label "[ROOT]" :path "/" :depth 0 :pause-mode :pause))
+  (make-actor :label "[ROOT]" :path "/" :root-p t :depth 0 :pause-mode :pause))
 
 ;; Walk down the scene tree starting at the supplied actor, executing the arbitrary code in the body
 ;; for each actor reached, with the supplied `binding` symbol bound to that actor. Any actors that
@@ -79,10 +84,10 @@
                (funcall func actor)
                (dolist (child (children actor))
                  (recurse child)))))
-    (if (parent actor)
-        (recurse actor)
+    (if (root-p actor)
         (dolist (child (children actor))
-          (recurse child)))))
+          (recurse child))
+        (recurse actor))))
 
 ;; Helper function for the walk-parents macro.
 (defun %walk-parents (actor func)
@@ -139,6 +144,8 @@
 (declaim (inline reparent))
 (defun reparent (actor new-parent)
   (declare (optimize speed))
+  ;; Ensure the root is not moved when in debug mode.
+  (base::debug-check (not (root-p actor)))
   ;; Only in debug mode, error if the new parent is within the sub-tree rooted at the actor.
   #-zed.release (%check-reparent-target actor new-parent)
   ;; If the actor currently has a parent, remove the actor from the parent's list of children.
