@@ -9,7 +9,7 @@
    (#:ctx #:%zed.core.context)
    (#:dbg #:%zed.base.debug)
    (#:gob #:%zed.game-object)
-   (#:tree #:%zed.game-object.tree))
+   (#:tree #:%zed.core.tree))
   (:use #:cl)
   (:export
    #:game-object-enabled-p
@@ -39,12 +39,12 @@
 (defun reparent-game-object (context game-object &optional parent)
   (declare (optimize speed))
   (let ((parent (or parent (ctx::scene-tree context))))
-    (tree::reparent game-object parent)))
+    (tree::reparent context game-object parent)))
 
 (defun insert-game-object (context game-object &optional parent)
   (declare (optimize speed))
   (let ((parent (or parent (ctx::scene-tree context))))
-    (tree::insert game-object parent)))
+    (tree::insert context game-object parent)))
 
 (defun game-object-enabled-p (game-object)
   (declare (optimize speed))

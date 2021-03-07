@@ -13,7 +13,6 @@
    (#:in.man #:%zed.input.manager)
    (#:live #:%zed.base.live-coding)
    (#:mon #:%zed.render-backend.monitor)
-   (#:tree #:%zed.game-object.tree)
    (#:win #:%zed.render-backend.window))
   (:use #:cl))
 
@@ -53,7 +52,7 @@
          ;; Initialize the input manager.
          (input-manager (in::make-input-manager))
          ;; Create the root game object of the scene tree.
-         (scene-tree (tree::make-root)))
+         (scene-tree (gob::make-root)))
     ;; Setup live coding support. This instructs SLIME or Sly's REPL to run inside our game loop.
     (live::setup-repl)
     ;; Construct the context with references to the previously constructed state.

@@ -45,3 +45,6 @@
 
 (u:define-printer (game-object stream :type nil)
   (format stream "GAME-OBJECT: ~a" (path game-object)))
+
+(defun make-root ()
+  (make-game-object :label "[ROOT]" :path "/" :root-p t :depth 0 :pause-mode :pause))

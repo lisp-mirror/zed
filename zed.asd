@@ -35,12 +35,12 @@
    (:module "game-object"
     :components
     ((:file "transform-state")
-     (:file "game-object")
-     (:file "transform")
-     (:file "tree")))
+     (:file "game-object")))
    (:module "core"
     :components
     ((:file "context")
+     (:file "transform")
+     (:file "tree")
      (:file "game-loop")))
    (:module "protocol"
     :components

@@ -1,6 +1,6 @@
 (in-package #:cl-user)
 
-(defpackage #:%zed.game-object.transform
+(defpackage #:%zed.core.transform
   ;; Third-party aliases
   (:local-nicknames
    (#:m3 #:origin.mat3)
@@ -17,7 +17,7 @@
   (:shadow
    #:space))
 
-(in-package #:%zed.game-object.transform)
+(in-package #:%zed.core.transform)
 
 (deftype space () '(member :local :world))
 
