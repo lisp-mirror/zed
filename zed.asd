@@ -34,7 +34,10 @@
      (:file "input")))
    (:module "game-object"
     :components
-    ((:file "actor")))
+    ((:file "transform-state")
+     (:file "game-object")
+     (:file "transform")
+     (:file "tree")))
    (:module "core"
     :components
     ((:file "context")
@@ -42,5 +45,5 @@
    (:module "protocol"
     :components
     ((:file "input")
-     (:file "actor")
+     (:file "game-object")
      (:file "core")))))

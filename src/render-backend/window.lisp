@@ -34,6 +34,9 @@
   ;; The window title string, displayed in the window's titlebar.
   (title "" :type string))
 
+(u:define-printer (window stream :type nil)
+  (format stream "WINDOW: ~dx~d" (width window) (height window)))
+
 (defun make-window (width height &key (title "") (anti-alias-p t))
   ;; First, we have to initialize SDL2's video subsystem.
   (sdl2:init* '(:video))

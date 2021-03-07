@@ -18,3 +18,6 @@
   (entering (u:dict #'eq) :type hash-table)
   (exiting (u:dict #'eq) :type hash-table)
   (states (u:dict #'equal) :type hash-table))
+
+(u:define-printer (manager stream :type nil)
+  (format stream "INPUT-MANAGER"))

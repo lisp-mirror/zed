@@ -19,8 +19,8 @@
   (y 0 :type u:ub16)
   (refresh-rate 0 :type u:ub8))
 
-(u:define-printer (monitor stream)
-  (format stream "~dx~d @ ~dHz"
+(u:define-printer (monitor stream :type nil)
+  (format stream "MONITOR: ~dx~d @ ~dHz"
           (width monitor)
           (height monitor)
           (refresh-rate monitor)))

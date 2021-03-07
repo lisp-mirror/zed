@@ -30,6 +30,11 @@
   (running-time 0d0 :type u:f64)
   (pause-time 0d0 :type u:f64))
 
+(u:define-printer (clock stream :type nil)
+  (format stream "CLOCK: ~,1fs, ~,1f fps"
+          (running-time clock)
+          (fps/current clock)))
+
 (defun make-clock (delta-time)
   (%make-clock :init-time (get-internal-real-time)
                :delta-time (float delta-time 1f0)))

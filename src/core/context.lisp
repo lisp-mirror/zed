@@ -6,13 +6,14 @@
 
 (defpackage #:%zed.core.context
   (:local-nicknames
-   (#:actor #:%zed.game-object.actor)
    (#:cfg #:%zed.base.config)
    (#:clock #:%zed.base.clock)
+   (#:gob #:%zed.game-object)
    (#:in #:%zed.input)
    (#:in.man #:%zed.input.manager)
    (#:live #:%zed.base.live-coding)
    (#:mon #:%zed.render-backend.monitor)
+   (#:tree #:%zed.game-object.tree)
    (#:win #:%zed.render-backend.window))
   (:use #:cl))
 
@@ -27,7 +28,7 @@
   (clock nil :type clock::clock)
   (window nil :type win::window)
   (input-manager nil :type in.man::manager)
-  (scene-tree nil :type actor::actor))
+  (scene-tree nil :type gob::game-object))
 
 ;;; The current context is bound to this variable throughout the lifetime of the game. However, this
 ;;; should not be used in code. This only exists for internal debugging purposes. It is a core
@@ -51,8 +52,8 @@
                                        (/ (mon::get-refresh-rate (win::monitor window))))))
          ;; Initialize the input manager.
          (input-manager (in::make-input-manager))
-         ;; Create the root actor of the scene tree
-         (scene-tree (actor::make-root)))
+         ;; Create the root game object of the scene tree.
+         (scene-tree (tree::make-root)))
     ;; Setup live coding support. This instructs SLIME or Sly's REPL to run inside our game loop.
     (live::setup-repl)
     ;; Construct the context with references to the previously constructed state.
