@@ -1,8 +1,14 @@
-(in-package #:%zed.base)
+(in-package #:cl-user)
 
-;;; TODO: Add profiling code here
+(defpackage #:%zed.base.debug
+  ;; Third-party aliases
+  (:local-nicknames
+   (#:u #:golden-utils))
+  (:use #:cl))
 
-(defmacro debug-check (&body body)
+(in-package #:%zed.base.debug)
+
+(defmacro check (&body body)
   (unless (member :zed.release *features*)
     `(progn
        ,@(mapcar

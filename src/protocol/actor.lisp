@@ -6,8 +6,8 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:base #:%zed.base)
    (#:ctx #:%zed.core.context)
+   (#:dbg #:%zed.base.debug)
    (#:actor #:%zed.game-object.actor))
   (:use #:cl)
   (:export
@@ -50,7 +50,7 @@
 
 (defun pause-actor (actor)
   (declare (optimize speed))
-  (base::debug-check (not (actor::root-p actor)))
+  (dbg::check (not (actor::root-p actor)))
   (setf (actor::paused-p actor) t))
 
 (defun unpause-actor (actor)

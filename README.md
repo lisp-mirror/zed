@@ -1,20 +1,13 @@
-# new-project
-
-TODO
+# Zed
 
 ## Overview
 
-TODO
+An experimental game engine.
 
 ## Install
 
 ```lisp
-(ql:quickload :new-project)
-```
-
-## Usage
-
-TODO
+(ql:quickload :zed)
 
 ## License
 

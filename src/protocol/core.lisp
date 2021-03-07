@@ -2,7 +2,7 @@
 
 (defpackage #:%zed.protocol.core
   (:local-nicknames
-   (#:cfg #:%zed.core.config)
+   (#:cfg #:%zed.base.config)
    (#:ctx #:%zed.core.context)
    (#:loop #:%zed.core.game-loop))
   (:use #:cl)

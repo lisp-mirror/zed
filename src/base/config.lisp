@@ -1,11 +1,11 @@
 (in-package #:cl-user)
 
-(defpackage #:%zed.core.config
+(defpackage #:%zed.base.config
   (:local-nicknames
    (#:u #:golden-utils))
   (:use #:cl))
 
-(in-package #:%zed.core.config)
+(in-package #:%zed.base.config)
 
 (defstruct (config
             (:conc-name nil)

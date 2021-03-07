@@ -6,10 +6,10 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:clock #:%zed.core.clock)
+   (#:clock #:%zed.base.clock)
    (#:ctx #:%zed.core.context)
    (#:in #:%zed.input)
-   (#:live #:%zed.core.live-coding)
+   (#:live #:%zed.base.live-coding)
    (#:mon #:%zed.render-backend.monitor)
    (#:win #:%zed.render-backend.window))
   (:use #:cl))

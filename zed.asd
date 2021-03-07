@@ -14,8 +14,10 @@
   :components
   ((:module "base"
     :components
-    ((:file "package")
-     (:file "debug")))
+    ((:file "debug")
+     (:file "clock")
+     (:file "live-coding")
+     (:file "config")))
    (:module "render-backend"
     :components
     ((:file "gl-context")
@@ -35,10 +37,7 @@
     ((:file "actor")))
    (:module "core"
     :components
-    ((:file "clock")
-     (:file "live-coding")
-     (:file "config")
-     (:file "context")
+    ((:file "context")
      (:file "game-loop")))
    (:module "protocol"
     :components

@@ -7,11 +7,11 @@
 (defpackage #:%zed.core.context
   (:local-nicknames
    (#:actor #:%zed.game-object.actor)
-   (#:cfg #:%zed.core.config)
-   (#:clock #:%zed.core.clock)
+   (#:cfg #:%zed.base.config)
+   (#:clock #:%zed.base.clock)
    (#:in #:%zed.input)
    (#:in.man #:%zed.input.manager)
-   (#:live #:%zed.core.live-coding)
+   (#:live #:%zed.base.live-coding)
    (#:mon #:%zed.render-backend.monitor)
    (#:win #:%zed.render-backend.window))
   (:use #:cl))

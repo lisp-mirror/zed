@@ -6,7 +6,7 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:base #:%zed.base))
+   (#:dbg #:%zed.base.debug)
   (:use #:cl))
 
 (in-package #:%zed.game-object.actor)
@@ -145,7 +145,7 @@
 (defun reparent (actor new-parent)
   (declare (optimize speed))
   ;; Ensure the root is not moved when in debug mode.
-  (base::debug-check (not (root-p actor)))
+  (dbg::check (not (root-p actor)))
   ;; Only in debug mode, error if the new parent is within the sub-tree rooted at the actor.
   #-zed.release (%check-reparent-target actor new-parent)
   ;; If the actor currently has a parent, remove the actor from the parent's list of children.
@@ -176,3 +176,6 @@
   (dolist (child (children actor))
     (insert child actor))
   actor)
+
+;;; TODO: Need to add a function to delete an actor from a tree, as well as add functions for
+;;; spawning and destroying actors, which fire initialization hooks for their components.

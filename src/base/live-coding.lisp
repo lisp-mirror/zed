@@ -1,13 +1,13 @@
 (in-package #:cl-user)
 
-(defpackage #:%zed.core.live-coding
+(defpackage #:%zed.base.live-coding
   (:local-nicknames
    (#:u #:golden-utils))
   (:local-nicknames
-   (#:clock #:%zed.core.clock))
+   (#:clock #:%zed.base.clock))
   (:use #:cl))
 
-(in-package #:%zed.core.live-coding)
+(in-package #:%zed.base.live-coding)
 
 (defmacro with-continuable ((clock) &body body)
   (u:with-gensyms (entry-time previous-hook pause-time)

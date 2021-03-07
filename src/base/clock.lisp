@@ -1,11 +1,11 @@
 (in-package #:cl-user)
 
-(defpackage #:%zed.core.clock
+(defpackage #:%zed.base.clock
   (:local-nicknames
    (#:u #:golden-utils))
   (:use #:cl))
 
-(in-package #:%zed.core.clock)
+(in-package #:%zed.base.clock)
 
 (defstruct (clock
             (:constructor %make-clock)
