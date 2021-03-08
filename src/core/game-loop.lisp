@@ -11,6 +11,8 @@
    (#:in #:%zed.input)
    (#:live #:%zed.base.live-coding)
    (#:mon #:%zed.render-backend.monitor)
+   (#:tr #:%zed.core.transform)
+   (#:tree #:%zed.core.tree)
    (#:win #:%zed.render-backend.window))
   (:use #:cl))
 
@@ -22,6 +24,14 @@
   (lambda ()
     (live::update-repl (ctx::clock context))))
 
+;;
+(defun make-physics-update-function (context)
+  (let ((scene-tree (ctx::scene-tree context))
+        (delta-time (clock::delta-time (ctx::clock context))))
+    (lambda ()
+      (tree::walk-tree (x scene-tree)
+        (tr::transform-game-object x delta-time)))))
+
 (defun start (context)
   (declare (optimize speed))
   ;; Hold on to some variables before we enter the main game loop, since they are needed each
@@ -30,6 +40,7 @@
          (window (ctx::window context))
          (input-manager (ctx::input-manager context))
          (refresh-rate (mon::get-refresh-rate (win::monitor window)))
+         (physics-func (make-physics-update-function context))
          (periodic-func (make-periodic-update-function context)))
     ;; Request the Lisp implementation to perform a full garbage collection immediately before we
     ;; start the main game loop, to mitigate any large amounts of data from initialization or the
@@ -44,11 +55,7 @@
         (when (in::on-button-enter input-manager :key :escape)
           (ctx::shutdown context))
         ;; Perform one clock tick.
-        (clock::tick clock
-                     refresh-rate
-                     ;; TODO: Add physics update function
-                     (constantly nil)
-                     periodic-func)
+        (clock::tick clock refresh-rate physics-func periodic-func)
         ;; Draw this frame to the window.
         (win::draw window)
         ;; Increment the frame counter at the end of the frame.

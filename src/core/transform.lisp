@@ -21,6 +21,15 @@
 
 (deftype space () '(member :local :world))
 
+(u:fn-> transform-game-object (gob::game-object u:f32) null)
+(defun transform-game-object (game-object delta)
+  (declare (optimize speed))
+  (let ((state (gob::transform game-object)))
+    (trs::transform/translation state delta)
+    (trs::transform/rotation state delta)
+    (trs::transform/scale state delta)
+    nil))
+
 (u:fn-> resolve-local-matrix (trs::state u:f32) m4:mat)
 (defun resolve-local-matrix (state factor)
   (declare (optimize speed))
