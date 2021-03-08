@@ -1,11 +1,11 @@
 (in-package #:cl-user)
 
-(defpackage #:%zed.render-backend.gl-context
+(defpackage #:%zed.render.gl-context
   (:local-nicknames
    (#:u #:golden-utils))
   (:use #:cl))
 
-(in-package #:%zed.render-backend.gl-context)
+(in-package #:%zed.render.gl-context)
 
 (u:define-constant +enabled-capabilities+ '(:blend :cull-face :depth-test :dither :multisample)
   :test #'equal)

@@ -10,7 +10,9 @@
                #:lparallel
                #:origin
                #:sdl2
-               #:trivial-garbage)
+               #:shadow
+               #:trivial-garbage
+               #:umbra)
   :pathname "src"
   :serial t
   :components
@@ -21,11 +23,12 @@
      (:file "clock")
      (:file "live-coding")
      (:file "config")))
-   (:module "render-backend"
+   (:module "render"
     :components
     ((:file "gl-context")
      (:file "monitor")
-     (:file "window")))
+     (:file "window")
+     (:file "shader-program")))
    (:module "input"
     :components
     ((:file "manager")

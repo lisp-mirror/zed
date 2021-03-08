@@ -1,11 +1,11 @@
 (in-package #:cl-user)
 
-(defpackage #:%zed.render-backend.monitor
+(defpackage #:%zed.render.monitor
   (:local-nicknames
    (#:u #:golden-utils))
   (:use #:cl))
 
-(in-package #:%zed.render-backend.monitor)
+(in-package #:%zed.render.monitor)
 
 (defstruct (monitor
             (:constructor %make-monitor)

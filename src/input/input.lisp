@@ -12,7 +12,7 @@
    (#:in.win #:%zed.input.window)
    (#:man #:%zed.input.manager)
    (#:tr #:%zed.input.transition)
-   (#:win #:%zed.render-backend.window))
+   (#:win #:%zed.render.window))
   (:use #:cl))
 
 (in-package #:%zed.input)

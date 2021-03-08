@@ -1,16 +1,16 @@
 (in-package #:cl-user)
 
-(defpackage #:%zed.render-backend.window
+(defpackage #:%zed.render.window
   ;; Third-party packages
   (:local-nicknames
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:gl-context #:%zed.render-backend.gl-context)
-   (#:mon #:%zed.render-backend.monitor))
+   (#:gl-context #:%zed.render.gl-context)
+   (#:mon #:%zed.render.monitor))
   (:use #:cl))
 
-(in-package #:%zed.render-backend.window)
+(in-package #:%zed.render.window)
 
 (defstruct (window
             (:constructor %make-window)

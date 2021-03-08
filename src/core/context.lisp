@@ -12,8 +12,10 @@
    (#:in #:%zed.input)
    (#:in.man #:%zed.input.manager)
    (#:live #:%zed.base.live-coding)
-   (#:mon #:%zed.render-backend.monitor)
-   (#:win #:%zed.render-backend.window))
+   (#:mon #:%zed.render.monitor)
+   (#:shd #:%zed.render.shader-program)
+   (#:tp #:%zed.base.thread-pool)
+   (#:win #:%zed.render.window))
   (:use #:cl))
 
 (in-package #:%zed.core.context)
@@ -24,8 +26,9 @@
             (:predicate nil)
             (:copier nil))
   (running-p nil :type boolean)
-  (clock nil :type clock::clock)
+  (thread-pool nil :type tp::thread-pool)
   (window nil :type win::window)
+  (clock nil :type clock::clock)
   (input-manager nil :type in.man::manager)
   (scene-tree nil :type gob::game-object))
 
@@ -40,7 +43,9 @@
 
 ;; Construct the context with everything needed to enter the main game loop.
 (defun make-context (config)
-  (let* (;; Create a window for drawing.
+  (let* (;; Create the thread pool.
+         (thread-pool (tp::make-thread-pool))
+         ;; Create a window for drawing.
          (window (win::make-window (cfg::window-width config)
                                    (cfg::window-height config)
                                    :title (cfg::window-title config)
@@ -55,8 +60,12 @@
          (scene-tree (gob::make-root)))
     ;; Setup live coding support. This instructs SLIME or Sly's REPL to run inside our game loop.
     (live::setup-repl)
+    ;; Register all defined shader programs with the thread pool so they are updated when recompiled
+    ;; at runtime.
+    (shd::register-shaders thread-pool)
     ;; Construct the context with references to the previously constructed state.
     (%make-context :running-p t
+                   :thread-pool thread-pool
                    :clock clock
                    :window window
                    :input-manager input-manager

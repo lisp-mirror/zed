@@ -7,9 +7,9 @@
   ;; Internal aliases
   (:local-nicknames
    (#:man #:%zed.input.manager)
-   (#:mon #:%zed.render-backend.monitor)
+   (#:mon #:%zed.render.monitor)
    (#:tr #:%zed.input.transition)
-   (#:win #:%zed.render-backend.window))
+   (#:win #:%zed.render.window))
   (:use #:cl)
   (:shadow
    #:close))

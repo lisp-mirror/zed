@@ -11,7 +11,7 @@
    (#:man #:%zed.input.manager)
    (#:mouse #:%zed.input.mouse)
    (#:tr #:%zed.input.transition)
-   (#:win #:%zed.render-backend.window))
+   (#:win #:%zed.render.window))
   (:use #:cl)
   (:export
    #:disable-relative-mouse-mode

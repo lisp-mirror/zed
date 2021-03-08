@@ -10,11 +10,11 @@
    (#:ctx #:%zed.core.context)
    (#:in #:%zed.input)
    (#:live #:%zed.base.live-coding)
-   (#:mon #:%zed.render-backend.monitor)
+   (#:mon #:%zed.render.monitor)
    (#:tp #:%zed.base.thread-pool)
    (#:tr #:%zed.core.transform)
    (#:tree #:%zed.core.tree)
-   (#:win #:%zed.render-backend.window))
+   (#:win #:%zed.render.window))
   (:use #:cl))
 
 (in-package #:%zed.core.game-loop)
@@ -23,7 +23,8 @@
 ;; need to run every frame.
 (defun make-periodic-update-function (context)
   (lambda ()
-    (live::update-repl (ctx::clock context))))
+    (live::update-repl (ctx::clock context))
+    (tp::process-queue context (ctx::thread-pool context))))
 
 ;; Create a function that is called every clock tick to update the transform state of each game
 ;; object.
@@ -49,7 +50,7 @@
     ;; last run from being cleaned up at runtime causing frame drops.
     (tg:gc :full t)
     ;; Actually start the main game loop.
-    (tp::with-thread-pool
+    (tp::with-thread-pool (ctx::thread-pool context)
       (u:while (ctx::running-p context)
         (live::with-continuable (clock)
           (in::handle-events input-manager window)
