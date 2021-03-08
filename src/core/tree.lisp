@@ -136,7 +136,7 @@
     ;; :inherit.
     (when (eq (gob::pause-mode game-object) :inherit)
       (setf (gob::pause-mode game-object) (gob::pause-mode new-parent)))
-    ;; Resolve the world matrix for the moved game object.
+    ;; Resolve the new world matrix for the moved game object.
     (tr::resolve-world-matrix game-object (clock::alpha clock))
     ;; Return the updated game object.
     game-object))
