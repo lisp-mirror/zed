@@ -52,8 +52,7 @@
                                    :anti-alias-p (cfg::anti-alias-p config)))
          ;; Initialize the clock using either the user-supplied delta-time or defaulting to the
          ;; inverse monitor refresh rate.
-         (clock (clock::make-clock (or (cfg::delta-time config)
-                                       (/ (mon::get-refresh-rate (win::monitor window))))))
+         (clock (clock::make-clock config (mon::get-refresh-rate (win::monitor window))))
          ;; Initialize the input manager.
          (input-manager (in::make-input-manager))
          ;; Create the root game object of the scene tree.

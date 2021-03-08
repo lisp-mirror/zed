@@ -1,8 +1,12 @@
 (in-package #:cl-user)
 
 (defpackage #:%zed.base.clock
+  ;; Third-party aliases
   (:local-nicknames
    (#:u #:golden-utils))
+  ;; Internal aliases
+  (:local-nicknames
+   (#:cfg #:%zed.base.config))
   (:use #:cl))
 
 (in-package #:%zed.base.clock)
@@ -35,9 +39,10 @@
           (running-time clock)
           (fps/current clock)))
 
-(defun make-clock (delta-time)
-  (%make-clock :init-time (get-internal-real-time)
-               :delta-time (float delta-time 1f0)))
+(defun make-clock (config refresh-rate)
+  (let ((delta-time (float (or (cfg::delta-time config) (/ refresh-rate)) 1f0)))
+    (%make-clock :init-time (get-internal-real-time)
+                 :delta-time delta-time)))
 
 (declaim (inline get-time))
 (defun get-time (clock)

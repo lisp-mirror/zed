@@ -19,10 +19,10 @@
   ((:module "base"
     :components
     ((:file "debug")
+     (:file "config")
      (:file "thread-pool")
      (:file "clock")
-     (:file "live-coding")
-     (:file "config")))
+     (:file "live-coding")))
    (:module "render"
     :components
     ((:file "gl-context")
