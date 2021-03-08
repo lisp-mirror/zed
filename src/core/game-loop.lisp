@@ -11,6 +11,7 @@
    (#:in #:%zed.input)
    (#:live #:%zed.base.live-coding)
    (#:mon #:%zed.render-backend.monitor)
+   (#:tp #:%zed.base.thread-pool)
    (#:tr #:%zed.core.transform)
    (#:tree #:%zed.core.tree)
    (#:win #:%zed.render-backend.window))
@@ -48,18 +49,19 @@
     ;; last run from being cleaned up at runtime causing frame drops.
     (tg:gc :full t)
     ;; Actually start the main game loop.
-    (u:while (ctx::running-p context)
-      (live::with-continuable (clock)
-        (in::handle-events input-manager window)
-        ;; HACK: Remove this later when possible. This is just so we can easily stop the engine with
-        ;; the Escape key.
-        (when (in::on-button-enter input-manager :key :escape)
-          (ctx::shutdown context))
-        ;; Perform one clock tick.
-        (clock::tick clock refresh-rate physics-func periodic-func)
-        ;; TODO: updates go here.
-        ;;
-        ;; Draw this frame to the window.
-        (win::draw window)
-        ;; Increment the frame counter at the end of the frame.
-        (clock::count-frame clock)))))
+    (tp::with-thread-pool
+      (u:while (ctx::running-p context)
+        (live::with-continuable (clock)
+          (in::handle-events input-manager window)
+          ;; HACK: Remove this later when possible. This is just so we can easily stop the engine with
+          ;; the Escape key.
+          (when (in::on-button-enter input-manager :key :escape)
+            (ctx::shutdown context))
+          ;; Perform one clock tick.
+          (clock::tick clock refresh-rate physics-func periodic-func)
+          ;; TODO: updates go here.
+          ;;
+          ;; Draw this frame to the window.
+          (win::draw window)
+          ;; Increment the frame counter at the end of the frame.
+          (clock::count-frame clock))))))

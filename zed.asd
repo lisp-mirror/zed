@@ -4,8 +4,10 @@
   :license "MIT"
   :source-control (:git "https://git.mfiano.net/mfiano/zed.git")
   :encoding :utf-8
-  :depends-on (#:cl-opengl
+  :depends-on (#:cl-cpus
+               #:cl-opengl
                #:golden-utils
+               #:lparallel
                #:origin
                #:sdl2
                #:trivial-garbage)
@@ -15,6 +17,7 @@
   ((:module "base"
     :components
     ((:file "debug")
+     (:file "thread-pool")
      (:file "clock")
      (:file "live-coding")
      (:file "config")))
