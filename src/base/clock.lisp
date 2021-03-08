@@ -118,7 +118,8 @@
     (smooth-delta-time clock refresh-rate)
     ;; Advance N physics steps according to how much time is in the accumulator.
     (advance-physics clock update-func)
-    ;; Run the periodic updates if it is time to do so.
+    ;; Run the periodic updates if it is time to do so, but only during debug mode.
+    #-zed.release
     (when (>= (- current (period-elapsed clock)) (period-interval clock))
       (funcall periodic-func)
       (setf (period-elapsed clock) current))
