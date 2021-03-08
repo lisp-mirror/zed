@@ -34,7 +34,7 @@
   ;; The depth this game object exists into the scene tree.
   (depth 1 :type u:ub16)
   ;; Whether the game object is currently enabled.
-  (enabled-p t :type boolean)
+  (enabled-p nil :type boolean)
   ;; Whether the game object is currently paused.
   (paused-p nil :type boolean)
   ;; Determines if the game object and its children should be paused when the game is paused.
@@ -49,4 +49,4 @@
   (format stream "GAME-OBJECT: ~a" (path game-object)))
 
 (defun make-root ()
-  (make-game-object :label "[ROOT]" :path "/" :root-p t :depth 0 :pause-mode :pause))
+  (make-game-object :label "[ROOT]" :path "/" :root-p t :depth 0 :enabled-p t :pause-mode :pause))
