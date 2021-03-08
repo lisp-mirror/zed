@@ -44,6 +44,16 @@
   (* (- (get-internal-real-time) (init-time clock))
      #.(/ (float internal-time-units-per-second 1d0))))
 
+;; Adjust the clock's pause time when live coding interferes with clock's running time. This is
+;; called when exiting the debugger, or after evaluating REPL forms, in order to subtract any time
+;; spent in the debugger or evaluating REPL functions from the running time of the game clock.
+(u:fn-> adjust-pause-time (clock u:f64) u:f32)
+(declaim (inline adjust-pause-time))
+(defun adjust-pause-time (clock time)
+  (let ((adjusted (- (get-time clock) time)))
+    (setf (pause-time clock) adjusted)
+    (float adjusted 1f0)))
+
 ;; Perform delta-time smoothing, as per https://frankforce.com/frame-rate-delta-buffering/
 (u:fn-> smooth-delta-time (clock u:ub8) null)
 (defun smooth-delta-time (clock refresh-rate)
