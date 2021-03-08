@@ -85,7 +85,7 @@
               (fps/average clock) fps))
     nil))
 
-;; Advanced the physics simulation forward: https://gafferongames.com/post/fix_your_timestep/
+;; Advance the physics simulation forward: https://gafferongames.com/post/fix_your_timestep/
 (u:fn-> advance-physics (clock function) null)
 (declaim (inline advance-physics))
 (defun advance-physics (clock func)

@@ -57,6 +57,8 @@
           (ctx::shutdown context))
         ;; Perform one clock tick.
         (clock::tick clock refresh-rate physics-func periodic-func)
+        ;; TODO: updates go here.
+        ;;
         ;; Draw this frame to the window.
         (win::draw window)
         ;; Increment the frame counter at the end of the frame.
