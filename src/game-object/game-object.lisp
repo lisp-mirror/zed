@@ -11,6 +11,8 @@
 
 (in-package #:%zed.game-object)
 
+(deftype pause-mode () '(member :pause :ignore :inherit))
+
 (declaim (inline make-game-object))
 (defstruct (game-object
             (:conc-name nil)
@@ -39,7 +41,7 @@
   ;; :pause - The game object and its children are paused when the game is paused.
   ;; :ignore - The game object and its children continue to update when the game is paused.
   ;; :inherit - The pause mode for the game object is the pause mode of its parent game object.
-  (pause-mode :inherit :type (member :pause :ignore :inherit))
+  (pause-mode :inherit :type pause-mode)
   ;; The transform state of the game object.
   (transform (trs::make-state) :type trs::state))
 

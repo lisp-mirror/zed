@@ -30,7 +30,7 @@
 ;; `:ignore`, or `:inherit`, and #their behavior is documented in the struct definition at the top
 ;; of this file.
 (u:fn-> make-game-object
-        (&key (:label string) (:disabled-p boolean) (:pause-mode (member :pause :ignore :inherit)))
+        (&key (:label string) (:disabled-p boolean) (:pause-mode gob::pause-mode))
         gob::game-object)
 (defun make-game-object (&key (label "[NO-LABEL]") disabled-p (pause-mode :inherit))
   (declare (optimize speed))
