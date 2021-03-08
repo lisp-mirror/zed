@@ -5,6 +5,7 @@
    (#:cfg #:%zed.base.config)
    (#:ctx #:%zed.core.context)
    (#:gob #:%zed.game-object)
+   (#:live #:%zed.base.live-coding)
    (#:loop #:%zed.core.game-loop)
    (#:tree #:%zed.core.tree))
   (:use #:cl)
@@ -22,6 +23,10 @@
   ;; Create the context, initialized with any user-supplied options.
   (let* ((context (ctx::make-context (apply #'cfg::make-config options)))
          (ctx::*context* context))
+    ;; Emulate this function returning by sending the context value to the REPL. This only works on
+    ;; Sly, and only if it is configured to allow sending code to the REPL. See:
+    ;; https://joaotavora.github.io/sly/#Controlling-SLY-from-outside-Emacs
+    (live::send-to-repl (list context) :comment "")
     ;; Start the main game loop.
     (unwind-protect (loop::start context)
       ;; If we reached this point it means the main game loop has terminated, so clean up the state
