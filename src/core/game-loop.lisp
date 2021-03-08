@@ -18,13 +18,14 @@
 
 (in-package #:%zed.core.game-loop)
 
-;; Return a function that is called periodically to perform necessary book-keeping that does not
+;; Create a function that is called periodically to perform necessary book-keeping that does not
 ;; need to run every frame.
 (defun make-periodic-update-function (context)
   (lambda ()
     (live::update-repl (ctx::clock context))))
 
-;;
+;; Create a function that is called every clock tick to update the transform state of each game
+;; object.
 (defun make-physics-update-function (context)
   (let ((scene-tree (ctx::scene-tree context))
         (delta-time (clock::delta-time (ctx::clock context))))
