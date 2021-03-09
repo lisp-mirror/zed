@@ -11,6 +11,7 @@
    (#:gob #:%zed.game-object)
    (#:in #:%zed.input)
    (#:in.man #:%zed.input.manager)
+   (#:jobs #:%zed.game-object.jobs)
    (#:live #:%zed.base.live-coding)
    (#:mon #:%zed.render.monitor)
    (#:shd #:%zed.render.shader-program)
@@ -30,7 +31,8 @@
   (window nil :type win::window)
   (clock nil :type clock::clock)
   (input-manager nil :type in.man::manager)
-  (scene-tree nil :type gob::game-object))
+  (scene-tree nil :type gob::game-object)
+  (jobs nil :type jobs::jobs))
 
 ;;; The current context is bound to this variable throughout the lifetime of the game. However, this
 ;;; should not be used in code. This only exists for internal debugging purposes. It is a core
@@ -56,7 +58,10 @@
          ;; Initialize the input manager.
          (input-manager (in::make-input-manager))
          ;; Create the root game object of the scene tree.
-         (scene-tree (gob::make-root)))
+         (scene-tree (gob::make-root))
+         ;; Create the jobs structure, which is used to add future work that needs to be performed
+         ;; on game objects.
+         (jobs (jobs::make-jobs)))
     ;; Setup live coding support. This instructs SLIME or Sly's REPL to run inside our game loop.
     (live::setup-repl)
     ;; Register all defined shader programs with the thread pool so they are updated when recompiled
@@ -68,7 +73,8 @@
                    :clock clock
                    :window window
                    :input-manager input-manager
-                   :scene-tree scene-tree)))
+                   :scene-tree scene-tree
+                   :jobs jobs)))
 
 ;; This is called when the main game loop exits to destroy the context. All code should call
 ;; #'shutdown instead, which initiates a graceful shutdown of the context.

@@ -34,7 +34,7 @@
   ;; The depth this game object exists into the scene tree.
   (depth 1 :type u:ub16)
   ;; Whether the game object is currently enabled.
-  (enabled-p nil :type boolean)
+  (enabled-p t :type boolean)
   ;; Whether the game object is currently paused.
   (paused-p nil :type boolean)
   ;; Determines if the game object and its children should be paused when the game is paused.
@@ -43,10 +43,12 @@
   ;; :inherit - The pause mode for the game object is the pause mode of its parent game object.
   (pause-mode :inherit :type pause-mode)
   ;; The transform state of the game object.
-  (transform (trs::make-state) :type trs::state))
+  (transform (trs::make-state) :type trs::state)
+  ;; A list of traits attached to this game object.
+  (traits nil :type list))
 
 (u:define-printer (game-object stream :type nil)
   (format stream "GAME-OBJECT: ~a" (path game-object)))
 
 (defun make-root ()
-  (make-game-object :label "[ROOT]" :path "/" :root-p t :depth 0 :enabled-p t :pause-mode :pause))
+  (make-game-object :label "[ROOT]" :path "/" :root-p t :depth 0 :pause-mode :pause))

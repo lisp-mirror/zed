@@ -9,6 +9,7 @@
    (#:clock #:%zed.base.clock)
    (#:ctx #:%zed.core.context)
    (#:in #:%zed.input)
+   (#:jobs #:%zed.game-object.jobs)
    (#:live #:%zed.base.live-coding)
    (#:mon #:%zed.render.monitor)
    (#:tp #:%zed.base.thread-pool)
@@ -35,6 +36,14 @@
       (tree::walk-tree (x scene-tree)
         (tr::transform-game-object x delta-time)))))
 
+(u:fn-> update (ctx::context) null)
+(defun update (context)
+  (declare (optimize speed))
+  (let ((jobs (ctx::jobs context)))
+    (jobs::update-enabled-traits jobs)
+    (jobs::update-disabled-traits jobs)
+    nil))
+
 (defun start (context)
   (declare (optimize speed))
   ;; Hold on to some variables before we enter the main game loop, since they are needed each
@@ -60,8 +69,8 @@
             (ctx::shutdown context))
           ;; Perform one clock tick.
           (clock::tick clock refresh-rate physics-func periodic-func)
-          ;; TODO: updates go here.
-          ;;
+          ;; Perform update logic that needs to occur each frame.
+          (update context)
           ;; Draw this frame to the window.
           (win::draw window)
           ;; Increment the frame counter at the end of the frame.

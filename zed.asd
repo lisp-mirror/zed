@@ -41,13 +41,16 @@
    (:module "game-object"
     :components
     ((:file "transform-state")
-     (:file "game-object")))
+     (:file "game-object")
+     (:file "jobs")))
    (:module "core"
     :components
     ((:file "context")
      (:file "transform")
      (:file "tree")
+     (:file "trait")
      (:file "game-loop")))
+   (:module "trait")
    (:module "protocol"
     :components
     ((:file "input")
