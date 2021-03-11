@@ -27,7 +27,7 @@
 
 (u:define-constant +depth-mode+ :less)
 
-(u:define-constant +polygon-mode+ '(:front-and-back :fill) :test #'equal)
+(u:define-constant +polygon-mode+ :fill)
 
 ;; Prepare the OpenGL context. This must be called before an SDL2 window is created, as it informs
 ;; SDL2 how the context is to be configured when the window is created.
