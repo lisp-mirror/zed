@@ -69,10 +69,9 @@
                 `(:priority ,priority))
             ,@(u:mappend
                (lambda (x)
-                 (destructuring-bind (option value) x
-                   (ecase option
-                     ((:setup-hook :attach-hook :detach-hook :update-hook)
-                      `(,option ,value)))))
+                 (ecase (car x)
+                   ((:setup-hook :attach-hook :detach-hook :update-hook)
+                    x)))
                options))))))
 
 ;; Create an instance of a trait of the given type. Slow path, for when the type is not a quoted
