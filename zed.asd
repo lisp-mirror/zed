@@ -6,6 +6,7 @@
   :encoding :utf-8
   :depends-on (#:cl-cpus
                #:cl-opengl
+               #:closer-mop
                #:golden-utils
                #:lparallel
                #:origin
@@ -22,7 +23,8 @@
      (:file "config")
      (:file "thread-pool")
      (:file "clock")
-     (:file "live-coding")))
+     (:file "live-coding")
+     (:file "ordered-class")))
    (:module "render"
     :components
     ((:file "gl-context")
