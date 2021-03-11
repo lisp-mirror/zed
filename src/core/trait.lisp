@@ -57,7 +57,7 @@
     (:order #.+slot-order+)))
 
 (u:define-printer (trait stream :type nil)
-  (format stream "~s" (class-name (class-of trait))))
+  (format stream "TRAIT: ~s" (class-name (class-of trait))))
 
 (defmacro define-trait (type (&key priority) &body (slots . options))
   `(oc::define-ordered-class ,type (trait)
