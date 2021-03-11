@@ -8,41 +8,72 @@
   (:local-nicknames
    (#:ctx #:%zed.core.context)
    (#:jobs #:%zed.game-object.jobs)
-   (#:gob #:%zed.game-object))
+   (#:gob #:%zed.game-object)
+   (#:oc #:%zed.base.ordered-class))
   (:use #:cl))
 
 (in-package #:%zed.core.trait)
 
-(defstruct (trait
-            (:constructor nil)
-            (:conc-name nil)
-            (:predicate nil)
-            (:copier nil))
-  (context nil :type ctx::context)
-  (owner nil :type (or gob::game-object null))
-  (priority #.(1- (expt 2 32)) :type u:ub32)
-  (setup-hook (constantly nil) :type function)
-  (attach-hook (constantly nil) :type function)
-  (detach-hook (constantly nil) :type function)
-  (update-hook (constantly nil) :type function))
+(u:define-constant +slot-order+
+    '(%context %owner %priority %setup-hook %attach-hook %detach-hook %update-hook)
+  :test #'equal)
+
+(u:eval-always
+  (oc::define-ordered-class trait ()
+    ((%context :reader context
+               :initarg :context
+               :inline t
+               :type ctx::context)
+     (%owner :accessor owner
+             :inline t
+             :type (or gob::game-object null)
+             :initarg :owner
+             :initform nil)
+     (%priority :reader priority
+                :inline t
+                :type u:ub32
+                :initarg :priority
+                :initform #.(1- (expt 2 32)))
+     (%setup-hook :reader setup-hook
+                  :inline t
+                  :type function
+                  :initarg :setup-hook
+                  :initform (constantly nil))
+     (%attach-hook :reader attach-hook
+                   :inline t
+                   :type function
+                   :initarg :attach-hook
+                   :initform (constantly nil))
+     (%detach-hook :reader detach-hook
+                   :inline t
+                   :type function
+                   :initarg :detach-hook
+                   :initform (constantly nil))
+     (%update-hook :reader update-hook
+                   :inline t
+                   :type function
+                   :initarg :update-hook
+                   :initform (constantly nil)))
+    (:order #.+slot-order+)))
 
 (u:define-printer (trait stream :type nil)
   (format stream "~s" (class-name (class-of trait))))
 
-(defmacro define-trait (type (&key priority) &body (slots &optional options))
-  (destructuring-bind (&key setup-hook attach-hook detach-hook update-hook) options
-    `(defstruct (,type
-                 (:include trait
-                  (:priority ,(or priority #.(1- (expt 2 32))))
-                  (:setup-hook ,(or setup-hook '(constantly nil)))
-                  (:attach-hook ,(or attach-hook '(constantly nil)))
-                  (:detach-hook ,(or detach-hook '(constantly nil)))
-                  (:update-hook ,(or update-hook '(constantly nil))))
-                 (:constructor ,(u:symbolicate '#:make- type) (context &key ,@(mapcar #'car slots)))
-                 (:conc-name "")
-                 (:predicate nil)
-                 (:copier nil))
-       ,@slots)))
+(defmacro define-trait (type (&key priority) &body (slots . options))
+  `(oc::define-ordered-class ,type (trait)
+     ,slots
+     (:order #.+slot-order+)
+     ,@(when options
+         `((:default-initargs
+            ,@(when priority
+                `(:priority ,priority))
+            ,@(u:mappend
+               (lambda (x)
+                 (destructuring-bind (option value) x
+                   (ecase option
+                     ((:setup-hook :attach-hook :detach-hook :update-hook)
+                      `(,option ,value)))))
+               options))))))
 
 ;; Create an instance of a trait of the given type. Slow path, for when the type is not a quoted
 ;; symbol.
@@ -50,7 +81,7 @@
 (defun make-trait (context type &rest args)
   (declare (optimize speed))
   (if (subtypep type 'trait)
-      (let ((trait (apply (fdefinition (u:symbolicate '#:make- type)) context args)))
+      (let ((trait (apply #'make-instance type :context context args)))
         (funcall (setup-hook trait) trait)
         trait)
       (error "Trait type ~s is not defined." type)))
@@ -60,11 +91,10 @@
   (u:with-gensyms (trait)
     (if (and (consp type)
              (eq (car type) 'quote))
-        (let* ((type (cadr type))
-               (func (u:format-symbol (symbol-package type) "MAKE-~a" type)))
+        (let ((type (cadr type)))
           (unless (subtypep type 'trait)
             (error "Trait type ~s is not defined." type))
-          `(let ((,trait (,func ,context ,@args)))
+          `(let ((,trait (make-instance ',type :context ,context ,@args)))
              (funcall (setup-hook ,trait) ,trait)
              ,trait))
         whole)))
