@@ -6,12 +6,12 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:ctx #:%zed.core.context)
+   (#:ctx #:%zed.context)
    (#:in #:%zed.input)
    (#:man #:%zed.input.manager)
    (#:mouse #:%zed.input.mouse)
    (#:tr #:%zed.input.transition)
-   (#:win #:%zed.render.window))
+   (#:win #:%zed.window))
   (:use #:cl)
   (:export
    #:disable-relative-mouse-mode

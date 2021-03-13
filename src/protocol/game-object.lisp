@@ -6,10 +6,10 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:ctx #:%zed.core.context)
-   (#:dbg #:%zed.base.debug)
+   (#:ctx #:%zed.context)
+   (#:dbg #:%zed.debug)
    (#:gob #:%zed.game-object)
-   (#:tree #:%zed.core.tree))
+   (#:tree #:%zed.tree))
   (:use #:cl)
   (:export
    #:game-object-enabled-p

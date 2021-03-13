@@ -2,12 +2,12 @@
 
 (defpackage #:%zed.protocol.core
   (:local-nicknames
-   (#:cfg #:%zed.base.config)
-   (#:ctx #:%zed.core.context)
+   (#:cfg #:%zed.config)
+   (#:ctx #:%zed.context)
    (#:gob #:%zed.game-object)
-   (#:live #:%zed.base.live-coding)
-   (#:loop #:%zed.core.game-loop)
-   (#:tree #:%zed.core.tree))
+   (#:live #:%zed.live-coding)
+   (#:loop #:%zed.game-loop)
+   (#:tree #:%zed.tree))
   (:use #:cl)
   (:export
    #:pause-game

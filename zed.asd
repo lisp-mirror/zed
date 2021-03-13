@@ -4,55 +4,70 @@
   :license "MIT"
   :source-control (:git "https://git.mfiano.net/mfiano/zed.git")
   :encoding :utf-8
-  :depends-on (#:cl-cpus
+  :depends-on (#:babel
+               #:cffi
+               #:cl-cpus
                #:cl-opengl
+               #:cl-slug
                #:closer-mop
+               #:global-vars
                #:golden-utils
                #:lparallel
                #:origin
+               #:pngload
                #:sdl2
                #:shadow
+               #:split-sequence
                #:trivial-garbage
+               #:uiop
                #:umbra)
   :pathname "src"
   :serial t
   :components
-  ((:module "base"
-    :components
-    ((:file "debug")
-     (:file "config")
-     (:file "thread-pool")
-     (:file "clock")
-     (:file "live-coding")
-     (:file "ordered-class")))
-   (:module "render"
-    :components
-    ((:file "gl-context")
-     (:file "monitor")
-     (:file "window")
-     (:file "shader-program")))
-   (:module "input"
-    :components
-    ((:file "manager")
-     (:file "transition")
-     (:file "keyboard")
-     (:file "mouse")
-     (:file "gamepad")
-     (:file "window")
-     (:file "input")))
-   (:module "game-object"
-    :components
-    ((:file "transform-state")
-     (:file "game-object")
-     (:file "jobs")))
-   (:module "core"
-    :components
-    ((:file "context")
-     (:file "transform")
-     (:file "tree")
-     (:file "trait")
-     (:file "game-loop")))
-   (:module "trait")
+  ((:file "debug")
+   (:file "ordered-class")
+   (:file "config")
+   (:file "thread-pool")
+   (:file "clock")
+   (:file "live-coding")
+   (:file "opengl")
+   (:file "monitor")
+   (:file "window")
+   (:file "shader-program")
+   (:file "input-manager")
+   (:file "input-transition")
+   (:file "input-keyboard")
+   (:file "input-mouse")
+   (:file "input-gamepad")
+   (:file "input-window")
+   (:file "input")
+   (:file "transform-state")
+   (:file "game-object")
+   (:file "jobs")
+   (:file "context")
+   (:file "asset-pool")
+   (:file "image")
+   (:file "image-png")
+   (:file "image-hdr")
+   (:file "transform")
+   (:file "tree")
+   (:file "trait")
+   (:file "trait-camera")
+   (:file "trait-render")
+   (:file "texture-data")
+   (:file "texture")
+   (:file "texture-2d")
+   (:file "texture-2d-array")
+   (:file "texture-cube-map")
+   (:file "texture-cube-map-array")
+   (:file "framebuffer-data")
+   (:file "framebuffer")
+   (:file "material-data")
+   (:file "material-definition")
+   (:file "material-uniform")
+   (:file "render")
+   (:file "material")
+   (:file "game-loop")
    (:module "protocol"
     :components
     ((:file "input")
