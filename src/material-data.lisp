@@ -8,7 +8,7 @@
   ;; Internal aliases
   (:local-nicknames
    (#:fb #:%zed.framebuffer)
-   (#:fbd #:%zed.framebuffer.data))
+   (#:fb.data #:%zed.framebuffer.data))
   (:use #:cl)
   (:shadow
    #:find))
@@ -17,8 +17,8 @@
 
 (glob:define-global-var =data= (u:dict #'eq))
 
-(defstruct (material
-            (:constructor %make-material)
+(defstruct (data
+            (:constructor %make-data)
             (:conc-name nil)
             (:predicate nil)
             (:copier nil))
@@ -33,8 +33,8 @@
   (attachments nil :type list)
   (render-func (constantly nil) :type function))
 
-(u:define-printer (material stream :type nil)
-  (format stream "MATERIAL-DATA: ~s" (name material)))
+(u:define-printer (data stream :type nil)
+  (format stream "MATERIAL-DATA: ~s" (name data)))
 
 (defun find (name)
   (or (u:href =data= name)
@@ -76,12 +76,12 @@
     (pushnew (name data) (slaves master))))
 
 (defun update-framebuffer-link (material-name framebuffer-name)
-  (u:do-hash-values (v fbd::=data=)
-    (dolist (framebuffer-material-name (fbd::materials v))
+  (u:do-hash-values (v fb.data::=data=)
+    (dolist (framebuffer-material-name (fb.data::materials v))
       (when (eq material-name framebuffer-material-name)
-        (u:deletef (fbd::materials v) framebuffer-material-name))))
+        (u:deletef (fb.data::materials v) framebuffer-material-name))))
   (when framebuffer-name
-    (push material-name (fbd::materials (fbd::find framebuffer-name)))))
+    (push material-name (fb.data::materials (fb.data::find framebuffer-name)))))
 
 (defun update (name master shader uniforms pass output func)
   (let* ((data (find name))
@@ -116,8 +116,8 @@
                     (or (attachments slave) (attachments master-data)))
               (render-func slave)))))
 
-(defun make-material (name master shader uniforms pass output func)
-  (let ((data (%make-material :name name)))
+(defun make-data (name master shader uniforms pass output func)
+  (let ((data (%make-data :name name)))
     (setf (u:href =data= name) data)
     (update name master shader uniforms pass output func)
     data))

@@ -6,8 +6,8 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:data #:%zed.material.data)
-   (#:fb #:%zed.framebuffer))
+   (#:fb #:%zed.framebuffer)
+   (#:mat.data #:%zed.material.data))
   (:use #:cl))
 
 (in-package #:%zed.material.definition)
@@ -17,7 +17,7 @@
             (:conc-name nil)
             (:predicate nil)
             (:copier nil))
-  (data nil :type data::material)
+  (data nil :type mat.data::data)
   (uniforms (u:dict #'eq) :type hash-table)
   (framebuffer nil :type (or fb::framebuffer null))
   (attachments nil :type list)
@@ -25,4 +25,4 @@
   (textures nil :type list))
 
 (u:define-printer (material stream :type nil)
-  (format stream "MATERIAL: ~s" (data::name (data material))))
+  (format stream "MATERIAL: ~s" (mat.data::name (data material))))

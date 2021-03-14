@@ -7,10 +7,10 @@
    (#:v4 #:origin.vec4))
   ;; Internal aliases
   (:local-nicknames
-   (#:asset #:%zed.asset-pool)
+   (#:ap #:%zed.asset-pool)
    (#:ctx #:%zed.context)
-   (#:data #:%zed.texture.data)
-   (#:img #:%zed.image))
+   (#:img #:%zed.image)
+   (#:tex.data #:%zed.texture.data))
   (:use #:cl)
   (:shadow
    #:load))
@@ -23,7 +23,7 @@
             (:predicate nil)
             (:copier nil))
   ;; TODO: maybe (or null) like Z
-  (data nil :type data::texture)
+  (data nil :type tex.data::data)
   (target :texture-2d :type keyword)
   (id 0 :type u:ub16)
   (width nil :type (or u:ub16 null))
@@ -31,12 +31,12 @@
   (materials nil :type list))
 
 (u:define-printer (texture stream :type nil)
-  (format stream "TEXTURE: ~s" (data::name (data texture))))
+  (format stream "TEXTURE: ~s" (tex.data::name (data texture))))
 
-(u:fn-> calculate-mipmap-levels (data::texture u:ub16 u:ub16) u:ub8)
+(u:fn-> calculate-mipmap-levels (tex.data::data u:ub16 u:ub16) u:ub8)
 (defun calculate-mipmap-levels (data width height)
   (declare (optimize speed))
-  (if (data::mipmaps-p data)
+  (if (tex.data::mipmaps-p data)
       (loop :for i :of-type fixnum :from 0
             :while (or (> (ash width (- i)) 1)
                        (> (ash height (- i)) 1))
@@ -57,14 +57,14 @@
         (target (target texture))
         (data (data texture)))
     (gl:bind-texture target id)
-    (when (data::mipmaps-p data)
+    (when (tex.data::mipmaps-p data)
       (gl:generate-mipmap target))
-    (u:do-plist (k v (data::parameters data))
+    (u:do-plist (k v (tex.data::parameters data))
       (gl:tex-parameter target k v))
     (gl:bind-texture target 0)
     nil))
 
-(u:fn-> load-framebuffer-texture (data::texture u:ub16 u:ub16) img::image)
+(u:fn-> load-framebuffer-texture (tex.data::data u:ub16 u:ub16) img::image)
 (declaim (inline load-framebuffer-texture))
 (defun load-framebuffer-texture (data width height)
   (declare (optimize speed))
@@ -72,9 +72,9 @@
    (img::load nil
               :width width
               :height height
-              :pixel-format (data::pixel-format data)
-              :pixel-type (data::pixel-type data)
-              :internal-format (data::internal-format data))))
+              :pixel-format (tex.data::pixel-format data)
+              :pixel-type (tex.data::pixel-type data)
+              :internal-format (tex.data::internal-format data))))
 
 (defgeneric update (type texture source))
 
@@ -86,7 +86,7 @@
       (unless (and (every #'img::width source-list)
                    (every #'img::height source-list))
         (error "Texture ~s does not have a width and height set."
-               (data::name data)))
+               (tex.data::name data)))
       loaded)))
 
 (u:fn-> make-target (keyword) keyword)
@@ -95,7 +95,7 @@
   (declare (optimize speed))
   (values (u:format-symbol :keyword "TEXTURE-~a" type)))
 
-(u:fn-> make-texture (data::texture keyword data::source) texture)
+(u:fn-> make-texture (tex.data::data keyword tex.data::source) texture)
 (defun make-texture (data type source)
   (declare (optimize speed))
   (let ((texture (%make-texture :data data :target (make-target type))))
@@ -106,10 +106,10 @@
         (ctx::context symbol &key (:width (or u:ub16 null)) (:height (or u:ub16 null)))
         texture)
 (defun load (context name &key width height)
-  (asset::with-asset-cache (context :texture name)
-      (let* ((data (data::find name))
-             (type (data::type data))
-             (source (load-source data type (data::source data) :width width :height height))
+  (ap::with-asset-cache (context :texture name)
+      (let* ((data (tex.data::find name))
+             (type (tex.data::type data))
+             (source (load-source data type (tex.data::source data) :width width :height height))
              (texture (make-texture data type source)))
         (configure texture)
         texture)))

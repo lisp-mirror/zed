@@ -6,8 +6,8 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:man #:%zed.input.manager)
-   (#:tr #:%zed.input.transition))
+   (#:in.man #:%zed.input.manager)
+   (#:in.tr #:%zed.input.transition))
   (:use #:cl))
 
 (in-package #:%zed.input.mouse)
@@ -26,10 +26,10 @@
 
 (u:define-constant +button-names+ #(nil :left :middle :right :x1 :x2) :test #'equalp)
 
-(u:fn-> reset-state (man::manager) null)
+(u:fn-> reset-state (in.man::manager) null)
 (defun reset-state (manager)
   (declare (optimize speed))
-  (let* ((states (man::states manager))
+  (let* ((states (in.man::states manager))
          (state (u:href states '(:mouse :motion))))
     (setf (u:href states '(:mouse :scroll-horizontal)) 0
           (u:href states '(:mouse :scroll-vertical)) 0
@@ -37,36 +37,36 @@
           (relative-y state) 0)
     nil))
 
-(u:fn-> button-up (man::manager u:ub32) null)
+(u:fn-> button-up (in.man::manager u:ub32) null)
 (declaim (inline button-up))
 (defun button-up (manager button)
   (declare (optimize speed))
-  (tr::out manager :mouse (aref +button-names+ button))
-  (tr::out manager :mouse :any)
+  (in.tr::out manager :mouse (aref +button-names+ button))
+  (in.tr::out manager :mouse :any)
   nil)
 
-(u:fn-> button-down (man::manager u:ub32) null)
+(u:fn-> button-down (in.man::manager u:ub32) null)
 (declaim (inline button-down))
 (defun button-down (manager button)
   (declare (optimize speed))
-  (tr::in manager :mouse (aref +button-names+ button))
-  (tr::in manager :mouse :any)
+  (in.tr::in manager :mouse (aref +button-names+ button))
+  (in.tr::in manager :mouse :any)
   nil)
 
-(u:fn-> wheel (man::manager u:b32 u:b32) null)
+(u:fn-> wheel (in.man::manager u:b32 u:b32) null)
 (defun wheel (manager x y)
   (declare (optimize speed))
-  (let ((states (man::states manager)))
+  (let ((states (in.man::states manager)))
     (unless (zerop x)
       (setf (u:href states '(:mouse :scroll-horizontal)) x))
     (unless (zerop y)
       (setf (u:href states '(:mouse :scroll-vertical)) y))
     nil))
 
-(u:fn-> move (man::manager u:ub16 u:b32 u:b32 u:b32 u:b32) null)
+(u:fn-> move (in.man::manager u:ub16 u:b32 u:b32 u:b32 u:b32) null)
 (defun move (manager window-height x y relative-x relative-y)
   (declare (optimize speed))
-  (let ((state (u:href (man::states manager) '(:mouse :motion)))
+  (let ((state (u:href (in.man::states manager) '(:mouse :motion)))
         (relative-mode-p (sdl2:relative-mouse-mode-p)))
     (unless relative-mode-p
       (setf (x state) x

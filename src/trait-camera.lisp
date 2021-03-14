@@ -12,7 +12,7 @@
   (:local-nicknames
    (#:ctx #:%zed.context)
    (#:gob #:%zed.game-object)
-   (#:trs #:%zed.transform-state)
+   (#:ts #:%zed.transform-state)
    (#:trait #:%zed.trait)
    (#:win #:%zed.window))
   (:use #:cl))
@@ -87,7 +87,7 @@
                     q:+id+
                     (v3:vec #.(- (asin (/ (sqrt 3)))) 0 const::pi/4)))))
     (%update-projection/orthographic camera)
-    (trs::initialize-rotation transform rotation)))
+    (ts::initialize-rotation transform rotation)))
 
 (defun update-projection (camera)
   (ecase (mode camera)
@@ -97,7 +97,7 @@
 
 (defun update-view (camera)
   (let* ((transform (gob::transform (trait::owner camera)))
-         (world-matrix (m4:copy (trs::world-matrix transform)))
+         (world-matrix (m4:copy (ts::world-matrix transform)))
          (view (view camera))
          (eye (m4:get-translation world-matrix))
          (target (v3:+ eye (v3:negate (m4:rotation-axis-to-vec3 world-matrix :z))))

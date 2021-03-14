@@ -6,8 +6,8 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:man #:%zed.input.manager)
-   (#:tr #:%zed.input.transition))
+   (#:in.mgr #:%zed.input.manager)
+   (#:in.tr #:%zed.input.transition))
   (:use #:cl))
 
 (in-package #:%zed.input.keyboard)
@@ -40,17 +40,17 @@
       :kbdillumtoggle :kbdillumdown :kbdillumup :eject :sleep)
   :test #'equalp)
 
-(u:fn-> up (man::manager u:ub32) null)
+(u:fn-> up (in.mgr::manager u:ub32) null)
 (declaim (inline up))
 (defun up (manager key)
   (declare (optimize speed))
-  (tr::out manager :key (aref +key-names+ key))
-  (tr::out manager :key :any)
+  (in.tr::out manager :key (aref +key-names+ key))
+  (in.tr::out manager :key :any)
   nil)
 
-(u:fn-> down (man::manager u:ub32) null)
+(u:fn-> down (in.mgr::manager u:ub32) null)
 (declaim (inline down))
 (defun down (manager key)
   (declare (optimize speed))
-  (tr::in manager :key (aref +key-names+ key))
-  (tr::in manager :key :any))
+  (in.tr::in manager :key (aref +key-names+ key))
+  (in.tr::in manager :key :any))

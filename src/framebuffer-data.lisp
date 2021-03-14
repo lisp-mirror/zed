@@ -18,8 +18,8 @@
 
 (deftype modes () '(member :read :write :read/write))
 
-(defstruct (framebuffer
-            (:constructor %make-framebuffer)
+(defstruct (data
+            (:constructor %make-data)
             (:conc-name nil)
             (:predicate nil)
             (:copier nil))
@@ -28,8 +28,8 @@
   (attachments (u:dict #'eq) :type hash-table)
   (materials nil :type list))
 
-(u:define-printer (framebuffer stream :type nil)
-  (format stream "FRAMEBUFFER-DATA: ~s" (name framebuffer)))
+(u:define-printer (data stream :type nil)
+  (format stream "FRAMEBUFFER-DATA: ~s" (name data)))
 
 (defstruct (attachment
             (:constructor %make-attachment)
@@ -73,8 +73,8 @@
       (destructuring-bind (name &key &allow-other-keys) x
         (setf (u:href attachment-data name) (make-attachment x))))))
 
-(defun make-framebuffer (name mode attachments)
-  (let ((data (%make-framebuffer :name name)))
+(defun make-data (name mode attachments)
+  (let ((data (%make-data :name name)))
     (setf (u:href =data= name) data)
     (update name mode attachments)
     data))
@@ -82,4 +82,4 @@
 (defmacro define-framebuffer (name (&key (mode :read/write)) &body body)
   `(if (u:href =data= ',name)
        (update ',name ',mode ',body)
-       (make-framebuffer ',name ',mode ',body)))
+       (make-data ',name ',mode ',body)))

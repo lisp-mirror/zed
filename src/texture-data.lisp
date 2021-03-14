@@ -20,8 +20,8 @@
 
 (deftype source () '(or list (integer 1 #.(expt 2 16))))
 
-(defstruct (texture
-            (:constructor %make-texture)
+(defstruct (data
+            (:constructor %make-data)
             (:conc-name nil)
             (:predicate nil)
             (:copier nil))
@@ -36,10 +36,10 @@
   (parameters nil :type list)
   (source nil :type source))
 
-(u:define-printer (texture stream :type nil)
-  (format stream "TEXTURE-DATA: ~s" (name texture)))
+(u:define-printer (data stream :type nil)
+  (format stream "TEXTURE-DATA: ~s" (name data)))
 
-(u:fn-> find (symbol) texture)
+(u:fn-> find (symbol) data)
 (declaim (inline find))
 (defun find (name)
   (declare (optimize speed))
@@ -60,8 +60,8 @@
           (source data) source)
     nil))
 
-(defun make-texture (name &rest args)
-  (let ((data (%make-texture :name name)))
+(defun make-data (name &rest args)
+  (let ((data (%make-data :name name)))
     (setf (u:href =data= name) data)
     (apply #'update name args)
     data))
@@ -117,5 +117,5 @@
       `(if (u:href =data= ',name)
            (update ',name ,type ',source ,width ,height ,pixel-format ,pixel-type ,internal-format
                    ,mipmaps-p ',parameters)
-           (make-texture ',name ,type ',source ,width ,height ,pixel-format ,pixel-type
-                         ,internal-format ,mipmaps-p ',parameters)))))
+           (make-data ',name ,type ',source ,width ,height ,pixel-format ,pixel-type
+                      ,internal-format ,mipmaps-p ',parameters)))))

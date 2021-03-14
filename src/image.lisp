@@ -6,7 +6,7 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:asset #:%zed.asset-pool))
+   (#:ap #:%zed.asset-pool))
   (:use #:cl)
   (:shadow
    #:load))
@@ -47,5 +47,5 @@
               :internal-format internal-format))
 
 (defmethod load (asset &key)
-  (let ((path (asset::resolve-path asset)))
+  (let ((path (ap::resolve-path asset)))
     (%load (get-type path) path)))

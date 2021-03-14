@@ -8,8 +8,8 @@
   ;; Internal aliases
   (:local-nicknames
    (#:img #:%zed.image)
-   (#:td #:%zed.texture.data)
-   (#:tex #:%zed.texture))
+   (#:tex #:%zed.texture)
+   (#:tex.data #:%zed.texture.data))
   (:use #:cl))
 
 (in-package #:%zed.texture.2d-array)
@@ -51,9 +51,9 @@
     ((null source)
      (list (tex::load-framebuffer-texture data width height)))
     ((typep source '(integer 1 #.most-positive-fixnum))
-     (loop :repeat (td::source data)
+     (loop :repeat (tex.data::source data)
            :collect (tex::load-framebuffer-texture data width height)))
     ((and (typep source 'u:proper-list)
           (every #'listp source))
      (lp:pmapcar #'img::load source))
-    (t (error "Unsupported source for 2D array texture: ~s." (td::name data)))))
+    (t (error "Unsupported source for 2D array texture: ~s." (tex.data::name data)))))

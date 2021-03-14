@@ -7,8 +7,8 @@
   ;; Internal aliases
   (:local-nicknames
    (#:ctx #:%zed.context)
-   (#:jobs #:%zed.jobs)
    (#:gob #:%zed.game-object)
+   (#:jobs #:%zed.jobs)
    (#:oc #:%zed.ordered-class))
   (:use #:cl)
   (:shadow

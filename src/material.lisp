@@ -7,42 +7,43 @@
   ;; Internal aliases
   (:local-nicknames
    (#:ctx #:%zed.context)
-   (#:data #:%zed.material.data)
    (#:fb #:%zed.framebuffer)
    (#:gob #:%zed.game-object)
-   (#:matdef #:%zed.material.definition)
+   (#:mat.data #:%zed.material.data)
+   (#:mat.def #:%zed.material.definition)
    (#:ogl #:%zed.opengl)
-   (#:ren #:%zed.trait.render)
    (#:trait #:%zed.trait)
+   (#:tr.ren #:%zed.trait.render)
    (#:uni #:%zed.material.uniform))
   (:use #:cl))
 
 (in-package #:%zed.material)
 
-(u:fn-> ensure-framebuffer (ctx::context matdef::material) null)
+(u:fn-> ensure-framebuffer (ctx::context mat.def::material) null)
 (defun ensure-framebuffer (context material)
   (declare (optimize speed))
-  (u:when-let* ((data (matdef::data material))
-                (framebuffer-name (data::framebuffer data))
+  (u:when-let* ((data (mat.def::data material))
+                (framebuffer-name (mat.data::framebuffer data))
                 (framebuffer (fb::load context framebuffer-name))
-                (attachments (fb::attachment-names->points framebuffer (data::attachments data))))
+                (attachments (fb::attachment-names->points framebuffer
+                                                           (mat.data::attachments data))))
     ;; TODO: The check for valid framebuffer in ndjinn is not correct.
-    (setf (matdef::framebuffer material) framebuffer
-          (matdef::attachments material) attachments)
+    (setf (mat.def::framebuffer material) framebuffer
+          (mat.def::attachments material) attachments)
     nil))
 
-(u:fn-> make-material (ctx::context symbol) matdef::material)
+(u:fn-> make-material (ctx::context symbol) mat.def::material)
 (defun make-material (context type)
   (declare (optimize speed))
   (let* ((materials (ctx::materials context))
-         (data (data::find type))
-         (material (matdef::%make-material :data data)))
+         (data (mat.data::find type))
+         (material (mat.def::%make-material :data data)))
     (uni::make-material-uniforms context material)
     (ensure-framebuffer context material)
     (setf (u:href materials type) material)
     material))
 
-(u:fn-> ensure-material (ctx::context symbol) matdef::material)
+(u:fn-> ensure-material (ctx::context symbol) mat.def::material)
 (declaim (inline ensure-material))
 (defun ensure-material (context type)
   (declare (optimize speed))
@@ -60,9 +61,9 @@
             (polygon-mode (and (not (eq polygon-mode ogl::+polygon-mode+)) polygon-mode)))
         `(lambda (,render-trait)
            (let ((,game-object (trait::owner ,render-trait))
-                 (,material (ren::current-material ,render-trait)))
+                 (,material (tr.ren::current-material ,render-trait)))
              (fb::with-framebuffer (framebuffer ,material) (:attachments (attachments ,material))
-               (shadow:with-shader (data::shader (data ,material))
+               (shadow:with-shader (mat.data::shader (data ,material))
                  ,@(when enable
                      `((gl:enable ,@enable)))
                  ,@(when disable
@@ -79,11 +80,11 @@
                      `((gl:point-size ,point-size)))
                  (dolist (x (gob::traits ,game-object))
                    (funcall (fdefinition (trait::pre-render-hook x)) x))
-                 (u:do-hash-values (v (matdef::uniforms ,material))
+                 (u:do-hash-values (v (mat.def::uniforms ,material))
                    (uni::resolve-func ,game-object v))
                  (dolist (x (gob::traits ,game-object))
                    (funcall (fdefinition (trait::render-hook x)) x))
-                 (setf (matdef::texture-unit-state ,material) 0)
+                 (setf (mat.def::texture-unit-state ,material) 0)
                  ,@(when disable
                      `((gl:enable ,@disable)))
                  ,@(when enable
@@ -104,5 +105,5 @@
     (u:with-gensyms (func)
       `(let ((,func ,(generate-render-func features)))
          (if (u:href =data= ',name)
-             (data::update ',name ',master ',shader (list ,@uniforms) ',pass ',output ,func)
-             (data::make-material ',name ',master ',shader (list ,@uniforms) ',pass ',output ,func))))))
+             (mat.data::update ',name ',master ',shader (list ,@uniforms) ',pass ',output ,func)
+             (mat.data::make-data ',name ',master ',shader (list ,@uniforms) ',pass ',output ,func))))))

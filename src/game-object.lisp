@@ -6,7 +6,7 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:trs #:%zed.transform-state))
+   (#:ts #:%zed.transform-state))
   (:use #:cl))
 
 (in-package #:%zed.game-object)
@@ -43,7 +43,7 @@
   ;; :inherit - The pause mode for the game object is the pause mode of its parent game object.
   (pause-mode :inherit :type pause-mode)
   ;; The transform state of the game object.
-  (transform (trs::make-state) :type trs::state)
+  (transform (ts::make-state) :type ts::state)
   ;; A list of traits attached to this game object.
   (traits nil :type list))
 

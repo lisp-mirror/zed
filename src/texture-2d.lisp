@@ -7,8 +7,8 @@
   ;; Internal aliases
   (:local-nicknames
    (#:img #:%zed.image)
-   (#:td #:%zed.texture.data)
-   (#:tex #:%zed.texture))
+   (#:tex #:%zed.texture)
+   (#:tex.data #:%zed.texture.data))
   (:use #:cl))
 
 (in-package #:%zed.texture.2d)
@@ -45,5 +45,5 @@
     ((or null (integer 1 1))
      (tex::load-framebuffer-texture data width height))
     (list
-     (img::load (td::source data)))
-    (t (error "Unsupported source for 2D texture: ~s." (td::name data)))))
+     (img::load (tex.data::source data)))
+    (t (error "Unsupported source for 2D texture: ~s." (tex.data::name data)))))

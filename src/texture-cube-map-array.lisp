@@ -8,7 +8,6 @@
   ;; Internal aliases
   (:local-nicknames
    (#:img #:%zed.image)
-   (#:td #:%zed.texture.data)
    (#:tex #:%zed.texture))
   (:use #:cl))
 

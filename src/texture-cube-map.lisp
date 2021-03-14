@@ -8,8 +8,8 @@
   ;; Internal aliases
   (:local-nicknames
    (#:img #:%zed.image)
-   (#:td #:%zed.texture.data)
-   (#:tex #:%zed.texture))
+   (#:tex #:%zed.texture)
+   (#:tex.data #:%zed.texture.data))
   (:use #:cl))
 
 (in-package #:%zed.texture.cube-map)
@@ -64,4 +64,4 @@
              :collect v :into result
              :finally (destructuring-bind (&key x+ x- y+ y- z+ z-) result
                         (return (lp:pmapcar #'img::load (list x+ x- y+ y- z+ z-))))))
-      (t (error "Unsupported source for cube map texture: ~s." (td::name data))))))
+      (t (error "Unsupported source for cube map texture: ~s." (tex.data::name data))))))
