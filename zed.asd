@@ -68,8 +68,9 @@
    (:file "render")
    (:file "material")
    (:file "game-loop")
-   (:module "protocol"
+   (:module "interface"
     :components
-    ((:file "input")
-     (:file "game-object")
-     (:file "core")))))
+    ((:file "package")
+     (:file "core")
+     (:file "input")
+     (:file "game-object")))))

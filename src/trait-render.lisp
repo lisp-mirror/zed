@@ -16,7 +16,7 @@
                :initarg :materials)
    (%current-material :accessor current-material
                       :initform nil))
-  (:attach-hook #'attach))
+  (:attach-hook attach))
 
 (defun attach (trait)
   (print trait))

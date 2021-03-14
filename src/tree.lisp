@@ -156,5 +156,18 @@
     (insert context child game-object))
   game-object)
 
+;; Pause the game associated with the given context. Only game objects that are marked as pausable
+;; stop updating, allowing menus and any other game objects that wish to be interactive to be so.
+(defun pause-game (context)
+  (walk-tree (x (ctx::scene-tree context))
+    (when (eq (gob::pause-mode x) :pause)
+      (setf (gob::paused-p x) t))))
+
+;; Un-pauses the game associated with the given context.
+(defun unpause-game (context)
+  (walk-tree (x (ctx::scene-tree context) :paused-p t)
+    (when (eq (gob::pause-mode x) :pause)
+      (setf (gob::paused-p x) nil))))
+
 ;;; TODO: Need to add a function to delete a game object from a tree, as well as add functions for
 ;;; spawning and destroying game objects, which fire initialization hooks for their components.

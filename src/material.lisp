@@ -78,11 +78,11 @@
                  ,@(when point-size
                      `((gl:point-size ,point-size)))
                  (dolist (x (gob::traits ,game-object))
-                   (funcall (trait::pre-render-hook x) x))
+                   (funcall (fdefinition (trait::pre-render-hook x)) x))
                  (u:do-hash-values (v (matdef::uniforms ,material))
                    (uni::resolve-func ,game-object v))
                  (dolist (x (gob::traits ,game-object))
-                   (funcall (trait::render-hook x) x))
+                   (funcall (fdefinition (trait::render-hook x)) x))
                  (setf (matdef::texture-unit-state ,material) 0)
                  ,@(when disable
                      `((gl:enable ,@disable)))

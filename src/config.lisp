@@ -1,6 +1,7 @@
 (in-package #:cl-user)
 
 (defpackage #:%zed.config
+  ;; Third-party aliases
   (:local-nicknames
    (#:u #:golden-utils))
   (:use #:cl))

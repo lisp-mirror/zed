@@ -1,8 +1,10 @@
 (in-package #:cl-user)
 
 (defpackage #:%zed.live-coding
+  ;; Third-party aliases
   (:local-nicknames
    (#:u #:golden-utils))
+  ;; Internal aliases
   (:local-nicknames
    (#:clock #:%zed.clock))
   (:use #:cl))

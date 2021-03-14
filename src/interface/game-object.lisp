@@ -1,26 +1,4 @@
-(in-package #:cl-user)
-
-(defpackage #:%zed.protocol.game-object
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:ctx #:%zed.context)
-   (#:dbg #:%zed.debug)
-   (#:gob #:%zed.game-object)
-   (#:tree #:%zed.tree))
-  (:use #:cl)
-  (:export
-   #:game-object-enabled-p
-   #:game-object-paused-p
-   #:insert-game-object
-   #:make-game-object
-   #:pause-game-object
-   #:reparent-game-object
-   #:unpause-game-object))
-
-(in-package #:%zed.protocol.game-object)
+(in-package #:zed)
 
 ;; Create a new game object. This game object is not yet rooted and thus does not exist in the scene
 ;; until #'insert is called on it. `:disabled-p`, if non-NIL, marks the game object to not be

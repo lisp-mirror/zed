@@ -8,12 +8,14 @@
   (:local-nicknames
    (#:clock #:%zed.clock)
    (#:ctx #:%zed.context)
+   (#:gob #:%zed.game-object)
    (#:in #:%zed.input)
    (#:jobs #:%zed.jobs)
    (#:live #:%zed.live-coding)
    (#:mon #:%zed.monitor)
    (#:tp #:%zed.thread-pool)
    (#:tr #:%zed.transform)
+   (#:trait #:%zed.trait)
    (#:tree #:%zed.tree)
    (#:win #:%zed.window))
   (:use #:cl))
@@ -43,9 +45,13 @@
 (u:fn-> update (ctx::context) null)
 (defun update (context)
   (declare (optimize speed))
-  (let ((jobs (ctx::jobs context)))
+  (let ((scene-tree (ctx::scene-tree context))
+        (jobs (ctx::jobs context)))
     (jobs::update-enabled-traits jobs)
     (jobs::update-disabled-traits jobs)
+    (tree::walk-tree (x scene-tree)
+      (dolist (c (gob::traits x))
+        (funcall (fdefinition (trait::update-hook c)) c)))
     nil))
 
 (defun start (context)
@@ -58,6 +64,10 @@
          (refresh-rate (mon::get-refresh-rate (win::monitor window)))
          (physics-func (make-physics-update-function context))
          (periodic-func (make-periodic-update-function context)))
+    ;; Emulate this function returning by sending the context value to the REPL. This only works on
+    ;; Sly, and only if it is configured to allow sending code to the REPL. See:
+    ;; https://joaotavora.github.io/sly/#Controlling-SLY-from-outside-Emacs
+    (live::send-to-repl (list context) :comment "")
     ;; Request the Lisp implementation to perform a full garbage collection immediately before we
     ;; start the main game loop, to mitigate any large amounts of data from initialization or the
     ;; last run from being cleaned up at runtime causing frame drops.

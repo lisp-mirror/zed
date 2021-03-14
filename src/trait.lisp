@@ -21,6 +21,10 @@
       %render-hook)
   :test #'equal)
 
+(u:define-constant +hook-names+
+    '(:setup-hook :attach-hook :detach-hook :update-hook :pre-render-hook :render-hook)
+  :test #'equal)
+
 (u:eval-always
   (oc::define-ordered-class trait ()
     ((%context :reader context
@@ -39,35 +43,41 @@
                 :initform #.(1- (expt 2 32)))
      (%setup-hook :reader setup-hook
                   :inline t
-                  :type function
+                  :type symbol
                   :initarg :setup-hook
-                  :initform (constantly nil))
+                  :initform 'default-hook)
      (%attach-hook :reader attach-hook
                    :inline t
-                   :type function
+                   :type symbol
                    :initarg :attach-hook
-                   :initform (constantly nil))
+                   :initform 'default-hook)
      (%detach-hook :reader detach-hook
                    :inline t
-                   :type function
+                   :type symbol
                    :initarg :detach-hook
-                   :initform (constantly nil))
+                   :initform 'default-hook)
      (%update-hook :reader update-hook
                    :inline t
-                   :type function
+                   :type symbol
                    :initarg :update-hook
-                   :initform (constantly nil))
+                   :initform 'default-hook)
      (%pre-render-hook :reader pre-render-hook
                        :inline t
-                       :type function
+                       :type symbol
                        :initarg :pre-render-hook
-                       :initform (constantly nil))
+                       :initform 'default-hook)
      (%render-hook :reader render-hook
                    :inline t
-                   :type function
+                   :type symbol
                    :initarg :render-hook
-                   :initform (constantly nil)))
+                   :initform 'default-hook))
     (:order #.+slot-order+)))
+
+(u:fn-> default-hook (trait) null)
+(defun default-hook (trait)
+  (declare (optimize speed))
+  (declare (ignore trait))
+  nil)
 
 (u:fn-> get-type (trait) symbol)
 (declaim (inline get-type))
@@ -78,21 +88,35 @@
 (u:define-printer (trait stream :type nil)
   (format stream "TRAIT: ~s" (get-type trait)))
 
+(defun generate-initargs (type priority options)
+  (when (or priority options)
+    `((:default-initargs
+       ,@(when priority
+           `(:priority ,priority))
+       ,@(u:mappend
+          (lambda (x)
+            (destructuring-bind (key value) x
+              (ecase key
+                (#.+hook-names+
+                 (if (symbolp value)
+                     `(,key ',value)
+                     (error "~s for trait ~s should be an unquoted symbol but got: ~s"
+                            key
+                            type
+                            value))))))
+          options)))))
+
+(defmacro define-internal-trait (type (&key priority) &body (slots . options))
+  `(oc::define-ordered-class ,type (trait)
+     ,slots
+     (:order (,@+slot-order+ ,@(mapcar #'car slots)))
+     ,@(generate-initargs type priority options)))
+
 (defmacro define-trait (type (&key priority) &body (slots . options))
   `(oc::define-ordered-class ,type (trait)
      ,slots
-     (:order #.+slot-order+)
-     ,@(when options
-         `((:default-initargs
-            ,@(when priority
-                `(:priority ,priority))
-            ,@(u:mappend
-               (lambda (x)
-                 (ecase (car x)
-                   ((:setup-hook :attach-hook :detach-hook :update-hook :pre-render-hook
-                                 :render-hook)
-                    x)))
-               options))))))
+     (:order ,+slot-order+)
+     ,@(generate-initargs type priority options)))
 
 ;; Create an instance of a trait of the given type. Slow path, for when the type is not a quoted
 ;; symbol.
@@ -101,7 +125,7 @@
   (declare (optimize speed))
   (if (subtypep type 'trait)
       (let ((trait (apply #'make-instance type :context context args)))
-        (funcall (setup-hook trait) trait)
+        (funcall (fdefinition (setup-hook trait)) trait)
         trait)
       (error "Trait type ~s is not defined." type)))
 
@@ -114,7 +138,7 @@
           (unless (subtypep type 'trait)
             (error "Trait type ~s is not defined." type))
           `(let ((,trait (make-instance ',type :context ,context ,@args)))
-             (funcall (setup-hook ,trait) ,trait)
+             (funcall (fdefinition (setup-hook ,trait)) ,trait)
              ,trait))
         whole)))
 
@@ -131,7 +155,7 @@
   (let ((jobs (ctx::jobs (context trait))))
     (setf (owner trait) game-object)
     (push (list game-object trait #'priority) (jobs::enable-traits jobs))
-    (funcall (attach-hook trait) trait)
+    (funcall (fdefinition (attach-hook trait)) trait)
     nil))
 
 (u:fn-> detach (gob::game-object trait) null)
@@ -140,7 +164,7 @@
   (unless (eq game-object (owner trait))
     (error "Trait ~s is not attached to game object ~s." trait game-object))
   (let ((jobs (ctx::jobs (context trait))))
-    (funcall (detach-hook trait) trait)
+    (funcall (fdefinition (detach-hook trait)) trait)
     (push (cons game-object trait) (jobs::disable-traits jobs))
     (setf (owner trait) nil)
     nil))

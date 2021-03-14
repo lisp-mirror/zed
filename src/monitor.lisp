@@ -1,6 +1,7 @@
 (in-package #:cl-user)
 
 (defpackage #:%zed.monitor
+  ;; Third-party aliases
   (:local-nicknames
    (#:u #:golden-utils))
   (:use #:cl))

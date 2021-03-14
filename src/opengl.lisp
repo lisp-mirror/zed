@@ -1,6 +1,7 @@
 (in-package #:cl-user)
 
 (defpackage #:%zed.opengl
+  ;; Third-party aliases
   (:local-nicknames
    (#:u #:golden-utils))
   (:use #:cl))
