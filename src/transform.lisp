@@ -11,6 +11,7 @@
    (#:v4 #:origin.vec4))
   ;; Internal aliases
   (:local-nicknames
+   (#:ctx #:%zed.context)
    (#:gob #:%zed.game-object)
    (#:ts #:%zed.transform-state))
   (:use #:cl)
@@ -56,19 +57,6 @@
            (ts::world-matrix (gob::transform parent))
            (resolve-local-matrix state factor))
     nil))
-
-(u:fn-> resolve-normal-matrix (gob::game-object) m3:mat)
-;; TODO: Need a camera implemented for this.
-#++(defun resolve-normal-matrix (game-object)
-     (declare (optimize speed))
-     (let* ((state (gob::transform game-object))
-            (normal-matrix (ts::normal-matrix state)))
-       (u:when-let ((camera nil))
-         (m4:set-translation! normal-matrix (ts::world-matrix state) v3:+zero+)
-         (m4:*! normal-matrix (camera-view camera) normal-matrix)
-         (m4:invert! normal-matrix normal-matrix)
-         (m4:transpose! normal-matrix normal-matrix))
-       (m4:rotation-to-mat3 normal-matrix)))
 
 (u:fn-> get-translation (gob::game-object &key (:space space)) v3:vec)
 (defun get-translation (game-object &key (space :local))

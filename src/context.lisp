@@ -39,7 +39,8 @@
   (jobs (jobs::make-jobs) :type jobs::jobs)
   (assets (u:dict #'eq) :type hash-table)
   (framebuffers (u:dict #'eq) :type hash-table)
-  (materials (u:dict #'eq) :type hash-table))
+  (materials (u:dict #'eq) :type hash-table)
+  (active-camera nil))
 
 ;;; The current context is bound to this variable throughout the lifetime of the game. However, this
 ;;; should not be used in code. This only exists for internal debugging purposes. It is a core

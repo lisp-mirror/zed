@@ -49,6 +49,7 @@
    (:file "image")
    (:file "image-png")
    (:file "image-hdr")
+   (:file "camera-state")
    (:file "transform")
    (:file "tree")
    (:file "trait")
