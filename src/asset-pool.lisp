@@ -151,7 +151,7 @@
                      path))
           (values path data)))))
 
-(defmacro with-asset-cache ((context type key) &body body)
+(defmacro with-asset ((context type key) &body body)
   (u:with-gensyms (table value found-p)
     `(symbol-macrolet ((,table (u:href (ctx::assets ,context) ,type)))
        (u:mvlet ((,value ,found-p ,table))
