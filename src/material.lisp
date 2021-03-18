@@ -50,6 +50,19 @@
   (or (u:href (ctx::materials context) type)
       (make-material context type)))
 
+(u:fn-> set-uniforms (mat.def::material &rest t) null)
+(defun set-uniforms (material &rest args)
+  (declare (optimize speed))
+  (let ((uniforms (mat.def::uniforms material)))
+    (u:do-plist (k v args)
+      (unless (u:href uniforms k)
+        (setf (u:href uniforms k) (uni::make-uniform :key k)))
+      (let ((uniform (u:href uniforms k)))
+        (setf (uni::value uniform) v)
+        (unless (uni::func uniform)
+          (uni::register material uniform))))
+    nil))
+
 (defun generate-render-func (features)
   (destructuring-bind (&key enable disable blend-mode depth-mode polygon-mode line-width point-size)
       features
@@ -62,8 +75,9 @@
         `(lambda (,render-trait)
            (let ((,game-object (trait::owner ,render-trait))
                  (,material (tr.ren::current-material ,render-trait)))
-             (fb::with-framebuffer (framebuffer ,material) (:attachments (attachments ,material))
-               (shadow:with-shader (mat.data::shader (data ,material))
+             (fb::with-framebuffer (mat.def::framebuffer ,material)
+                 (:attachments (mat.def::attachments ,material))
+               (shadow:with-shader (mat.data::shader (mat.def::data ,material))
                  ,@(when enable
                      `((gl:enable ,@enable)))
                  ,@(when disable
@@ -104,6 +118,6 @@
   (destructuring-bind (&key shader uniforms features pass output) (car body)
     (u:with-gensyms (func)
       `(let ((,func ,(generate-render-func features)))
-         (if (u:href =data= ',name)
+         (if (u:href mat.data::=data= ',name)
              (mat.data::update ',name ',master ',shader (list ,@uniforms) ',pass ',output ,func)
              (mat.data::make-data ',name ',master ',shader (list ,@uniforms) ',pass ',output ,func))))))

@@ -143,7 +143,7 @@
              ,trait))
         whole)))
 
-(u:fn-> find (gob::game-object symbol) trait)
+(u:fn-> find (gob::game-object symbol) (or trait null))
 (defun find (game-object type)
   (declare (optimize speed))
   (cl:find type (gob::traits game-object) :key #'get-type))

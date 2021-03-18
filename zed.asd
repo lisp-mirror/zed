@@ -66,11 +66,11 @@
    (:file "material-data")
    (:file "material-definition")
    (:file "material-uniform")
-   (:file "trait-camera")
-   (:file "trait-sprite")
    (:file "trait-render")
    (:file "render")
    (:file "material")
+   (:file "trait-camera")
+   (:file "trait-sprite")
    (:file "game-loop")
    (:module "interface"
     :components

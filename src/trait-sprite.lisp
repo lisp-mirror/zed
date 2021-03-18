@@ -8,6 +8,9 @@
   (:local-nicknames
    (#:clock #:%zed.clock)
    (#:ctx #:%zed.context)
+   (#:mat #:%zed.material)
+   (#:mat.def #:%zed.material.definition)
+   (#:tr.ren #:%zed.trait.render)
    (#:sbs #:%zed.shader-buffer-state)
    (#:ss #:%zed.spritesheet)
    (#:trait #:%zed.trait)
@@ -94,10 +97,9 @@
   (declare (optimize speed))
   (unless (pause-p sprite)
     (let* ((duration (duration sprite))
-           (clock (ctx::clock (trait::context sprite)))
-           (frame-time (float (clock::frame-time clock) 1f0)))
-      (incf (elapsed sprite) frame-time)
-      (if (>= frame-time duration)
+           (clock (ctx::clock (trait::context sprite))))
+      (incf (elapsed sprite) (float (clock::frame-time clock) 1f0))
+      (if (>= (elapsed sprite) duration)
           (setf (elapsed sprite) 0.0
                 (pause-p sprite) (unless (repeat-p sprite) t))
           (let* ((step (/ (elapsed sprite) duration))
@@ -108,8 +110,9 @@
       nil)))
 
 (defun pre-render (sprite)
-  ;; TODO: set-uniforms
-  (declare (ignore sprite)))
+  (let* ((render-trait (trait::find (trait::owner sprite) 'tr.ren::render))
+         (material (tr.ren::current-material render-trait)))
+    (mat::set-uniforms material :sprite.index (index sprite))))
 
 (u:fn-> render (sprite) null)
 (defun render (sprite)
