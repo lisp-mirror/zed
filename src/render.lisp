@@ -12,7 +12,7 @@
    (#:mat.data #:%zed.material.data)
    (#:mat.def #:%zed.material.definition)
    (#:trait #:%zed.trait)
-   (#:tr.ren #:%zed.trait.render)
+   (#:tr.ren #:zed.trait.render)
    (#:tree #:%zed.tree))
   (:use #:cl))
 

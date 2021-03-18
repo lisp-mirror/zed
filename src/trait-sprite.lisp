@@ -1,6 +1,6 @@
 (in-package #:cl-user)
 
-(defpackage #:%zed.trait.sprite
+(defpackage #:zed.trait.sprite
   ;; Third-party aliases
   (:local-nicknames
    (#:u #:golden-utils))
@@ -10,14 +10,16 @@
    (#:ctx #:%zed.context)
    (#:mat #:%zed.material)
    (#:mat.def #:%zed.material.definition)
-   (#:tr.ren #:%zed.trait.render)
+   (#:tr.ren #:zed.trait.render)
    (#:sbs #:%zed.shader-buffer-state)
    (#:ss #:%zed.spritesheet)
    (#:trait #:%zed.trait)
    (#:uni #:%zed.material.uniform))
-  (:use #:cl))
+  (:use #:cl)
+  (:export
+   #:sprite))
 
-(in-package #:%zed.trait.sprite)
+(in-package #:zed.trait.sprite)
 
 (trait::define-internal-trait sprite ()
   ((%name :reader name

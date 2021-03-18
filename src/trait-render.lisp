@@ -1,15 +1,17 @@
 (in-package #:cl-user)
 
-(defpackage #:%zed.trait.render
+(defpackage #:zed.trait.render
   ;; Third-party aliases
   (:local-nicknames
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
    (#:trait #:%zed.trait))
-  (:use #:cl))
+  (:use #:cl)
+  (:export
+   #:render))
 
-(in-package #:%zed.trait.render)
+(in-package #:zed.trait.render)
 
 (trait::define-trait render ()
   ((%materials :accessor materials

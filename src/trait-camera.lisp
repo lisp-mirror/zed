@@ -1,6 +1,6 @@
 (in-package #:cl-user)
 
-(defpackage #:%zed.trait.camera
+(defpackage #:zed.trait.camera
   ;; Third-party aliases
   (:local-nicknames
    (#:const #:origin.constants)
@@ -11,9 +11,11 @@
    (#:ctx #:%zed.context)
    (#:gob #:%zed.game-object)
    (#:trait #:%zed.trait))
-  (:use #:cl))
+  (:use #:cl)
+  (:export
+   #:camera))
 
-(in-package #:%zed.trait.camera)
+(in-package #:zed.trait.camera)
 
 (trait::define-internal-trait camera ()
   ((%state :accessor state

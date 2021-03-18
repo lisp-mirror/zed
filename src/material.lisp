@@ -13,7 +13,7 @@
    (#:mat.def #:%zed.material.definition)
    (#:ogl #:%zed.opengl)
    (#:trait #:%zed.trait)
-   (#:tr.ren #:%zed.trait.render)
+   (#:tr.ren #:zed.trait.render)
    (#:uni #:%zed.material.uniform))
   (:use #:cl))
 
