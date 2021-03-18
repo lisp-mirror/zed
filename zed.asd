@@ -34,6 +34,7 @@
    (:file "monitor")
    (:file "window")
    (:file "shader-program")
+   (:file "shader-buffer-state")
    (:file "input-manager")
    (:file "input-transition")
    (:file "input-keyboard")
