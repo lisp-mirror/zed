@@ -107,10 +107,11 @@
           options)))))
 
 (defmacro define-internal-trait (type (&key priority) &body (slots . options))
-  `(oc::define-ordered-class ,type (trait)
-     ,slots
-     (:order (,@+slot-order+ ,@(mapcar #'car slots)))
-     ,@(generate-initargs type priority options)))
+  `(u:eval-always
+     (oc::define-ordered-class ,type (trait)
+       ,slots
+       (:order (,@+slot-order+ ,@(mapcar #'car slots)))
+       ,@(generate-initargs type priority options))))
 
 (defmacro define-trait (type (&key priority) &body (slots . options))
   `(oc::define-ordered-class ,type (trait)
