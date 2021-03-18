@@ -52,4 +52,43 @@
    #:make-game-object
    #:pause-game-object
    #:reparent-game-object
-   #:unpause-game-object))
+   #:unpause-game-object)
+
+  ;; Trait
+  (:import-from
+   #:%zed.trait
+   #:attach-trait
+   #:detach-all-traits
+   #:detach-trait
+   #:detach-trait-type
+   #:find-trait
+   #:make-trait)
+  (:export
+   #:attach-trait
+   #:detach-all-traits
+   #:detach-trait
+   #:detach-trait-type
+   #:find-trait
+   #:make-trait)
+
+  ;; Asset pool
+  (:import-from
+   #:%zed.asset-pool
+   #:define-asset-pool)
+  (:export
+   #:define-asset-pool)
+
+  ;; Texture
+  (:import-from
+   #:%zed.texture.data
+   #:define-texture)
+  (:export
+   #:define-texture)
+
+  ;; Material
+  (:import-from
+   #:%zed.material
+   #:define-material)
+  (:export
+   #:define-material)
+  )
