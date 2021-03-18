@@ -53,6 +53,7 @@
    (:file "camera-state")
    (:file "transform")
    (:file "tree")
+   (:file "spritesheet")
    (:file "trait")
    (:file "trait-camera")
    (:file "trait-render")
