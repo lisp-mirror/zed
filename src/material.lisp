@@ -13,7 +13,6 @@
    (#:mat.def #:%zed.material.definition)
    (#:ogl #:%zed.opengl)
    (#:trait #:%zed.trait)
-   (#:tr.ren #:zed.trait.render)
    (#:uni #:%zed.material.uniform))
   (:use #:cl))
 
@@ -66,53 +65,51 @@
 (defun generate-render-func (features)
   (destructuring-bind (&key enable disable blend-mode depth-mode polygon-mode line-width point-size)
       features
-    (u:with-gensyms (game-object render-trait material)
+    (u:with-gensyms (game-object material)
       (let ((enable (set-difference enable ogl::+enabled-capabilities+))
             (disable (set-difference disable ogl::+disabled-capabilities+))
             (blend-mode (and (not (equal blend-mode ogl::+blend-mode+)) blend-mode))
             (depth-mode (and (not (eq depth-mode ogl::+depth-mode+)) depth-mode))
             (polygon-mode (and (not (eq polygon-mode ogl::+polygon-mode+)) polygon-mode)))
-        `(lambda (,render-trait)
-           (let ((,game-object (trait::owner ,render-trait))
-                 (,material (tr.ren::current-material ,render-trait)))
-             (fb::with-framebuffer (mat.def::framebuffer ,material)
-                 (:attachments (mat.def::attachments ,material))
-               (shadow:with-shader (mat.data::shader (mat.def::data ,material))
-                 ,@(when enable
-                     `((gl:enable ,@enable)))
-                 ,@(when disable
-                     `((gl:disable ,@disable)))
-                 ,@(when blend-mode
-                     `((gl:blend-func ,@blend-mode)))
-                 ,@(when depth-mode
-                     `((gl:depth-func ,depth-mode)))
-                 ,@(when polygon-mode
-                     `((gl:polygon-mode :front-and-back ,polygon-mode)))
-                 ,@(when line-width
-                     `((gl:line-width ,line-width)))
-                 ,@(when point-size
-                     `((gl:point-size ,point-size)))
-                 (dolist (x (gob::traits ,game-object))
-                   (funcall (fdefinition (trait::pre-render-hook x)) x))
-                 (u:do-hash-values (v (mat.def::uniforms ,material))
-                   (uni::resolve-func ,game-object v))
-                 (dolist (x (gob::traits ,game-object))
-                   (funcall (fdefinition (trait::render-hook x)) x))
-                 (setf (mat.def::texture-unit-state ,material) 0)
-                 ,@(when disable
-                     `((gl:enable ,@disable)))
-                 ,@(when enable
-                     `((gl:disable ,@enable)))
-                 ,@(when blend-mode
-                     `((gl:blend-func ,@ogl::+blend-mode+)))
-                 ,@(when depth-mode
-                     `((gl:depth-func ,ogl::+depth-mode+)))
-                 ,@(when polygon-mode
-                     `((gl:polygon-mode :front-and-back ,ogl::+polygon-mode+)))
-                 ,@(when line-width
-                     `((gl:line-width 1.0)))
-                 ,@(when point-size
-                     `((gl:point-size 1.0)))))))))))
+        `(lambda (,game-object ,material)
+           (fb::with-framebuffer (mat.def::framebuffer ,material)
+               (:attachments (mat.def::attachments ,material))
+             (shadow:with-shader (mat.data::shader (mat.def::data ,material))
+               ,@(when enable
+                   `((gl:enable ,@enable)))
+               ,@(when disable
+                   `((gl:disable ,@disable)))
+               ,@(when blend-mode
+                   `((gl:blend-func ,@blend-mode)))
+               ,@(when depth-mode
+                   `((gl:depth-func ,depth-mode)))
+               ,@(when polygon-mode
+                   `((gl:polygon-mode :front-and-back ,polygon-mode)))
+               ,@(when line-width
+                   `((gl:line-width ,line-width)))
+               ,@(when point-size
+                   `((gl:point-size ,point-size)))
+               (dolist (x (gob::traits ,game-object))
+                 (funcall (fdefinition (trait::pre-render-hook x)) x))
+               (u:do-hash-values (v (mat.def::uniforms ,material))
+                 (uni::resolve-func ,game-object v))
+               (dolist (x (gob::traits ,game-object))
+                 (funcall (fdefinition (trait::render-hook x)) x))
+               (setf (mat.def::texture-unit-state ,material) 0)
+               ,@(when disable
+                   `((gl:enable ,@disable)))
+               ,@(when enable
+                   `((gl:disable ,@enable)))
+               ,@(when blend-mode
+                   `((gl:blend-func ,@ogl::+blend-mode+)))
+               ,@(when depth-mode
+                   `((gl:depth-func ,ogl::+depth-mode+)))
+               ,@(when polygon-mode
+                   `((gl:polygon-mode :front-and-back ,ogl::+polygon-mode+)))
+               ,@(when line-width
+                   `((gl:line-width 1.0)))
+               ,@(when point-size
+                   `((gl:point-size 1.0))))))))))
 
 (defmacro define-material (name (&optional master) &body body)
   (destructuring-bind (&key shader uniforms features pass output) (car body)
