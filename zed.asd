@@ -70,8 +70,8 @@
    (:file "material-definition")
    (:file "material-uniform")
    (:file "material")
-   (:file "trait-render")
    (:file "trait-camera")
+   (:file "trait-render")
    (:file "trait-sprite")
    (:file "game-loop")
    (:module "interface"
