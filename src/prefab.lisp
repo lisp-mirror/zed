@@ -85,7 +85,7 @@
 
 (defun preprocess-data (name options data)
   (let ((data `(((,name ,@options) ,@data))))
-    `(copy-tree (list ,@(mapcar #'process-node-data data)))))
+    `(list ,@(mapcar #'process-node-data data))))
 
 (defun parse-trait-args (data)
   (flet ((%parse (data func)
