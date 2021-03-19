@@ -42,13 +42,6 @@
     (setf (u:href materials type) material)
     material))
 
-(u:fn-> ensure-material (ctx::context symbol) mat.def::material)
-(declaim (inline ensure-material))
-(defun ensure-material (context type)
-  (declare (optimize speed))
-  (or (u:href (ctx::materials context) type)
-      (make-material context type)))
-
 (u:fn-> set-uniforms (mat.def::material &rest t) null)
 (defun set-uniforms (material &rest args)
   (declare (optimize speed))

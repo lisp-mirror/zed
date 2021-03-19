@@ -23,15 +23,15 @@
 (in-package #:zed.trait.render)
 
 (trait::define-internal-trait render ()
-  ((%materials :accessor materials
-               :inline t
-               :type list
-               :initarg :materials
-               :initform nil)
-   (%current-material :accessor current-material
-                      :inline t
-                      :type (or mat.def::material null)
-                      :initform nil))
+  ((%material-name :reader material-name
+                   :inline t
+                   :type symbol
+                   :initarg :material
+                   :initform nil)
+   (%material :accessor material
+              :inline t
+              :type (or mat.def::material null)
+              :initform nil))
   (:attach-hook attach)
   (:pre-render-hook pre-render))
 
@@ -39,7 +39,7 @@
 (defun render-game-object (game-object)
   (declare (optimize speed))
   (let* ((render-trait (trait::find-trait game-object 'render))
-         (material (current-material render-trait)))
+         (material (material render-trait)))
     (dbg::with-debug-group (format nil "Game Object: ~a" (gob::label game-object))
       (funcall (mat.data::render-func (mat.def::data material)) game-object material))
     nil))
@@ -54,12 +54,15 @@
 ;;; Hooks
 
 (defun attach (render)
-  (print render))
+  (u:if-let ((material-name (material-name render)))
+    (let ((context (trait::context render)))
+      (setf (material render) (mat::make-material context material-name)))
+    (error "Render trait must have a material specified.")))
 
 (defun pre-render (render)
   (u:when-let* ((context (trait::context render))
                 (camera (ctx::active-camera context))
                 (camera-state (tr.cam::state camera)))
-    (mat::set-uniforms (current-material render)
+    (mat::set-uniforms (material render)
                        :view (cam::view camera-state)
                        :proj (cam::projection camera-state))))
