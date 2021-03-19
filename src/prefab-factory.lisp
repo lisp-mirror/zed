@@ -10,6 +10,7 @@
    (#:gob #:%zed.game-object)
    (#:pf.def #:%zed.prefab.definitions)
    (#:tr #:%zed.trait)
+   (#:ts #:%zed.transform-state)
    (#:tree #:%zed.tree))
   (:use #:cl))
 
@@ -45,14 +46,28 @@
     (setf (gob::prefab-name root) prefab-name)
     root))
 
+(defun initialize-transforms (game-object node)
+  (let ((node-options (pf.def::options node))
+        (transform (gob::transform game-object)))
+    (ts::initialize-translation transform
+                                (u:href node-options :translate)
+                                (u:href node-options :translate-velocity))
+    (ts::initialize-rotation transform
+                             (u:href node-options :rotate)
+                             (u:href node-options :rotate-velocity))
+    (ts::initialize-scale transform
+                          (u:href node-options :scale)
+                          (u:href node-options :scale-velocity))))
+
 (defun make-func (prefab)
   (lambda (context &key parent)
     (let ((factory (pf.def::factory prefab))
           (nodes (pf.def::nodes prefab)))
-      (u:do-hash-keys (k nodes)
-        (let* ((label (format nil "~(~a~)" (first (last k))))
+      (u:do-hash (path node nodes)
+        (let* ((label (format nil "~(~a~)" (first (last path))))
                (game-object (gob::make-game-object :label label)))
-          (setf (u:href (pf.def::factory-game-objects factory) k) game-object)))
+          (initialize-transforms game-object node)
+          (setf (u:href (pf.def::factory-game-objects factory) path) game-object)))
       (u:do-hash-values (node nodes)
         (setf (pf.def::factory-current-node factory) node)
         (realize-game-object context node parent))

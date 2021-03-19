@@ -61,10 +61,10 @@
     (let* ((options-p (listp (first options/args)))
            (args (if options-p (rest options/args) options/args))
            (thunked-args (loop :for (k v) :on args :by #'cddr
-                               :nconc `(,k (lambda () ,v)))))
-      `(,type
-        ,(when options-p `(,@(first options/args)))
-        ,@thunked-args))))
+                               :nconc `(,k '(lambda () ,v)))))
+      `(list ',type
+             ,(when options-p `(,@(first options/args)))
+             ,@thunked-args))))
 
 (defun process-node-data (data)
   (flet ((split-traits (data)
@@ -75,16 +75,17 @@
                  :finally (return (values traits cons)))))
     (destructuring-bind ((name . options) . rest) data
       (u:mvlet ((traits children (split-traits rest)))
-        `(,name
-          ,options
-          ,(when traits
-             `(,@(mapcar #'process-trait-data traits)))
-          ,(when children
-             `(,@(mapcar #'process-node-data children))))))))
+        `(list ',name
+               ,(when options
+                  `(list ,@options))
+               ,(when traits
+                  `(list ,@(mapcar #'process-trait-data traits)))
+               ,(when children
+                  `(list ,@(mapcar #'process-node-data children))))))))
 
 (defun preprocess-data (name options data)
   (let ((data `(((,name ,@options) ,@data))))
-    `(copy-tree '(,@(mapcar #'process-node-data data)))))
+    `(copy-tree (list ,@(mapcar #'process-node-data data)))))
 
 (defun parse-trait-args (data)
   (flet ((%parse (data func)

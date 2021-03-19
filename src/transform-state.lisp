@@ -45,10 +45,10 @@
 (defun initialize-translation (state &optional initial velocity)
   (declare (optimize speed))
   (when initial
-    (setf (translation/current state) initial
+    (setf (translation/current state) (v3:copy initial)
           (translation/previous state) (v3:copy initial)))
   (when velocity
-    (setf (translation/incremental state) velocity))
+    (setf (translation/incremental state) (v3:copy velocity)))
   nil)
 
 (u:fn-> initialize-rotation (state &optional (or q:quat null) (or v3:vec null)) null)
@@ -56,10 +56,10 @@
 (defun initialize-rotation (state &optional initial velocity)
   (declare (optimize speed))
   (when initial
-    (setf (rotation/current state) initial
+    (setf (rotation/current state) (q:copy initial)
           (rotation/previous state) (q:copy initial)))
   (when velocity
-    (setf (rotation/incremental state) velocity))
+    (setf (rotation/incremental state) (v3:copy velocity)))
   nil)
 
 (u:fn-> initialize-scale (state &optional (or v3:vec real null) (or v3:vec null)) null)
@@ -68,12 +68,12 @@
   (declare (optimize speed))
   (when initial
     (let ((initial (etypecase initial
-                     (v3:vec initial)
+                     (v3:vec (v3:copy initial))
                      (real (v3:vec initial)))))
       (setf (scale/current state) initial
             (scale/previous state) (v3:copy initial))))
   (when velocity
-    (setf (scale/incremental state) velocity))
+    (setf (scale/incremental state) (v3:copy velocity)))
   nil)
 
 (defun make-state (&key translate translate/velocity rotate rotate/velocity scale scale/velocity)
