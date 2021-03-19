@@ -71,6 +71,14 @@
    #:find-trait
    #:make-trait)
 
+  ;; Prefab
+  (:import-from
+   #:%zed.prefab
+   #:define-prefab)
+  (:export
+   #:define-prefab
+   #:load-prefab)
+
   ;; Asset pool
   (:import-from
    #:%zed.asset-pool

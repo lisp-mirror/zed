@@ -170,4 +170,4 @@
       (setf (gob::paused-p x) nil))))
 
 ;;; TODO: Need to add a function to delete a game object from a tree, as well as add functions for
-;;; spawning and destroying game objects, which fire initialization hooks for their components.
+;;; spawning and destroying game objects, which fire initialization hooks for their traits.

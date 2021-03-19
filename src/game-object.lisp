@@ -45,7 +45,10 @@
   ;; The transform state of the game object.
   (transform (ts::make-state) :type ts::state)
   ;; A list of traits attached to this game object.
-  (traits nil :type list))
+  (traits nil :type list)
+  ;; The name of the root prefab node this game object was created from, or NIL if it was created
+  ;; from a child of a prefab, or manually
+  (prefab-name nil :type symbol))
 
 (u:define-printer (game-object stream :type nil)
   (format stream "GAME-OBJECT: ~a" (path game-object)))

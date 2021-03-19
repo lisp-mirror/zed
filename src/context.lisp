@@ -42,6 +42,7 @@
   (assets (u:dict #'eq) :type hash-table)
   (framebuffers (u:dict #'eq) :type hash-table)
   (materials (u:dict #'eq) :type hash-table)
+  (prefabs (u:dict #'eq) :type hash-table)
   (active-camera nil))
 
 ;;; The current context is bound to this variable throughout the lifetime of the game. However, this
