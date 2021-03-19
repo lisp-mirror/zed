@@ -22,8 +22,7 @@
             (:conc-name nil)
             (:predicate nil)
             (:copier nil))
-  ;; TODO: maybe (or null) like Z
-  (data nil :type tex.data::data)
+  (data nil :type (or tex.data::data null))
   (target :texture-2d :type keyword)
   (id 0 :type u:ub16)
   (width nil :type (or u:ub16 null))
@@ -31,7 +30,10 @@
   (materials nil :type list))
 
 (u:define-printer (texture stream :type nil)
-  (format stream "TEXTURE: ~s" (tex.data::name (data texture))))
+  (format stream "TEXTURE: ~a"
+          (u:if-let ((data (data texture)))
+            (tex.data::name data)
+            "(no data)")))
 
 (u:fn-> calculate-mipmap-levels (tex.data::data u:ub16 u:ub16) u:ub8)
 (defun calculate-mipmap-levels (data width height)

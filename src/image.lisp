@@ -28,7 +28,11 @@
   (data nil :type (or vector null)))
 
 (u:define-printer (image stream :type nil)
-  (format stream "IMAGE: ~a" (path image)))
+  (format stream "IMAGE: ~a"
+          (u:if-let ((path (path image)))
+            (if (= (length (pathname-name path)) 0)
+                "(no data)"
+                path))))
 
 (defun get-type (path)
   (u:make-keyword (string-upcase (pathname-type path))))
