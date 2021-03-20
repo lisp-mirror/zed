@@ -26,6 +26,7 @@
   :components
   ((:file "debug")
    (:file "ordered-class")
+   (:file "red-black-tree")
    (:file "config")
    (:file "thread-pool")
    (:file "clock")
