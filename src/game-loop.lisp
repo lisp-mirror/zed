@@ -69,8 +69,8 @@
          (physics-func (make-physics-update-function context))
          (periodic-func (make-periodic-update-function context)))
     ;; Emulate this function returning by sending the context value to the REPL. This only works on
-    ;; Sly, and only if it is configured to allow sending code to the REPL. See:
-    ;; https://joaotavora.github.io/sly/#Controlling-SLY-from-outside-Emacs
+    ;; Sly, and only if it is configured to allow sending code to the REPL. It is a no-op on other
+    ;; environments. See: https://joaotavora.github.io/sly/#Controlling-SLY-from-outside-Emacs
     (live::send-to-repl (list context) :comment "")
     ;; Request the Lisp implementation to perform a full garbage collection immediately before we
     ;; start the main game loop, to mitigate any large amounts of data from initialization or the

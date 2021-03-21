@@ -70,6 +70,8 @@
 (u:fn-> render-frame (ctx::context) null)
 (defun render-frame (context)
   (declare (optimize speed))
+  ;; NOTE: This `when-let` is required: The tree is not created until the first render trait is
+  ;; created, but the game loop calls this function unconditionally each frame.
   (u:when-let ((tree (ctx::draw-order context)))
     (gl:clear-color 0 0 0 1)
     (gl:clear :color-buffer :depth-buffer)
