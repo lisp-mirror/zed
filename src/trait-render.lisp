@@ -77,23 +77,34 @@
 
 ;;; Hooks
 
+(u:fn-> setup (render) null)
 (defun setup (render)
+  (declare (optimize speed))
   (let ((context (trait::context render)))
     (unless (ctx::draw-order context)
-      (setf (ctx::draw-order context) (make-draw-order-tree)))))
+      (setf (ctx::draw-order context) (make-draw-order-tree)))
+    nil))
 
+(u:fn-> attach (render) null)
 (defun attach (render)
+  (declare (optimize speed))
   (u:if-let ((material-name (material-name render)))
     (let ((context (trait::context render)))
       (setf (material render) (mat::make-material context material-name))
-      (rb::insert (ctx::draw-order context) render))
+      (rb::insert (ctx::draw-order context) render)
+      nil)
     (error "Render trait must have a material specified.")))
 
+(u:fn-> detach (render) null)
 (defun detach (render)
+  (declare (optimize speed))
   (let ((context (trait::context render)))
-    (rb::delete (ctx::draw-order context) render)))
+    (rb::delete (ctx::draw-order context) render)
+    nil))
 
+(u:fn-> pre-render (render) null)
 (defun pre-render (render)
+  (declare (optimize speed))
   (u:when-let* ((context (trait::context render))
                 (owner (trait::owner render))
                 (camera (ctx::active-camera context))
@@ -102,4 +113,5 @@
     (mat::set-uniforms (material render)
                        :model world-matrix
                        :view (cam::view camera-state)
-                       :proj (cam::projection camera-state))))
+                       :proj (cam::projection camera-state))
+    nil))
