@@ -114,7 +114,7 @@
 (defun pre-render (sprite)
   (let* ((render-trait (trait:find-trait (trait::owner sprite) 'tr.ren::render))
          (material (tr.ren::material render-trait)))
-    (mat::set-uniforms material :sprite.index (index sprite))))
+    (mat::set-uniform material :sprite.index (index sprite))))
 
 (u:fn-> render (sprite) null)
 (defun render (sprite)
