@@ -12,6 +12,7 @@
             (:conc-name nil)
             (:predicate nil)
             (:copier nil))
+  (prelude (constantly nil) :type (or function symbol))
   (window-width 1280 :type u:ub16)
   (window-height 720 :type u:ub16)
   (window-title "" :type string)
