@@ -12,12 +12,13 @@
   (z.sprite:sprite :asset '(metadata sprites))
   (z.render:render :material 'sprite))
 
-(z:define-prefab planet (:template 'sprite)
+(z:define-prefab planet (:template 'sprite
+                         :scale 1.5)
   (z.sprite:sprite :name "planet11"))
 
 (z:define-prefab ship (:template 'sprite
                        :translate (v3:vec 0 -120)
-                       :scale 0.6)
+                       :scale 1)
   (z.sprite:sprite :name "ship29")
   (z.render:render :layer 1)
   ((exhaust :template 'sprite
@@ -33,6 +34,6 @@
            (z:load-prefab context 'camera/orthographic)
            (z:load-prefab context 'planet)
            (z:load-prefab context 'ship)))
-    (z:start-game :window-width 800
-                  :window-height 450
+    (z:start-game :window-width 1280
+                  :window-height 720
                   :prelude #'prelude)))
