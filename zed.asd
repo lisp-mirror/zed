@@ -10,14 +10,17 @@
                #:cl-opengl
                #:cl-slug
                #:closer-mop
+               #:fast-io
                #:global-vars
                #:golden-utils
+               #:jsown
                #:lparallel
                #:origin
                #:pngload
                #:sdl2
                #:shadow
                #:split-sequence
+               #:static-vectors
                #:trivial-garbage
                #:uiop
                #:umbra)
@@ -27,6 +30,7 @@
   ((:file "debug")
    (:file "ordered-class")
    (:file "red-black-tree")
+   (:file "binary-parser")
    (:file "config")
    (:file "thread-pool")
    (:file "clock")
@@ -51,6 +55,7 @@
    (:file "image")
    (:file "image-png")
    (:file "image-hdr")
+   (:file "mesh-gltf")
    (:file "camera-state")
    (:file "transform")
    (:file "tree")
