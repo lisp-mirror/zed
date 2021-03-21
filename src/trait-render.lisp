@@ -36,7 +36,7 @@
               :initform nil)
    (%layer :reader layer
            :inline t
-           :type fixnum
+           :type u:b16
            :initarg :layer
            :initform 0))
   (:setup-hook setup)
@@ -44,15 +44,11 @@
   (:detach-hook detach)
   (:pre-render-hook pre-render))
 
-(u:fn-> draw-order-tree-sort (cons cons) boolean)
+(u:fn-> draw-order-tree-sort (render render) boolean)
 (defun draw-order-tree-sort (x y)
   (declare (optimize speed))
-  (let ((x-layer (layer (cdr x)))
-        (y-layer (layer (cdr y))))
-    (or (> x-layer y-layer)
-        (and (= x-layer y-layer)
-             (< (gob::depth (car x))
-                (gob::depth (car y)))))))
+  (< (+ (ash (- #.(1- (expt 2 15)) (layer x)) 16) (gob::depth (trait::owner x)))
+     (+ (ash (- #.(1- (expt 2 15)) (layer y)) 16) (gob::depth (trait::owner y)))))
 
 (u:fn-> make-draw-order-tree () rb::tree)
 (declaim (inline make-draw-order-tree))
@@ -60,13 +56,15 @@
   (declare (optimize speed))
   (rb::make-tree :sort-func #'draw-order-tree-sort))
 
-(u:fn-> render-game-object (gob::game-object render) null)
-(defun render-game-object (game-object render-trait)
+(u:fn-> render-game-object (render) null)
+(defun render-game-object (render-trait)
   (declare (optimize speed))
-  (let* ((material (material render-trait))
+  (let* ((context (trait::context render-trait))
+         (owner (trait::owner render-trait))
+         (material (material render-trait))
          (func (mat.data::render-func (mat.def::data material))))
-    (dbg::with-debug-group (format nil "Game Object: ~a" (gob::label game-object))
-      (funcall func game-object material))
+    (dbg::with-debug-group (format nil "Game Object: ~a" (gob::label owner))
+      (funcall func context owner material))
     nil))
 
 (u:fn-> render-frame (ctx::context) null)
@@ -75,10 +73,7 @@
   (u:when-let ((tree (ctx::draw-order context)))
     (gl:clear-color 0 0 0 1)
     (gl:clear :color-buffer :depth-buffer)
-    (rb::walk tree
-              (lambda (x)
-                (destructuring-bind (game-object . render-trait) x
-                  (render-game-object game-object render-trait))))))
+    (rb::walk tree #'render-game-object)))
 
 ;;; Hooks
 
@@ -89,16 +84,14 @@
 
 (defun attach (render)
   (u:if-let ((material-name (material-name render)))
-    (let ((context (trait::context render))
-          (owner (trait::owner render)))
+    (let ((context (trait::context render)))
       (setf (material render) (mat::make-material context material-name))
-      (rb::insert (ctx::draw-order context) (cons owner render)))
+      (rb::insert (ctx::draw-order context) render))
     (error "Render trait must have a material specified.")))
 
 (defun detach (render)
-  (let ((context (trait::context render))
-        (owner (trait::owner render)))
-    (rb::delete (ctx::draw-order context) (cons owner render))))
+  (let ((context (trait::context render)))
+    (rb::delete (ctx::draw-order context) render)))
 
 (defun pre-render (render)
   (u:when-let* ((context (trait::context render))

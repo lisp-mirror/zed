@@ -97,7 +97,7 @@
   (declare (optimize speed))
   (values (u:format-symbol :keyword "TEXTURE-~a" type)))
 
-(u:fn-> make-texture (tex.data::data keyword img::image) texture)
+(u:fn-> make-texture (tex.data::data keyword (or img::image list)) texture)
 (defun make-texture (data type source)
   (declare (optimize speed))
   (let ((texture (%make-texture :data data :target (make-target type))))

@@ -4,16 +4,21 @@
   ;; Third-party aliases
   (:local-nicknames
    (#:const #:origin.constants)
-   (#:u #:golden-utils))
+   (#:m3 #:origin.mat3)
+   (#:m4 #:origin.mat4)
+   (#:u #:golden-utils)
+   (#:v3 #:origin.vec3))
   ;; Internal aliases
   (:local-nicknames
    (#:cam.state #:%zed.camera-state)
    (#:ctx #:%zed.context)
    (#:gob #:%zed.game-object)
-   (#:trait #:%zed.trait))
+   (#:trait #:%zed.trait)
+   (#:ts #:%zed.transform-state))
   (:use #:cl)
   (:export
-   #:camera))
+   #:camera
+   #:resolve-normal-matrix))
 
 (in-package #:zed.trait.camera)
 
@@ -59,6 +64,19 @@
 (defun make-active (camera)
   (let ((context (trait::context camera)))
     (setf (ctx::active-camera context) camera)))
+
+(u:fn-> resolve-normal-matrix (ctx::context gob::game-object) m3:mat)
+(defun resolve-normal-matrix (context game-object)
+  (declare (optimize speed))
+  (let* ((transform-state (gob::transform game-object))
+         (normal-matrix (ts::normal-matrix transform-state)))
+    (u:when-let* ((camera (ctx::active-camera context))
+                  (state (state camera)))
+      (m4:set-translation! normal-matrix (ts::world-matrix transform-state) v3:+zero+)
+      (m4:*! normal-matrix (cam.state::view state) normal-matrix)
+      (m4:invert! normal-matrix normal-matrix)
+      (m4:transpose! normal-matrix normal-matrix))
+    (m4:rotation-to-mat3 normal-matrix)))
 
 ;;; Hooks
 

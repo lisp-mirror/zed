@@ -124,20 +124,20 @@
     (declare (ignore game-object))
     (funcall func)))
 
-(u:fn-> resolve-value (gob::game-object uniform) t)
-(defun resolve-value (game-object uniform)
+(u:fn-> resolve-value (ctx::context gob::game-object uniform) t)
+(defun resolve-value (context game-object uniform)
   (let ((value (value uniform)))
     (etypecase value
       (boolean value)
-      ((or symbol function) (funcall value game-object))
+      ((or symbol function) (funcall value context game-object))
       (t value))))
 
-(u:fn-> resolve-func (gob::game-object uniform) t)
-(defun resolve-func (game-object uniform)
+(u:fn-> resolve-func (ctx::context gob::game-object uniform) t)
+(defun resolve-func (context game-object uniform)
   (funcall (func uniform)
            (program uniform)
            (key uniform)
-           (resolve-value game-object uniform)))
+           (resolve-value context game-object uniform)))
 
 (u:fn-> load-texture (ctx::context mat.def::material uniform) null)
 (defun load-texture (context material uniform)

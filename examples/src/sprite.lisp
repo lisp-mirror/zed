@@ -28,7 +28,7 @@
                     :duration 0.5)
    (z.render:render :layer 2)))
 
-(defun start ()
+(defun sprite ()
   (flet ((prelude (context)
            (z:load-prefab context 'camera/orthographic)
            (z:load-prefab context 'planet)

@@ -86,15 +86,3 @@
     (unless translate-p
       (m4:set-translation! view view v3:+zero+))
     nil))
-
-(u:fn-> resolve-normal-matrix ((or state null) gob::game-object) m3:mat)
-(defun resolve-normal-matrix (state game-object)
-  (declare (optimize speed))
-  (let* ((transform-state (gob::transform game-object))
-         (normal-matrix (ts::normal-matrix transform-state)))
-    (when state
-      (m4:set-translation! normal-matrix (ts::world-matrix transform-state) v3:+zero+)
-      (m4:*! normal-matrix (view state) normal-matrix)
-      (m4:invert! normal-matrix normal-matrix)
-      (m4:transpose! normal-matrix normal-matrix))
-    (m4:rotation-to-mat3 normal-matrix)))
