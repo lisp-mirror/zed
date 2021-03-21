@@ -16,6 +16,7 @@
    (#:tp #:%zed.thread-pool)
    (#:tr #:%zed.transform)
    (#:trait #:%zed.trait)
+   (#:tr.ren #:zed.trait.render)
    (#:tree #:%zed.tree)
    (#:win #:%zed.window))
   (:use #:cl))
@@ -88,6 +89,8 @@
           (clock::tick clock refresh-rate physics-func periodic-func)
           ;; Perform update logic that needs to occur each frame.
           (update context)
+          ;; Draw all game objects with a render trait attached.
+          (tr.ren::render-frame context)
           ;; Draw this frame to the window.
           (win::draw window)
           ;; Increment the frame counter at the end of the frame.

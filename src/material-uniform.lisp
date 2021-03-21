@@ -128,8 +128,9 @@
 (defun resolve-value (game-object uniform)
   (let ((value (value uniform)))
     (etypecase value
-      ((or real simple-array boolean) value)
-      ((or symbol function) (funcall value game-object)))))
+      (boolean value)
+      ((or symbol function) (funcall value game-object))
+      (t value))))
 
 (u:fn-> resolve-func (gob::game-object uniform) t)
 (defun resolve-func (game-object uniform)

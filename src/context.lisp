@@ -18,6 +18,7 @@
    (#:jobs #:%zed.jobs)
    (#:live #:%zed.live-coding)
    (#:mon #:%zed.monitor)
+   (#:rb #:%zed.red-black-tree)
    (#:sbs #:%zed.shader-buffer-state)
    (#:shd #:%zed.shader-program)
    (#:tp #:%zed.thread-pool)
@@ -43,6 +44,7 @@
   (framebuffers (u:dict #'eq) :type hash-table)
   (materials (u:dict #'eq) :type hash-table)
   (prefabs (u:dict #'eq) :type hash-table)
+  (draw-order nil :type (or rb::tree null))
   (active-camera nil))
 
 ;;; The current context is bound to this variable throughout the lifetime of the game. However, this
