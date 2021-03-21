@@ -175,8 +175,8 @@
 
 (defmacro with-framebuffer (framebuffer (&key mode attachments) &body body)
   (u:with-gensyms (id target)
-    `(if ,framebuffer
-         (let ((,id (id ,framebuffer))
+    (if framebuffer
+        `(let ((,id (id ,framebuffer))
                (,target ,(if mode
                              `(mode->target ,mode)
                              `(target ,framebuffer))))
@@ -185,4 +185,4 @@
                `((gl:draw-buffers ,attachments)))
            (progn ,@body)
            (gl:bind-framebuffer ,target 0))
-         (progn ,@body))))
+        `(progn ,@body))))
