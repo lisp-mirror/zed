@@ -9,11 +9,11 @@
    (#:cam #:%zed.camera-state)
    (#:ctx #:%zed.context)
    (#:dbg #:%zed.debug)
+   (#:do #:%zed.draw-order)
    (#:gob #:%zed.game-object)
    (#:mat #:%zed.material)
    (#:mat.data #:%zed.material.data)
    (#:mat.def #:%zed.material.definition)
-   (#:rb #:%zed.red-black-tree)
    (#:trait #:%zed.trait)
    (#:ts #:%zed.transform-state)
    (#:tree #:%zed.tree)
@@ -50,12 +50,6 @@
   (< (+ (ash (- #.(1- (expt 2 15)) (layer x)) 16) (gob::depth (trait::owner x)))
      (+ (ash (- #.(1- (expt 2 15)) (layer y)) 16) (gob::depth (trait::owner y)))))
 
-(u:fn-> make-draw-order-tree () rb::tree)
-(declaim (inline make-draw-order-tree))
-(defun make-draw-order-tree ()
-  (declare (optimize speed))
-  (rb::make-tree :sort-func #'draw-order-tree-sort))
-
 (u:fn-> render-game-object (render) null)
 (defun render-game-object (render-trait)
   (declare (optimize speed))
@@ -72,10 +66,10 @@
   (declare (optimize speed))
   ;; NOTE: This `when-let` is required: The tree is not created until the first render trait is
   ;; created, but the game loop calls this function unconditionally each frame.
-  (u:when-let ((tree (ctx::draw-order context)))
+  (u:when-let ((draw-order (ctx::draw-order context)))
     (gl:clear-color 0 0 0 1)
     (gl:clear :color-buffer :depth-buffer)
-    (rb::walk tree #'render-game-object)))
+    (do::map draw-order #'render-game-object)))
 
 ;;; Hooks
 
@@ -84,7 +78,7 @@
   (declare (optimize speed))
   (let ((context (trait::context render)))
     (unless (ctx::draw-order context)
-      (setf (ctx::draw-order context) (make-draw-order-tree)))
+      (setf (ctx::draw-order context) (do::make-manager #'draw-order-tree-sort)))
     nil))
 
 (u:fn-> attach (render) null)
@@ -93,7 +87,7 @@
   (u:if-let ((material-name (material-name render)))
     (let ((context (trait::context render)))
       (setf (material render) (mat::make-material context material-name))
-      (rb::insert (ctx::draw-order context) render)
+      (do::register context render)
       nil)
     (error "Render trait must have a material specified.")))
 
@@ -101,7 +95,7 @@
 (defun detach (render)
   (declare (optimize speed))
   (let ((context (trait::context render)))
-    (rb::delete (ctx::draw-order context) render)
+    (do::deregister context render)
     nil))
 
 (u:fn-> pre-render (render) null)

@@ -9,6 +9,7 @@
    (#:clock #:%zed.clock)
    (#:ctx #:%zed.context)
    (#:dbg #:%zed.debug)
+   (#:do #:%zed.draw-order)
    (#:gob #:%zed.game-object)
    (#:tr #:%zed.transform))
   (:use #:cl)
@@ -88,11 +89,14 @@
 ;; Walk the sub-tree rooted at a game object, modifying each game object's depth property. This
 ;; simply records an integral depth for each game object that is mapped over. This is called
 ;; whenever a game object is inserted or moved around in the scene tree.
-(u:fn-> %recalculate-sub-tree-depths (gob::game-object) null)
-(defun %recalculate-sub-tree-depths (game-object)
+(u:fn-> %recalculate-sub-tree-depths (ctx::context gob::game-object) null)
+(defun %recalculate-sub-tree-depths (context game-object)
   (declare (optimize speed))
   (walk-tree (x game-object)
-    (setf (gob::depth x) (1+ (gob::depth (gob::parent x))))))
+    (setf (gob::depth x) (1+ (gob::depth (gob::parent x))))
+    ;; When a game object's depth changes, we also have to resort its draw call in the draw order
+    ;; manager.
+    (do::resort context game-object)))
 
 ;; Update the game object's path string after it has been inserted or moved in the scene tree. This
 ;; is done by appending the game object's label to the resolved path of its parent game object,
@@ -135,7 +139,7 @@
     ;; Make the game object a child of the new parent game object.
     (push game-object (gob::children new-parent))
     ;; Update the tree depth of the moved game object and all of its children.
-    (%recalculate-sub-tree-depths game-object)
+    (%recalculate-sub-tree-depths context game-object)
     ;; Set the game object's new path used for printing.
     (%resolve-path game-object new-parent)
     ;; Set the game object's pause mode to be that of the new parent if it has a pause mode of
