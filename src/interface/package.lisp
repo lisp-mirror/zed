@@ -75,6 +75,7 @@
   (:import-from
    #:%zed.prefab
    #:define-prefab
+   #:load-prefab
    #:ref)
   (:export
    #:define-prefab

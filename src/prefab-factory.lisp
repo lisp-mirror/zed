@@ -28,8 +28,8 @@
                            (funcall (pf.def::reference-func arg) factory)
                            arg))
               :into args
-            :finally (let ((trait (apply #'tr::make-trait context type args)))
-                       (tr::attach-trait game-object trait))))
+            :finally (let ((trait (apply #'tr:make-trait context type args)))
+                       (tr:attach-trait game-object trait))))
     (tree::insert context
                   game-object
                   (u:if-let ((parent (pf.def::parent node)))

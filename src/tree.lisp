@@ -11,7 +11,10 @@
    (#:dbg #:%zed.debug)
    (#:gob #:%zed.game-object)
    (#:tr #:%zed.transform))
-  (:use #:cl))
+  (:use #:cl)
+  (:export
+   #:pause-game
+   #:unpause-game))
 
 (in-package #:%zed.tree)
 

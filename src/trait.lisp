@@ -12,7 +12,15 @@
    (#:oc #:%zed.ordered-class))
   (:use #:cl)
   (:shadow
-   #:find))
+   #:find)
+  (:export
+   #:attach-trait
+   #:detach-all-traits
+   #:detach-trait
+   #:detach-trait-type
+   #:find-trait
+   #:make-trait
+   #:trait))
 
 (in-package #:%zed.trait)
 
