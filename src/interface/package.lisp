@@ -74,10 +74,12 @@
   ;; Prefab
   (:import-from
    #:%zed.prefab
-   #:define-prefab)
+   #:define-prefab
+   #:ref)
   (:export
    #:define-prefab
-   #:load-prefab)
+   #:load-prefab
+   #:ref)
 
   ;; Asset pool
   (:import-from
