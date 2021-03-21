@@ -78,6 +78,7 @@
    (:file "material")
    (:file "trait-camera")
    (:file "trait-render")
+   (:file "trait-mesh")
    (:file "trait-sprite")
    (:file "game-loop")
    (:module "interface"

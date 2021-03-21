@@ -13,4 +13,6 @@
   :components
   ((:file "package")
    (:file "common")
-   (:file "sprite")))
+   (:file "sprite")
+   (:file "mesh-shader")
+   (:file "mesh")))
