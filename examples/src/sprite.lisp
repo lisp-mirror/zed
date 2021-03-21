@@ -6,7 +6,8 @@
 (z:define-material sprite ()
   (:shader umbra.sprite:sprite
    :uniforms (:sprite.sampler 'sprites
-              :opacity 1.0)))
+              :opacity 1.0)
+   :features (:depth-mode :lequal)))
 
 (z:define-prefab sprite ()
   (z.sprite:sprite :asset '(metadata sprites))

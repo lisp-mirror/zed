@@ -47,8 +47,8 @@
 (u:fn-> draw-order-tree-sort (render render) boolean)
 (defun draw-order-tree-sort (x y)
   (declare (optimize speed))
-  (< (+ (ash (- #.(1- (expt 2 15)) (layer x)) 16) (gob::depth (trait::owner x)))
-     (+ (ash (- #.(1- (expt 2 15)) (layer y)) 16) (gob::depth (trait::owner y)))))
+  (< (+ (ash (layer x) 16) (gob::depth (trait::owner x)))
+     (+ (ash (layer y) 16) (gob::depth (trait::owner y)))))
 
 (u:fn-> render-game-object (render) null)
 (defun render-game-object (render-trait)
