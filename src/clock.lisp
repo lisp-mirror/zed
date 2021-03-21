@@ -108,7 +108,8 @@
 
 (u:fn-> tick (clock u:ub8 function function) (values))
 (defun tick (clock refresh-rate update-func periodic-func)
-  (declare (optimize speed))
+  (declare (optimize speed)
+           (ignorable periodic-func))
   (let* ((pause (pause-time clock))
          (previous (+ (running-time clock) pause))
          (current (- (get-time clock) pause)))

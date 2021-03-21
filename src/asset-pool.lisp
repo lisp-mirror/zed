@@ -72,6 +72,7 @@
             (u:ensure-list filter)))))
 
 (defun %resolve-path (system path)
+  (declare (ignorable system))
   #+(and zed.release sbcl)
   (uiop:merge-pathnames* path (uiop:pathname-directory-pathname (first sb-ext:*posix-argv*)))
   #+(and zed.release (not sbcl))
