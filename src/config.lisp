@@ -12,6 +12,8 @@
             (:conc-name nil)
             (:predicate nil)
             (:copier nil))
+  (profile-p nil :type boolean)
+  (frame-count nil :type (or (and (integer 1) fixnum) boolean))
   (prelude (constantly nil) :type (or function symbol))
   (window-width 1280 :type u:ub16)
   (window-height 720 :type u:ub16)

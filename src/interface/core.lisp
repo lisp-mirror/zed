@@ -14,7 +14,9 @@
              ;; including loading any initial prefabs.
              (funcall (cfg::prelude config) context)
              ;; Start the main game loop.
-             (loop::start context))
+             (loop::start context
+                          :profile-p (cfg::profile-p config)
+                          :frame-count (cfg::frame-count config)))
         ;; If we reached this point it means the main game loop has terminated, so clean up the state
         ;; and shut everything down.
         (ctx::destroy context)))))

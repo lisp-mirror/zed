@@ -8,6 +8,7 @@
   (:local-nicknames
    (#:clock #:%zed.clock)
    (#:ctx #:%zed.context)
+   (#:dbg #:%zed.debug)
    (#:gob #:%zed.game-object)
    (#:in #:%zed.input)
    (#:jobs #:%zed.jobs)
@@ -58,7 +59,8 @@
         (funcall (fdefinition (trait::update-hook c)) c)))
     nil))
 
-(defun start (context)
+(u:fn-> start (ctx::context &key (:profile-p boolean) (:frame-count (or fixnum null))) null)
+(defun start (context &key profile-p frame-count)
   (declare (optimize speed))
   ;; Hold on to some variables before we enter the main game loop, since they are needed each
   ;; iteration and won't change. This way we won't have to look them up in a busy loop.
@@ -76,21 +78,28 @@
     ;; start the main game loop, to mitigate any large amounts of data from initialization or the
     ;; last run from being cleaned up at runtime causing frame drops.
     (tg:gc :full t)
-    ;; Actually start the main game loop.
-    (u:while (ctx::running-p context)
-      (live::with-continuable (clock)
-        (in::handle-events input-manager window)
-        ;; HACK: Remove this later when possible. This is just so we can easily stop the engine with
-        ;; the Escape key.
-        (when (in::on-button-enter input-manager :key :escape)
-          (ctx::shutdown context))
-        ;; Perform one clock tick.
-        (clock::tick clock refresh-rate physics-func periodic-func)
-        ;; Perform update logic that needs to occur each frame.
-        (update context)
-        ;; Draw all game objects with a render trait attached.
-        (tr.ren::render-frame context)
-        ;; Draw this frame to the window.
-        (win::draw window)
-        ;; Increment the frame counter at the end of the frame.
-        (clock::count-frame clock)))))
+    ;; Profile the game loop if the user requested to do so.
+    (dbg::with-profiling (profile-p)
+      ;; Actually start the main game loop.
+      (u:while (ctx::running-p context)
+        (live::with-continuable (clock)
+          (in::handle-events input-manager window)
+          ;; HACK: Remove this later when possible. This is just so we can easily stop the engine with
+          ;; the Escape key.
+          (when (in::on-button-enter input-manager :key :escape)
+            (ctx::shutdown context))
+          ;; Perform one clock tick.
+          (clock::tick clock refresh-rate physics-func periodic-func)
+          ;; Perform update logic that needs to occur each frame.
+          (update context)
+          ;; Draw all game objects with a render trait attached.
+          (tr.ren::render-frame context)
+          ;; Draw this frame to the window.
+          (win::draw window)
+          ;; Increment the frame counter at the end of the frame.
+          (clock::count-frame clock)
+          ;; In debug mode only, quit the game after the user-supplied frame count (useful for
+          ;; profiling).
+          #-release
+          (when (and frame-count (>= (clock::frame-count clock) frame-count))
+            (ctx::shutdown context)))))))
