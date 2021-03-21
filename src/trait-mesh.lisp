@@ -43,7 +43,7 @@
   (:setup-hook setup)
   (:render-hook render))
 
-;;; Hookes
+;;; Hooks
 
 (u:fn-> setup (mesh) null)
 (defun setup (mesh)
