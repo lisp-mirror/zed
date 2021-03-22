@@ -89,7 +89,6 @@
          (current (ts::translation/current state)))
     (v3:+! current (if replace-p v3:+zero+ current) vec)
     (when instant-p
-      ;; TODO: Maybe implement deferred updates.
       (v3:copy! (ts::translation/previous state) current))
     nil))
 
@@ -100,7 +99,6 @@
          (current (ts::translation/current state)))
     (v3:max! current current min)
     (v3:min! current current max)
-    ;; TODO: Maybe implement deferred updates.
     (when instant-p
       (v3:copy! (ts::translation/previous state) current))
     nil))
@@ -119,7 +117,6 @@
          (current (ts::rotation/current state)))
     (q:rotate! current (if replace-p q:+id+ current) quat)
     (when instant-p
-      ;; TODO: Maybe implement deferred updates.
       (q:copy! (ts::rotation/previous state) current))
     nil))
 
@@ -137,7 +134,6 @@
          (current (ts::scale/current state)))
     (v3:+! current (if replace-p v3:+zero+ current) vec)
     (when instant-p
-      ;; TODO: Maybe implement deferred updates.
       (v3:copy! (ts::scale/previous state) current))
     nil))
 
