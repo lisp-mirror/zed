@@ -38,7 +38,7 @@
 ;; TODO: Currently we only set the window's position, but if it is moved to a different monitor, we
 ;; also want to update the window's monitor reference, since it could have a different resolution,
 ;; refresh rate, etc.
-(u:fn-> move (in.man::manager win::window u:ub16 u:ub16) null)
+(u:fn-> move (in.man::manager win::window u:b32 u:b32) null)
 (declaim (inline move))
 (defun move (manager window x y)
   (declare (optimize speed)
@@ -46,7 +46,7 @@
   (win::move window x y)
   nil)
 
-(u:fn-> resize (in.man::manager win::window u:ub16 u:ub16) null)
+(u:fn-> resize (in.man::manager win::window u:b32 u:b32) null)
 (declaim (inline resize))
 (defun resize (manager window width height)
   (declare (optimize speed)

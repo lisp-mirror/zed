@@ -28,9 +28,9 @@
   ;; The current height in pixels of the window.
   (height 0 :type u:ub16)
   ;; The current horizontal position in pixels of the window.
-  (x 0 :type u:ub16)
+  (x 0 :type u:b32)
   ;; The current vertical position in pixels of the window.
-  (y 0 :type u:ub16)
+  (y 0 :type u:b32)
   ;; The window title string, displayed in the window's titlebar.
   (title "" :type string))
 
@@ -52,7 +52,7 @@
                   :height height
                   :title title)))
 
-(u:fn-> move (window u:ub16 u:ub16) null)
+(u:fn-> move (window u:b32 u:b32) null)
 (defun move (window x y)
   (declare (optimize speed))
   (u:mvlet ((monitor-x monitor-y (mon::get-position (monitor window))))
