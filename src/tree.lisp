@@ -11,8 +11,11 @@
    (#:dbg #:%zed.debug)
    (#:do #:%zed.draw-order)
    (#:gob #:%zed.game-object)
-   (#:tr #:%zed.transform))
+   (#:tr #:%zed.transform)
+   (#:trait #:%zed.trait))
   (:use #:cl)
+  (:shadow
+   #:delete)
   (:export
    #:pause-game
    #:unpause-game))
@@ -163,6 +166,28 @@
     (insert context child game-object))
   game-object)
 
+(u:fn-> delete (ctx::context gob::game-object &key (:reparent-p boolean)) null)
+(defun delete (context game-object &key reparent-p)
+  (declare (optimize speed))
+  (flet ((deregister-prefab (context game-object)
+           (u:when-let ((prefab-name (gob::prefab-name game-object))
+                        (table (ctx::prefabs context)))
+             (u:deletef (the list (u:href table prefab-name)) game-object)
+             (unless (u:href table prefab-name)
+               (remhash prefab-name table))
+             nil)))
+    #-zed.release
+    (dbg::check (not (gob::root-p game-object)))
+    (let ((parent (gob::parent game-object)))
+      (dolist (child (gob::children game-object))
+        (if reparent-p
+            (reparent context child parent)
+            (delete context child)))
+      (trait::destroy-all-traits game-object)
+      (deregister-prefab context game-object)
+      (u:deletef (gob::children parent) game-object)
+      nil)))
+
 ;; Pause the game associated with the given context. Only game objects that are marked as pausable
 ;; stop updating, allowing menus and any other game objects that wish to be interactive to be so.
 (defun pause-game (context)
@@ -175,6 +200,3 @@
   (walk-tree (x (ctx::scene-tree context) :paused-p t)
     (when (eq (gob::pause-mode x) :pause)
       (setf (gob::paused-p x) nil))))
-
-;;; TODO: Need to add a function to delete a game object from a tree, as well as add functions for
-;;; spawning and destroying game objects, which fire initialization hooks for their traits.

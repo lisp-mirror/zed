@@ -28,6 +28,13 @@
     (tree::insert context game-object parent)
     nil))
 
+(u:fn-> destroy-game-object (ctx::context gob::game-object &key (:reparent-p boolean)) null)
+(defun destroy-game-object (context game-object &key reparent-p)
+  (declare (optimize speed))
+  (tree::delete context game-object :reparent-p reparent-p)
+  nil)
+
+(u:fn-> game-object-enabled-p (gob::game-object) boolean)
 (defun game-object-enabled-p (game-object)
   (declare (optimize speed))
   (gob::enabled-p game-object))

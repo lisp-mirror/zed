@@ -195,3 +195,17 @@
   (declare (optimize speed))
   (dolist (x (gob::traits game-object))
     (detach-trait game-object x)))
+
+(u:fn-> destroy-trait (trait) null)
+(defun destroy-trait (trait)
+  (declare (optimize speed))
+  (funcall (fdefinition (destroy-hook trait)) trait)
+  (detach-trait (owner trait) trait)
+  nil)
+
+(u:fn-> destroy-all-traits (gob::game-object) null)
+(defun destroy-all-traits (game-object)
+  (declare (optimize speed))
+  (dolist (x (gob::traits game-object))
+    (destroy-trait x))
+  nil)
