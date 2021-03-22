@@ -28,7 +28,6 @@
                 (framebuffer (fb::load context framebuffer-name))
                 (attachments (fb::attachment-names->points framebuffer
                                                            (mat.data::attachments data))))
-    ;; TODO: The check for valid framebuffer in ndjinn is not correct.
     (setf (mat.def::framebuffer material) framebuffer
           (mat.def::attachments material) attachments)
     nil))
