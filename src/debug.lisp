@@ -3,10 +3,20 @@
 (defpackage #:%zed.debug
   ;; Third-party aliases
   (:local-nicknames
+   (#:glob #:global-vars)
    (#:u #:golden-utils))
   (:use #:cl))
 
 (in-package #:%zed.debug)
+
+;;; The current context is bound to this variable throughout the lifetime of the game. However, this
+;;; should not be used in code. This only exists for internal debugging purposes. It is a core
+;;; design decision not to have any global state, as it is the source of many bugs and hard to
+;;; reason about code. The reason this exists is two-fold: To quickly troubleshoot issues by
+;;; inspecting the currently bound value in the REPL as the engine is executing, and it may be used
+;;; as a hoist for compile-time constructs such as declarative DSLs that wish to read or write into
+;;; the running game state.
+(glob:define-global-var =context= nil)
 
 (defmacro check (&body body)
   (unless (member :zed.release *features*)

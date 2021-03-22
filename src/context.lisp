@@ -12,6 +12,7 @@
   (:local-nicknames
    (#:cfg #:%zed.config)
    (#:clock #:%zed.clock)
+   (#:dbg #:%zed.debug)
    (#:gob #:%zed.game-object)
    (#:in #:%zed.input)
    (#:in.mgr #:%zed.input.manager)
@@ -45,15 +46,6 @@
   (prefabs (u:dict #'eq) :type hash-table)
   (draw-order nil)
   (active-camera nil))
-
-;;; The current context is bound to this variable throughout the lifetime of the game. However, this
-;;; should not be used in code. This only exists for internal debugging purposes. It is a core
-;;; design decision not to have any global state, as it is the source of many bugs and hard to
-;;; reason about code. The reason this exists is two-fold: To quickly troubleshoot issues by
-;;; inspecting the currently bound value in the REPL as the engine is executing, and it may be used
-;;; as a hoist for compile-time constructs such as declarative DSLs that wish to read or write into
-;;; the running game state.
-(defvar *context* nil)
 
 ;; Construct the context with everything needed to enter the main game loop.
 (defun make-context (config)
@@ -95,13 +87,14 @@
   (setf (running-p context) nil))
 
 (defmacro with-context (context (config) &body body)
-  `(if *context*
+  `(if dbg::=context=
        (warn "There is a context already running.")
-       (let* ((,context (make-context ,config))
-              (*context* ,context))
+       (let* ((,context (make-context ,config)))
+         (setf dbg::=context= ,context)
          (tp::with-thread-pool (thread-pool ,context)
            (unwind-protect
                 (progn
                   (funcall (cfg::prelude ,config) ,context)
                   ,@body)
+             (setf dbg::=context= nil)
              (destroy ,context))))))
