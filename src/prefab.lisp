@@ -8,9 +8,14 @@
   ;; Internal aliases
   (:local-nicknames
    (#:ctx #:%zed.context)
+   (#:dbg #:%zed.debug)
    (#:gob #:%zed.game-object)
+   (#:live #:%zed.live-coding)
    (#:pf.def #:%zed.prefab.definitions)
-   (#:pf.fac #:%zed.prefab.factory))
+   (#:pf.fac #:%zed.prefab.factory)
+   (#:tr #:%zed.transform)
+   (#:tree #:%zed.tree)
+   (#:tp #:%zed.thread-pool))
   (:use #:cl))
 
 (in-package #:%zed.prefab)
@@ -208,19 +213,12 @@
 
 (defun update (prefab)
   (parse prefab)
-  ;; TODO
-  ;; (enqueue :recompile (list :prefab (prefab-name prefab)))
+  (when dbg::=context=
+    (tp::enqueue (ctx::thread-pool dbg::=context=) (list :prefab (pf.def::name prefab))))
   (dolist (spec (pf.def::slaves prefab))
     (u:when-let ((slave (u:href =data= spec)))
       (clrhash (pf.def::nodes slave))
       (update slave))))
-
-(defun deregister-game-object (context game-object)
-  (u:when-let ((prefab-name (gob::prefab-name game-object))
-               (table (ctx::prefabs context)))
-    (u:deletef (u:href table prefab-name) game-object)
-    (unless (u:href table prefab-name)
-      (remhash prefab-name table))))
 
 (defun load-prefab (context name &key parent)
   (let ((prefabs =data=))
@@ -276,3 +274,12 @@
              (reset ',name ,data)
              (make-prefab ',name ,data))
          (update (u:href =data= ',name))))))
+
+(defmethod live::recompile ((type (eql :prefab)) data)
+  (dolist (game-object (u:href (ctx::prefabs dbg::=context=) data))
+    (let* ((parent (gob::parent game-object))
+           (translation (tr::get-translation game-object))
+           (new-game-object (load-prefab dbg::=context= data :parent parent)))
+      (tr::translate new-game-object translation :replace-p t)
+      (tree::delete dbg::=context= game-object)))
+  (format t "Recompiled prefab: ~s.~%" data))
