@@ -86,7 +86,7 @@
   (declare (optimize speed))
   (u:if-let ((material-name (material-name render)))
     (let ((context (trait::context render)))
-      (setf (material render) (mat::make-material context material-name))
+      (setf (material render) (mat::ensure-material context material-name))
       (do::register context render)
       nil)
     (error "Render trait must have a material specified.")))

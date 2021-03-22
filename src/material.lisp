@@ -44,6 +44,12 @@
     (setf (u:href materials type) material)
     material))
 
+(u:fn-> ensure-material (ctx::context symbol) mat.def::material)
+(defun ensure-material (context type)
+  (declare (optimize speed))
+  (or (u:href (ctx::materials context) type)
+      (make-material context type)))
+
 (u:fn-> set-uniform (mat.def::material keyword t) null)
 (defun set-uniform (material key value)
   (declare (optimize speed))
