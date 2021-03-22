@@ -31,7 +31,7 @@
   (lambda ()
     (declare (optimize speed))
     (live::update-repl (ctx::clock context))
-    (tp::process-queue (ctx::thread-pool context))))
+    (tp::process-queue (ctx::thread-pool context) #'live::recompile)))
 
 ;; Create a function that is called every clock tick to update the transform state of each game
 ;; object.

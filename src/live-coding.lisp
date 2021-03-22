@@ -56,3 +56,7 @@
                             values :blurb comment :pop-to-buffer nil))
                         (constantly nil))))))
   (generate-live-support-functions))
+
+(defgeneric recompile (type data)
+  (:method (type data)
+    (error "No live recompilation hook defined for type ~s." type)))
