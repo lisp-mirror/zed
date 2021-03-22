@@ -4,8 +4,6 @@
   ;; Third-party aliases
   (:local-nicknames
    (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames)
   (:use #:cl)
   (:shadow
    #:read
@@ -20,6 +18,9 @@
             (:copier nil))
   (bindings (u:dict #'equalp) :type hash-table)
   (released-bindings nil :type list))
+
+(u:define-printer (state stream :type nil)
+  (format stream "SHADER-BUFFER-STATE"))
 
 (defun get-binding (state)
   (declare (optimize speed))

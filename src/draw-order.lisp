@@ -24,6 +24,9 @@
   (tree nil :type rb::tree)
   (table (u:dict #'eq) :type hash-table))
 
+(u:define-printer (manager stream :type nil)
+  (format stream "DRAW-ORDER MANAGER"))
+
 (u:fn-> manager-manager (function) manager)
 (defun make-manager (sort-func)
   (declare (optimize speed))

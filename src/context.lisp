@@ -47,6 +47,9 @@
   (draw-order nil)
   (active-camera nil))
 
+(u:define-printer (context stream :type nil :identity t)
+  (format stream "CONTEXT"))
+
 ;; Construct the context with everything needed to enter the main game loop.
 (defun make-context (config)
   (let* (;; Create the thread pool.
