@@ -15,7 +15,6 @@
    (#:in.mouse #:%zed.input.mouse)
    (#:in.tr #:%zed.input.transition)
    (#:loop #:%zed.game-loop)
-   (#:tp #:%zed.thread-pool)
    (#:tree #:%zed.tree)
    (#:win #:%zed.window))
   (:use #:cl)

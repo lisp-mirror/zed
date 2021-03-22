@@ -93,3 +93,15 @@
 ;; (not mid-iteration), and initiates the graceful destruction of the context.
 (defun shutdown (context)
   (setf (running-p context) nil))
+
+(defmacro with-context (context (config) &body body)
+  `(if *context*
+       (warn "There is a context already running.")
+       (let* ((,context (make-context ,config))
+              (*context* ,context))
+         (tp::with-thread-pool (thread-pool ,context)
+           (unwind-protect
+                (progn
+                  (funcall (cfg::prelude ,config) ,context)
+                  ,@body)
+             (destroy ,context))))))
