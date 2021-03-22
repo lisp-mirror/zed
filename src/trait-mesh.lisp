@@ -40,8 +40,8 @@
                :inline t
                :type (or gltf::primitive null)
                :initform nil))
-  (:setup-hook setup)
-  (:render-hook render))
+  (:setup setup)
+  (:render render))
 
 ;;; Hooks
 

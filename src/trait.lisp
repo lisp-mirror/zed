@@ -30,8 +30,7 @@
   :test #'equal)
 
 (u:define-constant +hook-names+
-    '(:setup-hook :attach-hook :detach-hook :update-hook :pre-render-hook :render-hook)
-  :test #'equal)
+    '(setup destroy attach detach update pre-render render) :test #'equal)
 
 (u:eval-always
   (oc::define-ordered-class trait ()
@@ -52,32 +51,37 @@
      (%setup-hook :reader setup-hook
                   :inline t
                   :type symbol
-                  :initarg :setup-hook
+                  :initarg setup
                   :initform 'default-hook)
+     (%destroy-hook :reader destroy-hook
+                    :inline t
+                    :type symbol
+                    :initarg destroy
+                    :initform 'default-hook)
      (%attach-hook :reader attach-hook
                    :inline t
                    :type symbol
-                   :initarg :attach-hook
+                   :initarg attach
                    :initform 'default-hook)
      (%detach-hook :reader detach-hook
                    :inline t
                    :type symbol
-                   :initarg :detach-hook
+                   :initarg detach
                    :initform 'default-hook)
      (%update-hook :reader update-hook
                    :inline t
                    :type symbol
-                   :initarg :update-hook
+                   :initarg update
                    :initform 'default-hook)
      (%pre-render-hook :reader pre-render-hook
                        :inline t
                        :type symbol
-                       :initarg :pre-render-hook
+                       :initarg pre-render
                        :initform 'default-hook)
      (%render-hook :reader render-hook
                    :inline t
                    :type symbol
-                   :initarg :render-hook
+                   :initarg render
                    :initform 'default-hook))
     (:order #.+slot-order+)))
 
@@ -104,14 +108,15 @@
        ,@(u:mappend
           (lambda (x)
             (destructuring-bind (key value) x
-              (ecase key
-                (#.+hook-names+
-                 (if (symbolp value)
-                     `(,key ',value)
-                     (error "~s for trait ~s should be an unquoted symbol but got: ~s"
-                            key
-                            type
-                            value))))))
+              (let ((local-key (u:format-symbol :%zed.trait "~a" key)))
+                (ecase local-key
+                  (#.+hook-names+
+                   (if (symbolp value)
+                       `(,local-key ',value)
+                       (error "~s for trait ~s should be an unquoted symbol but got: ~s"
+                              key
+                              type
+                              value)))))))
           options)))))
 
 (defmacro define-internal-trait (type (&key priority) &body (slots . options))

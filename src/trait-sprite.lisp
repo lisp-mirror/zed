@@ -77,10 +77,10 @@
              :inline t
              :type boolean
              :initform nil))
-  (:setup-hook setup)
-  (:update-hook update)
-  (:pre-render-hook pre-render)
-  (:render-hook render))
+  (:setup setup)
+  (:update update)
+  (:pre-render pre-render)
+  (:render render))
 
 ;;; Hooks
 

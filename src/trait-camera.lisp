@@ -57,9 +57,9 @@
                       :type boolean
                       :initarg :translate-view-p
                       :initform t))
-  (:setup-hook setup)
-  (:attach-hook attach)
-  (:update-hook update))
+  (:setup setup)
+  (:attach attach)
+  (:update update))
 
 (defun make-active (camera)
   (let ((context (trait::context camera)))

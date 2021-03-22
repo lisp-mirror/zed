@@ -39,10 +39,10 @@
            :type u:b16
            :initarg :layer
            :initform 0))
-  (:setup-hook setup)
-  (:attach-hook attach)
-  (:detach-hook detach)
-  (:pre-render-hook pre-render))
+  (:setup setup)
+  (:attach attach)
+  (:detach detach)
+  (:pre-render pre-render))
 
 (u:fn-> draw-order-tree-sort (render render) boolean)
 (defun draw-order-tree-sort (x y)
