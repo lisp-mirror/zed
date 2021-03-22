@@ -9,7 +9,8 @@
    (#:ctx #:%zed.context)
    (#:gob #:%zed.game-object)
    (#:jobs #:%zed.jobs)
-   (#:oc #:%zed.ordered-class))
+   (#:oc #:%zed.ordered-class)
+   (#:wl #:%zed.whitelist))
   (:use #:cl)
   (:shadow
    #:find)
@@ -132,6 +133,10 @@
      (:order ,+slot-order+)
      ,@(generate-initargs type priority options)))
 
+(defmacro call-hook (trait hook-type)
+  `(let ((wl::*current-hook* ,hook-type))
+     (funcall (fdefinition (,(u:format-symbol :%zed.trait "~a-HOOK" hook-type) ,trait)) ,trait)))
+
 ;; Create an instance of a trait of the given type. Slow path, for when the type is not a quoted
 ;; symbol.
 (u:fn-> make-trait (ctx::context symbol &rest t) trait)
@@ -139,7 +144,7 @@
   (declare (optimize speed))
   (if (subtypep type 'trait)
       (let ((trait (apply #'make-instance type :context context args)))
-        (funcall (fdefinition (setup-hook trait)) trait)
+        (call-hook trait :setup)
         trait)
       (error "Trait type ~s is not defined." type)))
 
@@ -169,7 +174,7 @@
   (let ((jobs (ctx::jobs (context trait))))
     (setf (owner trait) game-object)
     (push (list game-object trait #'priority) (jobs::enable-traits jobs))
-    (funcall (fdefinition (attach-hook trait)) trait)
+    (call-hook trait :attach)
     nil))
 
 (u:fn-> detach-trait (gob::game-object trait) null)
@@ -178,7 +183,7 @@
   (unless (eq game-object (owner trait))
     (error "Trait ~s is not attached to game object ~s." trait game-object))
   (let ((jobs (ctx::jobs (context trait))))
-    (funcall (fdefinition (detach-hook trait)) trait)
+    (call-hook trait :detach)
     (push (cons game-object trait) (jobs::disable-traits jobs))
     (setf (owner trait) nil)
     nil))
@@ -199,7 +204,7 @@
 (u:fn-> destroy-trait (trait) null)
 (defun destroy-trait (trait)
   (declare (optimize speed))
-  (funcall (fdefinition (destroy-hook trait)) trait)
+  (call-hook trait :destroy)
   (detach-trait (owner trait) trait)
   nil)
 

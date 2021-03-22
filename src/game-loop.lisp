@@ -56,7 +56,7 @@
       (tr::resolve-world-matrix x (clock::alpha clock)))
     (tree::walk-tree (x scene-tree)
       (dolist (c (gob::traits x))
-        (funcall (fdefinition (trait::update-hook c)) c)))
+        (trait::call-hook c :update)))
     nil))
 
 (u:fn-> start (ctx::context &key (:profile-p boolean) (:frame-count (or fixnum null))) null)

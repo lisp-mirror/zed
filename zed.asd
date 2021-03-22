@@ -31,6 +31,7 @@
    (:file "ordered-class")
    (:file "red-black-tree")
    (:file "binary-parser")
+   (:file "whitelist")
    (:file "config")
    (:file "thread-pool")
    (:file "clock")
