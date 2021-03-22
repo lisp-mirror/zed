@@ -151,8 +151,8 @@
         (pushnew value (mat.def::textures material))))
     nil))
 
-(u:fn-> make-material-uniforms (ctx::context mat.def::material) null)
-(defun make-material-uniforms (context material)
+(u:fn-> make-uniforms (ctx::context mat.def::material) null)
+(defun make-uniforms (context material)
   (declare (optimize speed))
   (let ((material-data (mat.def::data material)))
     (clrhash (mat.def::uniforms material))

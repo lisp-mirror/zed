@@ -7,8 +7,10 @@
   ;; Internal aliases
   (:local-nicknames
    (#:ctx #:%zed.context)
+   (#:dbg #:%zed.debug)
    (#:fb #:%zed.framebuffer)
    (#:gob #:%zed.game-object)
+   (#:live #:%zed.live-coding)
    (#:mat.data #:%zed.material.data)
    (#:mat.def #:%zed.material.definition)
    (#:ogl #:%zed.opengl)
@@ -37,7 +39,7 @@
   (let* ((materials (ctx::materials context))
          (data (mat.data::find type))
          (material (mat.def::%make-material :data data)))
-    (uni::make-material-uniforms context material)
+    (uni::make-uniforms context material)
     (ensure-framebuffer context material)
     (setf (u:href materials type) material)
     material))
@@ -111,3 +113,11 @@
          (if (u:href mat.data::=data= ',name)
              (mat.data::update ',name ',master ',shader (list ,@uniforms) ',pass ',output ,func)
              (mat.data::make-data ',name ',master ',shader (list ,@uniforms) ',pass ',output ,func))))))
+
+(defmethod live::recompile ((type (eql :material)) data)
+  (u:when-let ((shader (mat.data::shader (mat.data::find data))))
+    (live::recompile :shader (list shader)))
+  (u:when-let ((material (u:href (ctx::materials dbg::=context=) data)))
+    (uni::make-uniforms dbg::=context= material)
+    (ensure-framebuffer dbg::=context= material))
+  (format t "Recompiled material: ~s~%" data))

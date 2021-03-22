@@ -8,7 +8,10 @@
    (#:v4 #:origin.vec4))
   ;; Internal aliases
   (:local-nicknames
-   (#:img #:%zed.image))
+   (#:ctx #:%zed.context)
+   (#:dbg #:%zed.debug)
+   (#:img #:%zed.image)
+   (#:tp #:%zed.thread-pool))
   (:use #:cl)
   (:shadow
    #:find
@@ -58,6 +61,8 @@
           (mipmaps-p data) mipmaps-p
           (parameters data) parameters
           (source data) source)
+    (when dbg::=context=
+      (tp::enqueue (ctx::thread-pool dbg::=context=) (list :texture name)))
     nil))
 
 (defun make-data (name &rest args)

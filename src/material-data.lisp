@@ -7,8 +7,11 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
+   (#:ctx #:%zed.context)
+   (#:dbg #:%zed.debug)
    (#:fb #:%zed.framebuffer)
-   (#:fb.data #:%zed.framebuffer.data))
+   (#:fb.data #:%zed.framebuffer.data)
+   (#:tp #:%zed.thread-pool))
   (:use #:cl)
   (:shadow
    #:find))
@@ -100,6 +103,8 @@
       (update-framebuffer-link name framebuffer)
       (update-uniforms data uniforms)
       (update-relationships data)
+      (when dbg::=context=
+        (tp::enqueue (ctx::thread-pool dbg::=context=) (list :material name)))
       (update-slaves data))))
 
 (defun update-slaves (master-data)

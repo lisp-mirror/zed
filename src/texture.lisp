@@ -9,7 +9,9 @@
   (:local-nicknames
    (#:ap #:%zed.asset-pool)
    (#:ctx #:%zed.context)
+   (#:dbg #:%zed.debug)
    (#:img #:%zed.image)
+   (#:live #:%zed.live-coding)
    (#:tex.data #:%zed.texture.data))
   (:use #:cl)
   (:shadow
@@ -115,3 +117,12 @@
            (texture (make-texture data type source)))
       (configure texture)
       texture)))
+
+(defmethod live::recompile ((type (eql :texture)) data)
+  (u:when-let ((texture (ap::find dbg::=context= :texture data)))
+    (gl:delete-texture (id texture))
+    (ap::delete dbg::=context= :texture data)
+    (load dbg::=context= data :width (width texture) :height (height texture))
+    (dolist (material-name (materials texture))
+      (live::recompile :material material-name))
+    (format t "Recompiled texture: ~s~%" data)))
