@@ -134,7 +134,7 @@
      ,@(generate-initargs type priority options)))
 
 (defmacro call-hook (trait hook-type)
-  `(let ((wl::*current-hook* ,hook-type))
+  `(wl::with-scope (,(u:format-symbol :keyword "TRAIT-~a-HOOK" hook-type))
      (funcall (fdefinition (,(u:format-symbol :%zed.trait "~a-HOOK" hook-type) ,trait)) ,trait)))
 
 ;; Create an instance of a trait of the given type. Slow path, for when the type is not a quoted

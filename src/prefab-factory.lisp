@@ -11,7 +11,8 @@
    (#:pf.def #:%zed.prefab.definitions)
    (#:tr #:%zed.trait)
    (#:ts #:%zed.transform-state)
-   (#:tree #:%zed.tree))
+   (#:tree #:%zed.tree)
+   (#:wl #:%zed.whitelist))
   (:use #:cl))
 
 (in-package #:%zed.prefab.factory)
@@ -70,7 +71,8 @@
           (setf (u:href (pf.def::factory-game-objects factory) path) game-object)))
       (u:do-hash-values (node nodes)
         (setf (pf.def::factory-current-node factory) node)
-        (realize-game-object context node parent))
+        (wl::with-scope (:prefab-instantiate)
+          (realize-game-object context node parent)))
       (setf (pf.def::factory-current-node factory) nil)
       (register-root context prefab))))
 

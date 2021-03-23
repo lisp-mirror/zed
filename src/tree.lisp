@@ -12,7 +12,8 @@
    (#:do #:%zed.draw-order)
    (#:gob #:%zed.game-object)
    (#:tr #:%zed.transform)
-   (#:trait #:%zed.trait))
+   (#:trait #:%zed.trait)
+   (#:wl #:%zed.whitelist))
   (:use #:cl)
   (:shadow
    #:delete)
@@ -126,33 +127,35 @@
 (declaim (inline reparent))
 (defun reparent (context game-object new-parent)
   (declare (optimize speed))
-  (let (;; We need the clock so we can resolve the world matrix of the newly placed game object with
-        ;; the correct interpolation factor.
-        (clock (ctx::clock context)))
-    ;; Ensure the root is not moved when in debug mode.
-    (dbg::check (not (gob::root-p game-object)))
-    ;; Only in debug mode, error if the new parent is within the sub-tree rooted at the game object.
-    #-zed.release (%check-reparent-target game-object new-parent)
-    ;; If the game object currently has a parent, remove the game object from the parent's list of
-    ;; children.
-    (u:when-let ((current-parent (gob::parent game-object)))
-      (u:deletef (gob::children current-parent) game-object))
-    ;; Set the new parent reference for the game object.
-    (setf (gob::parent game-object) new-parent)
-    ;; Make the game object a child of the new parent game object.
-    (push game-object (gob::children new-parent))
-    ;; Update the tree depth of the moved game object and all of its children.
-    (%recalculate-sub-tree-depths context game-object)
-    ;; Set the game object's new path used for printing.
-    (%resolve-path game-object new-parent)
-    ;; Set the game object's pause mode to be that of the new parent if it has a pause mode of
-    ;; :inherit.
-    (when (eq (gob::pause-mode game-object) :inherit)
-      (setf (gob::pause-mode game-object) (gob::pause-mode new-parent)))
-    ;; Resolve the new world matrix for the moved game object.
-    (tr::resolve-world-matrix game-object (clock::alpha clock))
-    ;; Return the updated game object.
-    game-object))
+  (wl::with-allowed-scopes reparent-game-object (:prefab-instantiate)
+    (let (;; We need the clock so we can resolve the world matrix of the newly placed game object
+          ;; the correct interpolation factor.
+          (clock (ctx::clock context)))
+      ;; Ensure the root is not moved when in debug mode.
+      (dbg::check (not (gob::root-p game-object)))
+      ;; Only in debug mode, error if the new parent is within the sub-tree rooted at the game
+      ;; object.
+      #-zed.release (%check-reparent-target game-object new-parent)
+      ;; If the game object currently has a parent, remove the game object from the parent's list of
+      ;; children.
+      (u:when-let ((current-parent (gob::parent game-object)))
+        (u:deletef (gob::children current-parent) game-object))
+      ;; Set the new parent reference for the game object.
+      (setf (gob::parent game-object) new-parent)
+      ;; Make the game object a child of the new parent game object.
+      (push game-object (gob::children new-parent))
+      ;; Update the tree depth of the moved game object and all of its children.
+      (%recalculate-sub-tree-depths context game-object)
+      ;; Set the game object's new path used for printing.
+      (%resolve-path game-object new-parent)
+      ;; Set the game object's pause mode to be that of the new parent if it has a pause mode of
+      ;; :inherit.
+      (when (eq (gob::pause-mode game-object) :inherit)
+        (setf (gob::pause-mode game-object) (gob::pause-mode new-parent)))
+      ;; Resolve the new world matrix for the moved game object.
+      (tr::resolve-world-matrix game-object (clock::alpha clock))
+      ;; Return the updated game object.
+      game-object)))
 
 ;; Insert a game object into the sub-tree rooted at some parent game object. It is possible that
 ;; parent is not rooted in the scene tree, in which case the inserted game object is part of that
@@ -161,10 +164,11 @@
 (u:fn-> insert (ctx::context gob::game-object gob::game-object) gob::game-object)
 (defun insert (context game-object parent)
   (declare (optimize speed))
-  (reparent context game-object parent)
-  (dolist (child (gob::children game-object))
-    (insert context child game-object))
-  game-object)
+  (wl::with-allowed-scopes spawn-game-object (:prefab-instantiate)
+    (reparent context game-object parent)
+    (dolist (child (gob::children game-object))
+      (insert context child game-object))
+    game-object))
 
 (u:fn-> delete (ctx::context gob::game-object &key (:reparent-p boolean)) null)
 (defun delete (context game-object &key reparent-p)

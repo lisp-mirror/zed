@@ -53,7 +53,7 @@
 (u:fn-> set-uniform (mat.def::material keyword t) null)
 (defun set-uniform (material key value)
   (declare (optimize speed))
-  (wl::with-allowed-hooks set-uniform (:pre-render)
+  (wl::with-allowed-scopes set-uniform (:trait-pre-render-hook)
     (let ((uniforms (mat.def::uniforms material)))
       (unless (u:href uniforms key)
         (setf (u:href uniforms key) (uni::make-uniform :key key)))
