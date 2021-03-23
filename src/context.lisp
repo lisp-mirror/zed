@@ -22,7 +22,8 @@
    (#:sbs #:%zed.shader-buffer-state)
    (#:shd #:%zed.shader-program)
    (#:tp #:%zed.thread-pool)
-   (#:win #:%zed.window))
+   (#:win #:%zed.window)
+   (#:wl #:%zed.whitelist))
   (:use #:cl))
 
 (in-package #:%zed.context)
@@ -96,7 +97,7 @@
          (setf dbg::=context= ,context)
          (tp::with-thread-pool (thread-pool ,context)
            (unwind-protect
-                (progn
+                (wl::with-scope (:prelude)
                   (funcall (cfg::prelude ,config) ,context)
                   ,@body)
              (setf dbg::=context= nil)

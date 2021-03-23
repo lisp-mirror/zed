@@ -54,27 +54,33 @@
 (u:fn-> %walk-tree (gob::game-object function boolean boolean) null)
 (defun %walk-tree (game-object func disabled-p paused-p)
   (declare (optimize speed))
-  (labels ((recurse (game-object)
-             (when (and (or disabled-p (gob::enabled-p game-object))
-                        (or paused-p (not (gob::paused-p game-object))))
-               (funcall func game-object)
-               (dolist (child (gob::children game-object))
-                 (recurse child)))))
-    (if (gob::root-p game-object)
-        (dolist (child (gob::children game-object))
-          (recurse child))
-        (recurse game-object))))
+  (wl::with-allowed-scopes walk-tree
+      (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
+       :trait-attach-hook :trait-detach-hook)
+    (labels ((recurse (game-object)
+               (when (and (or disabled-p (gob::enabled-p game-object))
+                          (or paused-p (not (gob::paused-p game-object))))
+                 (funcall func game-object)
+                 (dolist (child (gob::children game-object))
+                   (recurse child)))))
+      (if (gob::root-p game-object)
+          (dolist (child (gob::children game-object))
+            (recurse child))
+          (recurse game-object)))))
 
 ;; Helper function for the walk-parents macro.
 (u:fn-> %walk-parents (gob::game-object function) null)
 (defun %walk-parents (game-object func)
   (declare (optimize speed))
-  (labels ((recurse (game-object)
-             (u:when-let ((parent (gob::parent game-object)))
-               (funcall func game-object)
-               (recurse parent))))
-    (u:when-let ((parent (gob::parent game-object)))
-      (recurse parent))))
+  (wl::with-allowed-scopes walk-parents
+      (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
+       :trait-attach-hook :trait-detach-hook)
+    (labels ((recurse (game-object)
+               (u:when-let ((parent (gob::parent game-object)))
+                 (funcall func game-object)
+                 (recurse parent))))
+      (u:when-let ((parent (gob::parent game-object)))
+        (recurse parent)))))
 
 ;; Walk up the parents of a game object, stopping and signalling an error if any traversed game
 ;; object is identical to the passed in parent game object. This is called when inserting and moving
@@ -127,7 +133,9 @@
 (declaim (inline reparent))
 (defun reparent (context game-object new-parent)
   (declare (optimize speed))
-  (wl::with-allowed-scopes reparent-game-object (:prefab-instantiate)
+  (wl::with-allowed-scopes reparent-game-object
+      (:prefab-instantiate :trait-setup-hook :trait-destroy-hook :trait-attach-hook
+       :trait-detach-hook :trait-update-hook)
     (let (;; We need the clock so we can resolve the world matrix of the newly placed game object
           ;; the correct interpolation factor.
           (clock (ctx::clock context)))
@@ -164,7 +172,9 @@
 (u:fn-> insert (ctx::context gob::game-object gob::game-object) gob::game-object)
 (defun insert (context game-object parent)
   (declare (optimize speed))
-  (wl::with-allowed-scopes spawn-game-object (:prefab-instantiate)
+  (wl::with-allowed-scopes spawn-game-object
+      (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
+       :trait-attach-hook :trait-detach-hook :trait-update-hook)
     (reparent context game-object parent)
     (dolist (child (gob::children game-object))
       (insert context child game-object))
@@ -173,34 +183,39 @@
 (u:fn-> delete (ctx::context gob::game-object &key (:reparent-p boolean)) null)
 (defun delete (context game-object &key reparent-p)
   (declare (optimize speed))
-  (flet ((deregister-prefab (context game-object)
-           (u:when-let ((prefab-name (gob::prefab-name game-object))
-                        (table (ctx::prefabs context)))
-             (u:deletef (the list (u:href table prefab-name)) game-object)
-             (unless (u:href table prefab-name)
-               (remhash prefab-name table))
-             nil)))
-    #-zed.release
-    (dbg::check (not (gob::root-p game-object)))
-    (let ((parent (gob::parent game-object)))
-      (dolist (child (gob::children game-object))
-        (if reparent-p
-            (reparent context child parent)
-            (delete context child)))
-      (trait::destroy-all-traits game-object)
-      (deregister-prefab context game-object)
-      (u:deletef (gob::children parent) game-object)
-      nil)))
+  (wl::with-allowed-scopes destroy-game-object
+      (:trait-setup-hook :trait-destroy-hook :trait-attach-hook :trait-detach-hook
+       :trait-update-hook)
+    (flet ((deregister-prefab (context game-object)
+             (u:when-let ((prefab-name (gob::prefab-name game-object))
+                          (table (ctx::prefabs context)))
+               (u:deletef (the list (u:href table prefab-name)) game-object)
+               (unless (u:href table prefab-name)
+                 (remhash prefab-name table))
+               nil)))
+      #-zed.release
+      (dbg::check (not (gob::root-p game-object)))
+      (let ((parent (gob::parent game-object)))
+        (dolist (child (gob::children game-object))
+          (if reparent-p
+              (reparent context child parent)
+              (delete context child)))
+        (trait::destroy-all-traits game-object)
+        (deregister-prefab context game-object)
+        (u:deletef (gob::children parent) game-object)
+        nil))))
 
-;; Pause the game associated with the given context. Only game objects that are marked as pausable
-;; stop updating, allowing menus and any other game objects that wish to be interactive to be so.
-(defun pause-game (context)
-  (walk-tree (x (ctx::scene-tree context))
-    (when (eq (gob::pause-mode x) :pause)
-      (setf (gob::paused-p x) t))))
+(u:fn-> pause-game-object (gob::game-object) null)
+(declaim (inline pause-game-object))
+(defun pause-game-object (game-object)
+  (declare (optimize speed))
+  (dbg::check (not (gob::root-p game-object)))
+  (setf (gob::paused-p game-object) t)
+  nil)
 
-;; Un-pauses the game associated with the given context.
-(defun unpause-game (context)
-  (walk-tree (x (ctx::scene-tree context) :paused-p t)
-    (when (eq (gob::pause-mode x) :pause)
-      (setf (gob::paused-p x) nil))))
+(u:fn-> unpause-game-object (gob::game-object) null)
+(declaim (inline unpause-game-object))
+(defun unpause-game-object (game-object)
+  (declare (optimize speed))
+  (setf (gob::paused-p game-object) nil)
+  nil)

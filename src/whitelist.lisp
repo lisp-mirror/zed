@@ -15,7 +15,13 @@
 (u:eval-always
   (defun scope-name->flag-name (scope)
     (let ((symbol (u:format-symbol :%zed.whitelist "+~a+" scope)))
-      symbol)))
+      symbol))
+
+  (defun scope-name->flag (scope)
+    (let ((flag-name (scope-name->flag-name scope)))
+      (if (boundp flag-name)
+          (symbol-value flag-name)
+          (error "Invalid scope name: ~a" scope)))))
 
 (defmacro define-scopes (() &body body)
   `(progn
@@ -30,22 +36,6 @@
                  :for i :from 0
                  :for value = (ash 1 i)
                  :collect `(,value ,scope))))))
-
-(define-scopes ()
-  :trait-setup-hook
-  :trait-destroy-hook
-  :trait-attach-hook
-  :trait-detach-hook
-  :trait-update-hook
-  :trait-pre-render-hook
-  :trait-render-hook
-  :prefab-instantiate)
-
-(defun scope-name->flag (scope)
-  (let ((flag-name (scope-name->flag-name scope)))
-    (if (boundp flag-name)
-        (symbol-value flag-name)
-        (error "Invalid scope name: ~a" scope))))
 
 (defmacro with-scope ((scope) &body body)
   `(let ((*current-scope* ,(scope-name->flag scope)))
@@ -63,3 +53,14 @@
                     ',scope-names
                     (scope-value->name *current-scope*)))
            ,@body))))
+
+(define-scopes ()
+  :prelude
+  :prefab-instantiate
+  :trait-setup-hook
+  :trait-destroy-hook
+  :trait-attach-hook
+  :trait-detach-hook
+  :trait-update-hook
+  :trait-pre-render-hook
+  :trait-render-hook)

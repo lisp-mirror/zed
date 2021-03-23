@@ -142,11 +142,14 @@
 (u:fn-> make-trait (ctx::context symbol &rest t) trait)
 (defun make-trait (context type &rest args)
   (declare (optimize speed))
-  (if (subtypep type 'trait)
-      (let ((trait (apply #'make-instance type :context context args)))
-        (call-hook trait :setup)
-        trait)
-      (error "Trait type ~s is not defined." type)))
+  (wl::with-allowed-scopes make-trait
+      (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
+       :trait-attach-hook :trait-detach-hook :trait-update-hook)
+    (if (subtypep type 'trait)
+        (let ((trait (apply #'make-instance type :context context args)))
+          (call-hook trait :setup)
+          trait)
+        (error "Trait type ~s is not defined." type))))
 
 ;; Create an instance of a trait of the given type. Fast path, for when the type is a quoted symbol.
 (define-compiler-macro make-trait (&whole whole context type &rest args)
@@ -156,9 +159,12 @@
         (let ((type (cadr type)))
           (unless (subtypep type 'trait)
             (error "Trait type ~s is not defined." type))
-          `(let ((,trait (make-instance ',type :context ,context ,@args)))
-             (funcall (fdefinition (setup-hook ,trait)) ,trait)
-             ,trait))
+          `(wl::with-allowed-scopes make-trait
+               (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
+                :trait-attach-hook :trait-detach-hook :trait-update-hook)
+             (let ((,trait (make-instance ',type :context ,context ,@args)))
+               (funcall (fdefinition (setup-hook ,trait)) ,trait)
+               ,trait)))
         whole)))
 
 (u:fn-> find-trait (gob::game-object symbol) (or trait null))
@@ -169,24 +175,30 @@
 (u:fn-> attach-trait (gob::game-object trait) null)
 (defun attach-trait (game-object trait)
   (declare (optimize speed))
-  (when (owner trait)
-    (error "Trait ~s is already attached to a game object." trait))
-  (let ((jobs (ctx::jobs (context trait))))
-    (setf (owner trait) game-object)
-    (push (list game-object trait #'priority) (jobs::enable-traits jobs))
-    (call-hook trait :attach)
-    nil))
+  (wl::with-allowed-scopes attach-trait
+      (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
+       :trait-attach-hook :trait-detach-hook :trait-update-hook)
+    (when (owner trait)
+      (error "Trait ~s is already attached to a game object." trait))
+    (let ((jobs (ctx::jobs (context trait))))
+      (setf (owner trait) game-object)
+      (push (list game-object trait #'priority) (jobs::enable-traits jobs))
+      (call-hook trait :attach)
+      nil)))
 
 (u:fn-> detach-trait (gob::game-object trait) null)
 (defun detach-trait (game-object trait)
   (declare (optimize speed))
-  (unless (eq game-object (owner trait))
-    (error "Trait ~s is not attached to game object ~s." trait game-object))
-  (let ((jobs (ctx::jobs (context trait))))
-    (call-hook trait :detach)
-    (push (cons game-object trait) (jobs::disable-traits jobs))
-    (setf (owner trait) nil)
-    nil))
+  (wl::with-allowed-scopes detach-trait
+      (:trait-setup-hook :trait-destroy-hook :trait-attach-hook :trait-detach-hook
+       :trait-update-hook)
+    (unless (eq game-object (owner trait))
+      (error "Trait ~s is not attached to game object ~s." trait game-object))
+    (let ((jobs (ctx::jobs (context trait))))
+      (call-hook trait :detach)
+      (push (cons game-object trait) (jobs::disable-traits jobs))
+      (setf (owner trait) nil)
+      nil)))
 
 (u:fn-> detach-trait-type (gob::game-object symbol) null)
 (defun detach-trait-type (game-object type)
@@ -204,8 +216,11 @@
 (u:fn-> destroy-trait (trait) null)
 (defun destroy-trait (trait)
   (declare (optimize speed))
-  (call-hook trait :destroy)
-  (detach-trait (owner trait) trait)
+  (wl::with-allowed-scopes destroy-trait
+      (:trait-setup-hook :trait-destroy-hook :trait-attach-hook :trait-detach-hook
+       :trait-update-hook)
+    (call-hook trait :destroy)
+    (detach-trait (owner trait) trait))
   nil)
 
 (u:fn-> destroy-all-traits (gob::game-object) null)

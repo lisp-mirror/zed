@@ -20,10 +20,6 @@
   (:use #:cl)
 
   ;; Core
-  (:import-from
-   #:%zed.tree
-   #:pause-game
-   #:unpause-game)
   (:export
    #:pause-game
    #:start-game
@@ -45,6 +41,10 @@
    #:relative-mouse-mode-p)
 
   ;; Game object
+  (:import-from
+   #:%zed.tree
+   #:pause-game-object
+   #:unpause-game-object)
   (:export
    #:game-object-enabled-p
    #:game-object-paused-p

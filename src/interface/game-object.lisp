@@ -39,19 +39,6 @@
   (declare (optimize speed))
   (gob::enabled-p game-object))
 
-(u:fn-> pause-game-object (gob::game-object) null)
-(defun pause-game-object (game-object)
-  (declare (optimize speed))
-  (dbg::check (not (gob::root-p game-object)))
-  (setf (gob::paused-p game-object) t)
-  nil)
-
-(u:fn-> unpause-game-object (gob::game-object) null)
-(defun unpause-game-object (game-object)
-  (declare (optimize speed))
-  (setf (gob::paused-p game-object) nil)
-  nil)
-
 (u:fn-> game-object-paused-p (gob::game-object) boolean)
 (defun game-object-paused-p (game-object)
   (declare (optimize speed))
