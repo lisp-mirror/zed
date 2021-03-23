@@ -279,13 +279,3 @@
              (reset ',name ,data)
              (make-prefab ',name ,data))
          (update (u:href =data= ',name))))))
-
-(defmethod live::recompile ((type (eql :prefab)) data)
-  (wl::with-scope (:prefab-recompile)
-    (dolist (game-object (u:href (ctx::prefabs dbg::=context=) data))
-      (let* ((parent (gob::parent game-object))
-             (translation (tr::get-translation game-object))
-             (new-game-object (load-prefab dbg::=context= data :parent parent)))
-        (tr::translate new-game-object translation :replace-p t)
-        (tree:destroy-game-object dbg::=context= game-object)))
-    (format t "Recompiled prefab: ~s.~%" data)))

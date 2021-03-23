@@ -82,6 +82,7 @@
    (:file "material-definition")
    (:file "material-uniform")
    (:file "material")
+   (:file "recompilation-hooks")
    (:file "trait-camera")
    (:file "trait-render")
    (:file "trait-mesh")

@@ -122,11 +122,3 @@
          (if (u:href mat.data::=data= ',name)
              (mat.data::update ',name ',master ',shader (list ,@uniforms) ',pass ',output ,func)
              (mat.data::make-data ',name ',master ',shader (list ,@uniforms) ',pass ',output ,func))))))
-
-(defmethod live::recompile ((type (eql :material)) data)
-  (u:when-let ((shader (mat.data::shader (mat.data::find data))))
-    (live::recompile :shader (list shader)))
-  (u:when-let ((material (u:href (ctx::materials dbg::=context=) data)))
-    (uni::make-uniforms dbg::=context= material)
-    (ensure-framebuffer dbg::=context= material))
-  (format t "Recompiled material: ~s~%" data))

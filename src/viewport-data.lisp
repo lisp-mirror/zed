@@ -5,6 +5,9 @@
   (:local-nicknames
    (#:glob #:global-vars)
    (#:u #:golden-utils))
+  ;; Internal aliases
+  (:local-nicknames
+   (#:tp #:%zed.thread-pool))
   (:use #:cl)
   (:shadow
    #:find))
@@ -36,7 +39,8 @@
     (setf (x data) (u:clamp (float x 1f0) 0.0 1.0)
           (y data) (u:clamp (float y 1f0) 0.0 1.0)
           (width data) (u:clamp (float width 1f0) 0.0 1.0)
-          (height data) (u:clamp (float height 1f0) 0.0 1.0))))
+          (height data) (u:clamp (float height 1f0) 0.0 1.0))
+    (tp::enqueue (list :viewport name))))
 
 (defun make-data (name x y width height)
   (let ((data (%make-data :name name)))

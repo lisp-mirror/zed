@@ -14,8 +14,3 @@
 
 (defun register-shaders ()
   (shadow:load-shaders (lambda (x) (tp::enqueue (list :shader x)))))
-
-(defmethod live::recompile ((type (eql :shader)) data)
-  (shadow:recompile-shaders data)
-  (dolist (x data)
-    (format t "Recompiled shader: ~s.~%" x)))
