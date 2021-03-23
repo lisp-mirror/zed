@@ -24,7 +24,7 @@
   stream
   (position 0 :type u:ub32)
   (end 0 :type u:ub32)
-  (data (make-array 0 :element-type 'u:ub8) :type (u:ub8a (*))))
+  (data (u:make-ub8-array 0) :type u:ub8a))
 
 (defun buffer-empty-p (buffer)
   (>= (position buffer) (end buffer)))
