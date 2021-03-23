@@ -190,8 +190,8 @@
 (defun detach-trait (game-object trait)
   (declare (optimize speed))
   (wl::with-allowed-scopes detach-trait
-      (:trait-setup-hook :trait-destroy-hook :trait-attach-hook :trait-detach-hook
-       :trait-update-hook)
+      (:prefab-recompile :trait-setup-hook :trait-destroy-hook :trait-attach-hook
+       :trait-detach-hook :trait-update-hook)
     (unless (eq game-object (owner trait))
       (error "Trait ~s is not attached to game object ~s." trait game-object))
     (let ((jobs (ctx::jobs (context trait))))
@@ -217,8 +217,8 @@
 (defun destroy-trait (trait)
   (declare (optimize speed))
   (wl::with-allowed-scopes destroy-trait
-      (:trait-setup-hook :trait-destroy-hook :trait-attach-hook :trait-detach-hook
-       :trait-update-hook)
+      (:prefab-recompile :trait-setup-hook :trait-destroy-hook :trait-attach-hook
+       :trait-detach-hook :trait-update-hook)
     (call-hook trait :destroy)
     (detach-trait (owner trait) trait))
   nil)

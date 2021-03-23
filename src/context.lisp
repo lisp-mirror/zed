@@ -103,8 +103,9 @@
          (setf dbg::=context= ,context)
          (tp::with-thread-pool (thread-pool ,context)
            (unwind-protect
-                (wl::with-scope (:prelude)
-                  (funcall (cfg::prelude ,config) ,context)
+                (progn
+                  (wl::with-scope (:prelude)
+                    (funcall (cfg::prelude ,config) ,context))
                   ,@body)
              (setf dbg::=context= nil)
              (destroy ,context))))))

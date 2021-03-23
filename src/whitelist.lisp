@@ -57,6 +57,7 @@
 (define-scopes ()
   :prelude
   :prefab-instantiate
+  :prefab-recompile
   :trait-setup-hook
   :trait-destroy-hook
   :trait-attach-hook

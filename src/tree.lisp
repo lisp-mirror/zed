@@ -187,8 +187,8 @@
 (defun destroy-game-object (context game-object &key reparent-p)
   (declare (optimize speed))
   (wl::with-allowed-scopes destroy-game-object
-      (:trait-setup-hook :trait-destroy-hook :trait-attach-hook :trait-detach-hook
-       :trait-update-hook)
+      (:prefab-recompile :trait-setup-hook :trait-destroy-hook :trait-attach-hook
+       :trait-detach-hook :trait-update-hook)
     (flet ((deregister-prefab (context game-object)
              (u:when-let ((prefab-name (gob::prefab-name game-object))
                           (table (ctx::prefabs context)))
