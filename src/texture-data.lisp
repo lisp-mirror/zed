@@ -64,7 +64,7 @@
           (parameters data) parameters
           (source data) source)
     (when dbg::=context=
-      (tp::enqueue (ctx::thread-pool dbg::=context=) (list :texture name)))
+      (tp::enqueue (list :texture name)))
     nil))
 
 (defun make-data (name &rest args)

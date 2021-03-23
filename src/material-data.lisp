@@ -103,8 +103,7 @@
       (update-framebuffer-link name framebuffer)
       (update-uniforms data uniforms)
       (update-relationships data)
-      (when dbg::=context=
-        (tp::enqueue (ctx::thread-pool dbg::=context=) (list :material name)))
+      (tp::enqueue (list :material name))
       (update-slaves data))))
 
 (defun update-slaves (master-data)

@@ -219,7 +219,7 @@
 (defun update (prefab)
   (parse prefab)
   (when dbg::=context=
-    (tp::enqueue (ctx::thread-pool dbg::=context=) (list :prefab (pf.def::name prefab))))
+    (tp::enqueue (list :prefab (pf.def::name prefab))))
   (dolist (spec (pf.def::slaves prefab))
     (u:when-let ((slave (u:href =data= spec)))
       (clrhash (pf.def::nodes slave))

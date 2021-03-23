@@ -3,12 +3,15 @@
 (defpackage #:%zed.thread-pool
   ;; Third-party aliases
   (:local-nicknames
+   (#:glob #:global-vars)
    (#:lp #:lparallel)
    (#:lpq #:lparallel.queue)
    (#:u #:golden-utils))
   (:use #:cl))
 
 (in-package #:%zed.thread-pool)
+
+(glob:define-global-var =thread-pool= nil)
 
 (defstruct (thread-pool
             (:constructor %make-thread-pool)
@@ -25,21 +28,26 @@
   (let ((worker-count (cl-cpus:get-number-of-processors)))
     (%make-thread-pool :worker-count worker-count)))
 
-(defmacro with-thread-pool (thread-pool &body body)
-  `(let ((lp:*kernel* (lp:make-kernel (worker-count ,thread-pool) :name "Zed")))
-     (unwind-protect (progn ,@body)
-       (lp:end-kernel :wait t))))
+(defmacro with-thread-pool (() &body body)
+  `(progn
+     (setf =thread-pool= (make-thread-pool))
+     (let ((lp:*kernel* (lp:make-kernel (worker-count =thread-pool=) :name "Zed")))
+       (unwind-protect (progn ,@body)
+         (setf =thread-pool= nil)
+         (lp:end-kernel :wait t)))))
 
-(u:fn-> enqueue (thread-pool list) null)
-(defun enqueue (thread-pool data)
+(u:fn-> enqueue (list) null)
+(defun enqueue (data)
   (declare (optimize speed))
-  (lpq:push-queue data (queue thread-pool))
+  (when =thread-pool=
+    (lpq:push-queue data (queue =thread-pool=)))
   nil)
 
-(u:fn-> process-queue (thread-pool function) null)
-(defun process-queue (thread-pool func)
+(u:fn-> process-queue (function) null)
+(defun process-queue (func)
   (declare (optimize speed))
-  (let ((queue (queue thread-pool)))
-    (u:until (lpq:queue-empty-p queue)
-      (destructuring-bind (type data) (lpq:pop-queue queue)
-        (funcall func type data)))))
+  (when =thread-pool=
+    (let ((queue (queue =thread-pool=)))
+      (u:until (lpq:queue-empty-p queue)
+        (destructuring-bind (type data) (lpq:pop-queue queue)
+          (funcall func type data))))))

@@ -35,7 +35,6 @@
             (:predicate nil)
             (:copier nil))
   (running-p nil :type boolean)
-  (thread-pool nil :type tp::thread-pool)
   (window nil :type win::window)
   (clock nil :type clock::clock)
   (input-manager nil :type in.mgr::manager)
@@ -55,9 +54,7 @@
 
 ;; Construct the context with everything needed to enter the main game loop.
 (defun make-context (config)
-  (let* (;; Create the thread pool.
-         (thread-pool (tp::make-thread-pool))
-         ;; Create a window for drawing.
+  (let* (;; Create a window for drawing.
          (window (win::make-window (cfg::window-width config)
                                    (cfg::window-height config)
                                    :title (cfg::window-title config)
@@ -71,10 +68,9 @@
     (live::setup-repl)
     ;; Register all defined shader programs with the thread pool so they are updated when recompiled
     ;; at runtime.
-    (shd::register-shaders thread-pool)
+    (shd::register-shaders)
     ;; Construct the context with references to the previously constructed state.
     (%make-context :running-p t
-                   :thread-pool thread-pool
                    :clock clock
                    :window window
                    :input-manager input-manager
@@ -101,7 +97,7 @@
        (warn "There is a context already running.")
        (let* ((,context (make-context ,config)))
          (setf dbg::=context= ,context)
-         (tp::with-thread-pool (thread-pool ,context)
+         (tp::with-thread-pool ()
            (unwind-protect
                 (progn
                   (wl::with-scope (:prelude)
