@@ -17,7 +17,9 @@
    (#:trait #:%zed.trait)
    (#:ts #:%zed.transform-state)
    (#:tree #:%zed.tree)
-   (#:tr.cam #:zed.trait.camera))
+   (#:tr.cam #:zed.trait.camera)
+   (#:vp #:%zed.viewport)
+   (#:vp.mgr #:%zed.viewport.manager))
   (:use #:cl)
   (:export
    #:render))
@@ -38,7 +40,16 @@
            :inline t
            :type u:b16
            :initarg :layer
-           :initform 0))
+           :initform 0)
+   (%viewport-name :reader viewport-name
+                   :inline t
+                   :type symbol
+                   :initarg :viewport-name
+                   :initform :default)
+   (%viewport :accessor viewport
+              :inline t
+              :type vp::viewport
+              :initform nil))
   (:setup setup)
   (:attach attach)
   (:detach detach)
@@ -57,6 +68,7 @@
          (owner (trait::owner render-trait))
          (material (material render-trait))
          (func (mat.data::render-func (mat.def::data material))))
+    (%zed.viewport::configure (viewport render-trait))
     (dbg::with-debug-group (format nil "Game Object: ~a" (gob::label owner))
       (funcall func context owner material))
     nil))
@@ -76,9 +88,11 @@
 (u:fn-> setup (render) null)
 (defun setup (render)
   (declare (optimize speed))
-  (let ((context (trait::context render)))
+  (let* ((context (trait::context render)))
     (unless (ctx::draw-order context)
       (setf (ctx::draw-order context) (do::make-manager #'draw-order-tree-sort)))
+    (setf (viewport render) (vp.mgr::ensure-viewport (ctx::viewports context)
+                                                     (viewport-name render)))
     nil))
 
 (u:fn-> attach (render) null)

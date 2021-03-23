@@ -22,6 +22,7 @@
    (#:sbs #:%zed.shader-buffer-state)
    (#:shd #:%zed.shader-program)
    (#:tp #:%zed.thread-pool)
+   (#:vp.mgr #:%zed.viewport.manager)
    (#:win #:%zed.window)
    (#:wl #:%zed.whitelist))
   (:use #:cl))
@@ -37,7 +38,7 @@
   (thread-pool nil :type tp::thread-pool)
   (window nil :type win::window)
   (clock nil :type clock::clock)
-  (input-manager (in::make-input-manager) :type in.mgr::manager)
+  (input-manager nil :type in.mgr::manager)
   (shader-buffer-state (sbs::make-state) :type sbs::state)
   (scene-tree (gob::make-root) :type gob::game-object)
   (jobs (jobs::make-jobs) :type jobs::jobs)
@@ -45,6 +46,7 @@
   (framebuffers (u:dict #'eq) :type hash-table)
   (materials (u:dict #'eq) :type hash-table)
   (prefabs (u:dict #'eq) :type hash-table)
+  (viewports nil :type vp.mgr::manager)
   (draw-order nil)
   (active-camera nil))
 
@@ -62,7 +64,9 @@
                                    :anti-alias-p (cfg::anti-alias-p config)))
          ;; Initialize the clock using either the user-supplied delta-time or defaulting to the
          ;; inverse monitor refresh rate.
-         (clock (clock::make-clock config (mon::get-refresh-rate (win::monitor window)))))
+         (clock (clock::make-clock config (mon::get-refresh-rate (win::monitor window))))
+         (input-manager (in::make-input-manager))
+         (viewport-manager (vp.mgr::make-manager window)))
     ;; Setup live coding support. This instructs SLIME or Sly's REPL to run inside our game loop.
     (live::setup-repl)
     ;; Register all defined shader programs with the thread pool so they are updated when recompiled
@@ -72,7 +76,9 @@
     (%make-context :running-p t
                    :thread-pool thread-pool
                    :clock clock
-                   :window window)))
+                   :window window
+                   :input-manager input-manager
+                   :viewports viewport-manager)))
 
 ;; This is called when the main game loop exits to destroy the context. All code should call
 ;; #'shutdown instead, which initiates a graceful shutdown of the context.

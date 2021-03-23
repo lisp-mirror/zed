@@ -67,6 +67,7 @@
   (let* ((clock (ctx::clock context))
          (window (ctx::window context))
          (input-manager (ctx::input-manager context))
+         (viewport-manager (ctx::viewports context))
          (refresh-rate (mon::get-refresh-rate (win::monitor window)))
          (physics-func (make-physics-update-function context))
          (periodic-func (make-periodic-update-function context)))
@@ -83,7 +84,7 @@
       ;; Actually start the main game loop.
       (u:while (ctx::running-p context)
         (live::with-continuable (clock)
-          (in::handle-events input-manager window)
+          (in::handle-events input-manager window viewport-manager)
           ;; HACK: Remove this later when possible. This is just so we can easily stop the engine with
           ;; the Escape key.
           (when (in::on-button-enter input-manager :key :escape)

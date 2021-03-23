@@ -9,7 +9,8 @@
    (#:in.man #:%zed.input.manager)
    (#:in.tr #:%zed.input.transition)
    (#:mon #:%zed.monitor)
-   (#:win #:%zed.window))
+   (#:win #:%zed.window)
+   (#:vp.mgr #:%zed.viewport.manager))
   (:use #:cl)
   (:shadow
    #:close))
@@ -46,12 +47,13 @@
   (win::move window x y)
   nil)
 
-(u:fn-> resize (in.man::manager win::window u:b32 u:b32) null)
+(u:fn-> resize (in.man::manager win::window vp.mgr::manager u:b32 u:b32) null)
 (declaim (inline resize))
-(defun resize (manager window width height)
+(defun resize (manager window viewports width height)
   (declare (optimize speed)
            (ignore manager))
   (win::resize window width height)
+  (vp.mgr::update viewports)
   nil)
 
 (u:fn-> minimize (in.man::manager) null)

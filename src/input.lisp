@@ -12,7 +12,8 @@
    (#:in.mouse #:%zed.input.mouse)
    (#:in.tr #:%zed.input.transition)
    (#:in.win #:%zed.input.window)
-   (#:win #:%zed.window))
+   (#:win #:%zed.window)
+   (#:vp.mgr #:%zed.viewport.manager))
   (:use #:cl))
 
 (in-package #:%zed.input)
@@ -40,7 +41,7 @@
        ,@(nreverse events))))
 
 ;; Update the input manager data structure for any input event that comes in.
-(defun dispatch-event (manager window event)
+(defun dispatch-event (manager window viewports event)
   (event-case (event)
     ;;; Window events.
     (:windowevent
@@ -49,7 +50,7 @@
        (:show (in.win::show manager))
        (:hide (in.win::hide manager))
        (:move (in.win::move manager window data1 data2))
-       (:resize (in.win::resize manager window data1 data2))
+       (:resize (in.win::resize manager window viewports data1 data2))
        (:minimize (in.win::minimize manager))
        (:maximize (in.win::maximize manager))
        (:restore (in.win::restore manager))
@@ -99,15 +100,15 @@
      (in.gp::button-down manager id button))))
 
 ;; Listen for any user input. This is called early in the main game loop.
-(u:fn-> handle-events (in.mgr::manager win::window) null)
-(defun handle-events (manager window)
+(u:fn-> handle-events (in.mgr::manager win::window vp.mgr::manager) null)
+(defun handle-events (manager window viewports)
   (declare (optimize speed))
   (in.tr::enable-entering manager)
   (in.tr::disable-exiting manager)
   (in.mouse::reset-state manager)
   (loop :with event = (sdl2:new-event)
         :until (zerop (the u:ub32 (sdl2:next-event event :poll)))
-        :do (dispatch-event manager window event)
+        :do (dispatch-event manager window viewports event)
         :finally (sdl2:free-event event)))
 
 (u:fn-> on-button-enter (in.mgr::manager &rest t) boolean)
