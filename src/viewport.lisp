@@ -19,7 +19,6 @@
             (:copier nil))
   (data nil :type vp.data::data)
   (window nil :type win::window)
-  picker ; TODO
   (x 0 :type u:ub16)
   (y 0 :type u:ub16)
   (width 0 :type u:ub16)
