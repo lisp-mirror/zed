@@ -1,4 +1,24 @@
-(in-package #:zed)
+(in-package #:cl-user)
+
+(defpackage #:%zed.core
+  ;; Third-party aliases
+  (:local-nicknames
+   (#:u #:golden-utils))
+  ;; Internal aliases
+  (:local-nicknames
+   (#:cfg #:%zed.config)
+   (#:ctx #:%zed.context)
+   (#:gob #:%zed.game-object)
+   (#:loop #:%zed.game-loop)
+   (#:tree #:%zed.tree))
+  (:use #:cl)
+  (:export
+   #:pause-game
+   #:start-game
+   #:stop-game
+   #:unpause-game))
+
+(in-package #:%zed.core)
 
 ;; The entry point of the engine. This constructs a context using the optional user-supplied
 ;; arguments, and then enters the main game loop.

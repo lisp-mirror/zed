@@ -6,15 +6,24 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
+   (#:dbg #:%zed.debug)
    (#:ts #:%zed.transform-state))
-  (:use #:cl))
+  (:use #:cl)
+  (:export
+   #:game-object
+   #:game-object-enabled-p
+   #:game-object-paused-p
+   #:make-game-object
+   #:pause-game-object
+   #:unpause-game-object))
 
 (in-package #:%zed.game-object)
 
 (deftype pause-mode () '(member :pause :ignore :inherit))
 
-(declaim (inline make-game-object))
+(declaim (inline %make-game-object))
 (defstruct (game-object
+            (:constructor %make-game-object)
             (:conc-name nil)
             (:predicate nil)
             (:copier nil))
@@ -53,5 +62,46 @@
 (u:define-printer (game-object stream :type nil)
   (format stream "GAME-OBJECT: ~a" (path game-object)))
 
+;; Create a new game object. This game object is not yet rooted and thus does not exist in the scene
+;; until #'insert is called on it. `:disabled-p`, if non-NIL, marks the game object to not be
+;; processed in the #game loop. This can be used to implement object pooling and other tasks. This
+;; causes the scene #tree traversal to stop at a disabled game object, so its children are also
+;; disabled, even if not #explicitly marked as such. `:pause-mode` may be one of `:pause`,
+;; `:ignore`, or `:inherit`, and #their behavior is documented in the struct definition at the top
+;; of this file.
+(u:fn-> make-game-object (&key (:label string) (:disabled-p boolean) (:pause-mode pause-mode))
+        game-object)
+(declaim (inline make-game-object))
+(defun make-game-object (&key (label "[NO-LABEL]") disabled-p (pause-mode :inherit))
+  (declare (optimize speed))
+  (%make-game-object :label label :enabled-p (not disabled-p) :pause-mode pause-mode))
+
 (defun make-root ()
-  (make-game-object :label "[ROOT]" :path "/" :root-p t :depth 0 :pause-mode :pause))
+  (%make-game-object :label "[ROOT]" :path "/" :root-p t :depth 0 :pause-mode :pause))
+
+(u:fn-> game-object-enabled-p (game-object) boolean)
+(declaim (inline game-object-enabled-p))
+(defun game-object-enabled-p (game-object)
+  (declare (optimize speed))
+  (enabled-p game-object))
+
+(u:fn-> game-object-paused-p (game-object) boolean)
+(declaim (inline game-object-paused-p))
+(defun game-object-paused-p (game-object)
+  (declare (optimize speed))
+  (paused-p game-object))
+
+(u:fn-> pause-game-object (game-object) null)
+(declaim (inline pause-game-object))
+(defun pause-game-object (game-object)
+  (declare (optimize speed))
+  (dbg::check (not (root-p game-object)))
+  (setf (paused-p game-object) t)
+  nil)
+
+(u:fn-> unpause-game-object (game-object) null)
+(declaim (inline unpause-game-object))
+(defun unpause-game-object (game-object)
+  (declare (optimize speed))
+  (setf (paused-p game-object) nil)
+  nil)

@@ -16,7 +16,11 @@
    (#:tr #:%zed.transform)
    (#:tree #:%zed.tree)
    (#:tp #:%zed.thread-pool))
-  (:use #:cl))
+  (:use #:cl)
+  (:export
+   #:define-prefab
+   #:load-prefab
+   #:ref))
 
 (in-package #:%zed.prefab)
 
@@ -281,5 +285,5 @@
            (translation (tr::get-translation game-object))
            (new-game-object (load-prefab dbg::=context= data :parent parent)))
       (tr::translate new-game-object translation :replace-p t)
-      (tree::delete dbg::=context= game-object)))
+      (tree:destroy-game-object dbg::=context= game-object)))
   (format t "Recompiled prefab: ~s.~%" data))

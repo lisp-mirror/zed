@@ -52,6 +52,7 @@
    (:file "game-object")
    (:file "jobs")
    (:file "context")
+   (:file "input-interface")
    (:file "trait")
    (:file "draw-order")
    (:file "asset-pool")
@@ -83,9 +84,5 @@
    (:file "trait-mesh")
    (:file "trait-sprite")
    (:file "game-loop")
-   (:module "interface"
-    :components
-    ((:file "package")
-     (:file "core")
-     (:file "input")
-     (:file "game-object")))))
+   (:file "core")
+   (:file "package")))

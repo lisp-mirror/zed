@@ -31,11 +31,11 @@
               :into args
             :finally (let ((trait (apply #'tr:make-trait context type args)))
                        (tr:attach-trait game-object trait))))
-    (tree::insert context
-                  game-object
-                  (u:if-let ((parent (pf.def::parent node)))
-                    (u:href game-objects (pf.def::path parent))
-                    (or root (ctx::scene-tree context))))
+    (tree:spawn-game-object context
+                            game-object
+                            (u:if-let ((parent (pf.def::parent node)))
+                              (u:href game-objects (pf.def::path parent))
+                              root))
     game-object))
 
 (defun register-root (context prefab)
@@ -66,7 +66,7 @@
           (nodes (pf.def::nodes prefab)))
       (u:do-hash (path node nodes)
         (let* ((label (format nil "~(~a~)" (first (last path))))
-               (game-object (gob::make-game-object :label label)))
+               (game-object (gob:make-game-object :label label)))
           (initialize-transforms game-object node)
           (setf (u:href (pf.def::factory-game-objects factory) path) game-object)))
       (u:do-hash-values (node nodes)

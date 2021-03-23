@@ -18,8 +18,10 @@
   (:shadow
    #:delete)
   (:export
-   #:pause-game
-   #:unpause-game))
+   #:%zed.tree
+   #:destroy-game-object
+   #:reparent-game-object
+   #:spawn-game-object))
 
 (in-package #:%zed.tree)
 
@@ -83,7 +85,7 @@
         (recurse parent)))))
 
 ;; Walk up the parents of a game object, stopping and signalling an error if any traversed game
-;; object is identical to the passed in parent game object. This is called when inserting and moving
+;; object is identical to the passed in parent game object. This is called when spawning and moving
 ;; game objects around in the scene tree, and only in debug mode. This ensures that the scene tree
 ;; always forms a valid tree structure.
 (u:fn-> %check-reparent-target (gob::game-object gob::game-object) boolean)
@@ -98,7 +100,7 @@
 
 ;; Walk the sub-tree rooted at a game object, modifying each game object's depth property. This
 ;; simply records an integral depth for each game object that is mapped over. This is called
-;; whenever a game object is inserted or moved around in the scene tree.
+;; whenever a game object is spawned or moved around in the scene tree.
 (u:fn-> %recalculate-sub-tree-depths (ctx::context gob::game-object) null)
 (defun %recalculate-sub-tree-depths (context game-object)
   (declare (optimize speed))
@@ -108,7 +110,7 @@
     ;; manager.
     (do::resort context game-object)))
 
-;; Update the game object's path string after it has been inserted or moved in the scene tree. This
+;; Update the game object's path string after it has been spawned or moved in the scene tree. This
 ;; is done by appending the game object's label to the resolved path of its parent game object,
 ;; separated by a slash (/) character. This path is solely for human identification purposes.
 (u:fn-> %resolve-path (gob::game-object gob::game-object) null)
@@ -123,15 +125,15 @@
     (setf (gob::path game-object) (format nil "~a/~a" parent-path (gob::label game-object)))
     nil))
 
-;; Re-parent a game object to be a child of some new parent game object. This is called by #'insert
-;; to do all the book-keeping of parenting when inserting a new game object, but it can also be
-;; called directly to move a game object and its sub-tree around in the scene tree. NOTE: In debug
-;; mode, it is checked and an error is signalled if attempting to re-parent a game object under
-;; itslef or one of its children, as the result would not be a tree structure. This safeguard is not
-;; checked in release mode for performance reasons, so be careful.
-(u:fn-> reparent (ctx::context gob::game-object gob::game-object) gob::game-object)
-(declaim (inline reparent))
-(defun reparent (context game-object new-parent)
+;; Re-parent a game object to be a child of some new parent game object. This is called by
+;; #'spawn-game-object to do all the book-keeping of parenting when spawning a new game object, but
+;; it can also be called directly to move a game object and its sub-tree around in the scene tree.
+;; NOTE: In debug mode, it is checked and an error is signalled if attempting to re-parent a game
+;; object under itslef or one of its children, as the result would not be a tree structure. This
+;; safeguard is not checked in release mode for performance reasons, so be careful.
+(u:fn-> reparent-game-object (ctx::context gob::game-object gob::game-object) gob::game-object)
+(declaim (inline reparent-game-object))
+(defun reparent-game-object (context game-object new-parent)
   (declare (optimize speed))
   (wl::with-allowed-scopes reparent-game-object
       (:prefab-instantiate :trait-setup-hook :trait-destroy-hook :trait-attach-hook
@@ -166,22 +168,23 @@
       game-object)))
 
 ;; Insert a game object into the sub-tree rooted at some parent game object. It is possible that
-;; parent is not rooted in the scene tree, in which case the inserted game object is part of that
+;; parent is not rooted in the scene tree, in which case the spawned game object is part of that
 ;; parent's disjoint tree until it is connected to the main scene tree. This allows building up
 ;; trees of game objects that are not yet registered with the scene.
-(u:fn-> insert (ctx::context gob::game-object gob::game-object) gob::game-object)
-(defun insert (context game-object parent)
+(u:fn-> spawn-game-object (ctx::context gob::game-object &optional gob::game-object)
+        gob::game-object)
+(defun spawn-game-object (context game-object &optional parent)
   (declare (optimize speed))
   (wl::with-allowed-scopes spawn-game-object
       (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
        :trait-attach-hook :trait-detach-hook :trait-update-hook)
-    (reparent context game-object parent)
+    (reparent-game-object context game-object (or parent (ctx::scene-tree context)))
     (dolist (child (gob::children game-object))
-      (insert context child game-object))
+      (spawn-game-object context child game-object))
     game-object))
 
-(u:fn-> delete (ctx::context gob::game-object &key (:reparent-p boolean)) null)
-(defun delete (context game-object &key reparent-p)
+(u:fn-> destroy-game-object (ctx::context gob::game-object &key (:reparent-p boolean)) null)
+(defun destroy-game-object (context game-object &key reparent-p)
   (declare (optimize speed))
   (wl::with-allowed-scopes destroy-game-object
       (:trait-setup-hook :trait-destroy-hook :trait-attach-hook :trait-detach-hook
@@ -198,24 +201,9 @@
       (let ((parent (gob::parent game-object)))
         (dolist (child (gob::children game-object))
           (if reparent-p
-              (reparent context child parent)
-              (delete context child)))
+              (reparent-game-object context child parent)
+              (destroy-game-object context child)))
         (trait::destroy-all-traits game-object)
         (deregister-prefab context game-object)
         (u:deletef (gob::children parent) game-object)
         nil))))
-
-(u:fn-> pause-game-object (gob::game-object) null)
-(declaim (inline pause-game-object))
-(defun pause-game-object (game-object)
-  (declare (optimize speed))
-  (dbg::check (not (gob::root-p game-object)))
-  (setf (gob::paused-p game-object) t)
-  nil)
-
-(u:fn-> unpause-game-object (gob::game-object) null)
-(declaim (inline unpause-game-object))
-(defun unpause-game-object (game-object)
-  (declare (optimize speed))
-  (setf (gob::paused-p game-object) nil)
-  nil)

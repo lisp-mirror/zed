@@ -17,7 +17,9 @@
    (#:trait #:%zed.trait)
    (#:uni #:%zed.material.uniform)
    (#:wl #:%zed.whitelist))
-  (:use #:cl))
+  (:use #:cl)
+  (:export
+   #:define-material))
 
 (in-package #:%zed.material)
 

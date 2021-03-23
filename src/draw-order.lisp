@@ -32,7 +32,7 @@
   (declare (optimize speed))
   (%make-manager :tree (rb::make-tree :sort-func sort-func)))
 
-(u:fn-> register (ctx::context trait::trait) null)
+(u:fn-> register (ctx::context trait:trait) null)
 (defun register (context render-trait)
   (declare (optimize speed))
   (let* ((manager (ctx::draw-order context))
@@ -41,7 +41,7 @@
     (setf (u:href (table manager) game-object) node)
     nil))
 
-(u:fn-> deregister (ctx::context trait::trait) null)
+(u:fn-> deregister (ctx::context trait:trait) null)
 (defun deregister (context render-trait)
   (declare (optimize speed))
   (let ((manager (ctx::draw-order context))

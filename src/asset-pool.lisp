@@ -11,7 +11,9 @@
   (:use #:cl)
   (:shadow
    #:delete
-   #:find))
+   #:find)
+  (:export
+   #:define-asset-pool))
 
 (in-package #:%zed.asset-pool)
 

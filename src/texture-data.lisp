@@ -15,7 +15,9 @@
   (:use #:cl)
   (:shadow
    #:find
-   #:type))
+   #:type)
+  (:export
+   #:define-texture))
 
 (in-package #:%zed.texture.data)
 

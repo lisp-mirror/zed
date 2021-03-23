@@ -1,4 +1,32 @@
-(in-package #:zed)
+(in-package #:cl-user)
+
+(defpackage #:%zed.input-interface
+  ;; Third-party aliases
+  (:local-nicknames
+   (#:u #:golden-utils))
+  ;; Internal aliases
+  (:local-nicknames
+   (#:ctx #:%zed.context)
+   (#:in #:%zed.input)
+   (#:in.mgr #:%zed.input.manager)
+   (#:in.mouse #:%zed.input.mouse)
+   (#:in.tr #:%zed.input.transition)
+   (#:win #:%zed.window))
+  (:use #:cl)
+  (:export
+   #:disable-relative-mouse-mode
+   #:enable-relative-mouse-mode
+   #:get-mouse-position
+   #:get-mouse-scroll
+   #:on-button-enabled
+   #:on-button-enter
+   #:on-button-exit
+   #:on-window-event-enabled
+   #:on-window-event-enter
+   #:on-window-event-exit
+   #:relative-mouse-mode-p))
+
+(in-package #:%zed.input-interface)
 
 (defun on-button-enter (context &rest args)
   (apply #'in::on-button-enter (ctx::input-manager context) args))
