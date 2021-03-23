@@ -58,6 +58,8 @@
   :prelude
   :prefab-instantiate
   :prefab-recompile
+  :physics-phase
+  :update-phase
   :trait-setup-hook
   :trait-destroy-hook
   :trait-attach-hook

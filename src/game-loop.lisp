@@ -19,15 +19,16 @@
    (#:trait #:%zed.trait)
    (#:tr.ren #:zed.trait.render)
    (#:tree #:%zed.tree)
-   (#:win #:%zed.window))
+   (#:win #:%zed.window)
+   (#:wl #:%zed.whitelist))
   (:use #:cl))
 
 (in-package #:%zed.game-loop)
 
 ;; Create a function that is called periodically to perform necessary book-keeping that does not
 ;; need to run every frame.
-(u:fn-> make-periodic-update-function (ctx::context) function)
-(defun make-periodic-update-function (context)
+(u:fn-> make-periodic-phase-function (ctx::context) function)
+(defun make-periodic-phase-function (context)
   (lambda ()
     (declare (optimize speed))
     (live::update-repl (ctx::clock context))
@@ -35,29 +36,31 @@
 
 ;; Create a function that is called every clock tick to update the transform state of each game
 ;; object.
-(u:fn-> make-physics-update-function (ctx::context) function)
-(defun make-physics-update-function (context)
+(u:fn-> make-physics-phase-function (ctx::context) function)
+(defun make-physics-phase-function (context)
   (let ((scene-tree (ctx::scene-tree context))
         (delta-time (clock::delta-time (ctx::clock context))))
     (lambda ()
       (declare (optimize speed))
-      (tree::walk-tree (x scene-tree)
-        (tr::transform-game-object x delta-time)))))
+      (wl::with-scope (:physics-phase)
+        (tree::walk-tree (x scene-tree)
+          (tr::transform-game-object x delta-time))))))
 
-(u:fn-> update (ctx::context) null)
-(defun update (context)
+(u:fn-> run-update-phase (ctx::context) null)
+(defun run-update-phase (context)
   (declare (optimize speed))
-  (let ((scene-tree (ctx::scene-tree context))
-        (clock (ctx::clock context))
-        (jobs (ctx::jobs context)))
-    (jobs::update-enabled-traits jobs)
-    (jobs::update-disabled-traits jobs)
-    (tree::walk-tree (x scene-tree)
-      (tr::resolve-world-matrix x (clock::alpha clock)))
-    (tree::walk-tree (x scene-tree)
-      (dolist (c (gob::traits x))
-        (trait::call-hook c :update)))
-    nil))
+  (wl::with-scope (:update-phase)
+    (let ((scene-tree (ctx::scene-tree context))
+          (clock (ctx::clock context))
+          (jobs (ctx::jobs context)))
+      (jobs::update-enabled-traits jobs)
+      (jobs::update-disabled-traits jobs)
+      (tree::walk-tree (x scene-tree)
+        (tr::resolve-world-matrix x (clock::alpha clock)))
+      (tree::walk-tree (x scene-tree)
+        (dolist (c (gob::traits x))
+          (trait::call-hook c :update)))
+      nil)))
 
 (u:fn-> start (ctx::context &key (:profile-p boolean) (:frame-count (or fixnum null))) null)
 (defun start (context &key profile-p frame-count)
@@ -69,8 +72,8 @@
          (input-manager (ctx::input-manager context))
          (viewport-manager (ctx::viewports context))
          (refresh-rate (mon::get-refresh-rate (win::monitor window)))
-         (physics-func (make-physics-update-function context))
-         (periodic-func (make-periodic-update-function context)))
+         (physics-phase-func (make-physics-phase-function context))
+         (periodic-phase-func (make-periodic-phase-function context)))
     ;; Emulate this function returning by sending the context value to the REPL. This only works on
     ;; Sly, and only if it is configured to allow sending code to the REPL. It is a no-op on other
     ;; environments. See: https://joaotavora.github.io/sly/#Controlling-SLY-from-outside-Emacs
@@ -90,9 +93,9 @@
           (when (in::on-button-enter input-manager :key :escape)
             (ctx::shutdown context))
           ;; Perform one clock tick.
-          (clock::tick clock refresh-rate physics-func periodic-func)
+          (clock::tick clock refresh-rate physics-phase-func periodic-phase-func)
           ;; Perform update logic that needs to occur each frame.
-          (update context)
+          (run-update-phase context)
           ;; Draw all game objects with a render trait attached.
           (tr.ren::render-frame context)
           ;; Draw this frame to the window.
