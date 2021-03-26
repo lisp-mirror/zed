@@ -6,12 +6,12 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:ap #:%zed.asset-pool)
    (#:ctx #:%zed.context)
    (#:fb #:%zed.framebuffer)
    (#:gob #:%zed.game-object)
    (#:mat.data #:%zed.material.data)
    (#:mat.def #:%zed.material.definition)
+   (#:rc #:%zed.resource-cache)
    (#:tex #:%zed.texture))
   (:use #:cl)
   (:shadow
@@ -157,7 +157,7 @@
   (let ((material-data (mat.def::data material)))
     (clrhash (mat.def::uniforms material))
     (dolist (texture-name (mat.def::textures material))
-      (let ((texture (ap::find context :texture texture-name)))
+      (let ((texture (rc::find context :texture texture-name)))
         (u:deletef (tex::materials texture) (mat.data::name material-data))))
     (setf (mat.def::textures material) nil)
     (u:do-hash (k v (mat.data::copy-uniforms material-data))

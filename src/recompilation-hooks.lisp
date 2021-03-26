@@ -6,7 +6,6 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:ap #:%zed.asset-pool)
    (#:ctx #:%zed.context)
    (#:dbg #:%zed.debug)
    (#:gob #:%zed.game-object)
@@ -14,6 +13,7 @@
    (#:mat #:%zed.material)
    (#:mat.data #:%zed.material.data)
    (#:pf #:%zed.prefab)
+   (#:rc #:%zed.resource-cache)
    (#:tex #:%zed.texture)
    (#:tr #:%zed.transform)
    (#:tree #:%zed.tree)
@@ -31,9 +31,9 @@
     (format t "Recompiled shader: ~s.~%" x)))
 
 (defmethod live::recompile ((type (eql :texture)) data)
-  (u:when-let ((texture (ap::find dbg::=context= :texture data)))
+  (u:when-let ((texture (rc::find dbg::=context= :texture data)))
     (gl:delete-texture (tex::id texture))
-    (ap::delete dbg::=context= :texture data)
+    (rc::delete dbg::=context= :texture data)
     (tex::load dbg::=context= data :width (tex::width texture) :height (tex::height texture))
     (dolist (material-name (tex::materials texture))
       (live::recompile :material material-name))

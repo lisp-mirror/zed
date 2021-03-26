@@ -58,7 +58,7 @@
    (:file "input-interface")
    (:file "trait")
    (:file "draw-order")
-   (:file "asset-pool")
+   (:file "resource-cache")
    (:file "image")
    (:file "image-png")
    (:file "image-hdr")

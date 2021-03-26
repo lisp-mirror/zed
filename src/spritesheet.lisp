@@ -6,8 +6,8 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:ap #:%zed.asset-pool)
    (#:ctx #:%zed.context)
+   (#:rc #:%zed.resource-cache)
    (#:sbs #:%zed.shader-buffer-state))
   (:use #:cl)
   (:shadow
@@ -52,8 +52,8 @@
 (u:fn-> make-spritesheet (ctx::context list list) spritesheet)
 (defun make-spritesheet (context asset buffer-spec)
   (declare (optimize speed))
-  (let ((path (ap::resolve-path asset)))
-    (ap::with-asset (context :spritesheet asset)
+  (let ((path (rc::resolve-path asset)))
+    (rc::with-resource-cache (context :spritesheet asset)
       (let ((spritesheet (%make-spritesheet :name asset
                                             :spec (u:safe-read-file-form path)
                                             :vao (gl:gen-vertex-array))))

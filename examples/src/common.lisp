@@ -1,41 +1,24 @@
 (in-package #:zed-examples)
 
-;;; Asset pools
-
-(z:define-asset-pool metadata (:system :zed-examples)
-  :path "data/metadata")
-
-(z:define-asset-pool textures (:system :zed-examples)
-  :path "data/textures"
-  :filter "png")
-
-(z:define-asset-pool environments (:system :zed-examples)
-  :path "data/textures/environments"
-  :filter "hdr")
-
-(z:define-asset-pool meshes (:system :zed-examples)
-  :path "data/meshes"
-  :filter "glb")
-
 ;;; Textures
 
 (z:define-texture brdf-lut ()
-  (:source (textures brdf-lut)))
+  (:source (:zed-examples "textures/brdf-lut.png")))
 
 (z:define-texture environment-papermill (:cube-map-array)
   (:min-filter :linear-mipmap-linear
-   :source ((:x+ (environments papermill-diffuse-right)
-             :x- (environments papermill-diffuse-left)
-             :y+ (environments papermill-diffuse-top)
-             :y- (environments papermill-diffuse-bottom)
-             :z+ (environments papermill-diffuse-front)
-             :z- (environments papermill-diffuse-back))
-            (:x+ (environments papermill-specular-right)
-             :x- (environments papermill-specular-left)
-             :y+ (environments papermill-specular-top)
-             :y- (environments papermill-specular-bottom)
-             :z+ (environments papermill-specular-front)
-             :z- (environments papermill-specular-back)))))
+   :source ((:x+ (:zed-examples "textures/environments/papermill-diffuse-right.hdr")
+             :x- (:zed-examples "textures/environments/papermill-diffuse-left.hdr")
+             :y+ (:zed-examples "textures/environments/papermill-diffuse-top.hdr")
+             :y- (:zed-examples "textures/environments/papermill-diffuse-bottom.hdr")
+             :z+ (:zed-examples "textures/environments/papermill-diffuse-front.hdr")
+             :z- (:zed-examples "textures/environments/papermill-diffuse-back.hdr"))
+            (:x+ (:zed-examples "textures/environments/papermill-specular-right.hdr")
+             :x- (:zed-examples "textures/environments/papermill-specular-left.hdr")
+             :y+ (:zed-examples "textures/environments/papermill-specular-top.hdr")
+             :y- (:zed-examples "textures/environments/papermill-specular-bottom.hdr")
+             :z+ (:zed-examples "textures/environments/papermill-specular-front.hdr")
+             :z- (:zed-examples "textures/environments/papermill-specular-back.hdr")))))
 
 ;;; Prefabs
 

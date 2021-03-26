@@ -1,7 +1,7 @@
 (in-package #:zed-examples)
 
 (z:define-texture sprites ()
-  (:source (textures sprites)))
+  (:source (:zed-examples "textures/sprites.png")))
 
 (z:define-material sprite ()
   (:shader umbra.sprite:sprite
@@ -10,7 +10,7 @@
    :features (:depth-mode :lequal)))
 
 (z:define-prefab sprite ()
-  (z.sprite:sprite :asset '(metadata sprites))
+  (z.sprite:sprite :asset '(:zed-examples "metadata/sprites.spec"))
   (z.render:render :material 'sprite))
 
 (z:define-prefab planet (:template 'sprite

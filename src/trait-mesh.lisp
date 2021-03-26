@@ -6,8 +6,8 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:ap #:%zed.asset-pool)
    (#:gltf #:%zed.mesh.gltf)
+   (#:rc #:%zed.resource-cache)
    (#:trait #:%zed.trait))
   (:use #:cl)
   (:export
@@ -50,8 +50,8 @@
   (declare (optimize speed))
   (let* ((context (trait::context mesh))
          (name (name mesh))
-         (path (ap::resolve-path (asset mesh)))
-         (gltf (ap::with-asset (context :mesh path)
+         (path (rc::resolve-path (asset mesh)))
+         (gltf (rc::with-resource-cache (context :mesh path)
                  (gltf::load path)))
          (mesh-data (u:href (gltf::gltf-meshes gltf) name)))
     (unless mesh-data

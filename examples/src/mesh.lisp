@@ -1,11 +1,11 @@
 (in-package #:zed-examples)
 
 (z:define-texture mesh (:2d-array)
-  (:source ((textures damaged-helmet-albedo)
-            (textures damaged-helmet-ao)
-            (textures damaged-helmet-emissive)
-            (textures damaged-helmet-metallic-roughness)
-            (textures damaged-helmet-normal))))
+  (:source ((:zed-examples "textures/damaged-helmet-albedo.png")
+            (:zed-examples "textures/damaged-helmet-ao.png")
+            (:zed-examples "textures/damaged-helmet-emissive.png")
+            (:zed-examples "textures/damaged-helmet-metallic-roughness.png")
+            (:zed-examples "textures/damaged-helmet-normal.png"))))
 
 (z:define-material mesh ()
   (:shader shader:mesh
@@ -30,7 +30,7 @@
                        :rotate-velocity (v3:velocity v3:+forward+ (- const:pi/6))
                        :scale 17)
   (z.mesh:mesh :name "helmet"
-               :asset '(meshes damaged-helmet))
+               :asset '(:zed-examples "meshes/damaged-helmet.glb"))
   (z.render:render :material 'mesh))
 
 (defun mesh ()

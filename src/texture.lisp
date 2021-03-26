@@ -7,11 +7,11 @@
    (#:v4 #:origin.vec4))
   ;; Internal aliases
   (:local-nicknames
-   (#:ap #:%zed.asset-pool)
    (#:ctx #:%zed.context)
    (#:dbg #:%zed.debug)
    (#:img #:%zed.image)
    (#:live #:%zed.live-coding)
+   (#:rc #:%zed.resource-cache)
    (#:tex.data #:%zed.texture.data))
   (:use #:cl)
   (:shadow
@@ -110,7 +110,7 @@
         (ctx::context symbol &key (:width (or u:ub16 null)) (:height (or u:ub16 null)))
         texture)
 (defun load (context name &key width height)
-  (ap::with-asset (context :texture name)
+  (rc::with-resource-cache (context :texture name)
     (let* ((data (tex.data::find name))
            (type (tex.data::type data))
            (source (load-source data type (tex.data::source data) :width width :height height))

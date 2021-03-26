@@ -3,7 +3,6 @@
 (uiop:define-package #:zed
   (:use #:cl)
   (:use-reexport
-   #:%zed.asset-pool
    #:%zed.core
    #:%zed.game-object
    #:%zed.input-interface

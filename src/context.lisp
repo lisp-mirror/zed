@@ -41,7 +41,7 @@
   (shader-buffer-state (sbs::make-state) :type sbs::state)
   (scene-tree (gob::make-root) :type gob::game-object)
   (jobs (jobs::make-jobs) :type jobs::jobs)
-  (assets (u:dict #'eq) :type hash-table)
+  (resource-cache (u:dict #'eq) :type hash-table)
   (framebuffers (u:dict #'eq) :type hash-table)
   (materials (u:dict #'eq) :type hash-table)
   (prefabs (u:dict #'eq) :type hash-table)
