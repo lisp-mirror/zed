@@ -27,7 +27,7 @@
   :pathname "src"
   :serial t
   :components
-  ((:file "debug")
+  ((:file "util")
    (:file "ordered-class")
    (:file "red-black-tree")
    (:file "binary-parser")

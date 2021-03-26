@@ -8,7 +8,6 @@
   (:local-nicknames
    (#:clock #:%zed.clock)
    (#:ctx #:%zed.context)
-   (#:dbg #:%zed.debug)
    (#:gob #:%zed.game-object)
    (#:in #:%zed.input)
    (#:jobs #:%zed.jobs)
@@ -19,6 +18,7 @@
    (#:trait #:%zed.trait)
    (#:tr.ren #:zed.trait.render)
    (#:tree #:%zed.tree)
+   (#:util #:%zed.util)
    (#:win #:%zed.window)
    (#:wl #:%zed.whitelist))
   (:use #:cl))
@@ -83,7 +83,7 @@
     ;; last run from being cleaned up at runtime causing frame drops.
     (tg:gc :full t)
     ;; Profile the game loop if the user requested to do so.
-    (dbg::with-profiling (profile-p)
+    (util::with-profiling (profile-p)
       ;; Actually start the main game loop.
       (u:while (ctx::running-p context)
         (live::with-continuable (clock)

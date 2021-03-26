@@ -8,7 +8,6 @@
   ;; Internal aliases
   (:local-nicknames
    (#:ctx #:%zed.context)
-   (#:dbg #:%zed.debug)
    (#:gob #:%zed.game-object)
    (#:live #:%zed.live-coding)
    (#:pf.def #:%zed.prefab.definitions)
@@ -16,6 +15,7 @@
    (#:tr #:%zed.transform)
    (#:tree #:%zed.tree)
    (#:tp #:%zed.thread-pool)
+   (#:util #:%zed.util)
    (#:wl #:%zed.whitelist))
   (:use #:cl)
   (:export
@@ -218,7 +218,7 @@
 
 (defun update (prefab)
   (parse prefab)
-  (when dbg::=context=
+  (when util::=context=
     (tp::enqueue (list :prefab (pf.def::name prefab))))
   (dolist (spec (pf.def::slaves prefab))
     (u:when-let ((slave (u:href =data= spec)))

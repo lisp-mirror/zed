@@ -8,7 +8,6 @@
   ;; Internal aliases
   (:local-nicknames
    (#:ctx #:%zed.context)
-   (#:dbg #:%zed.debug)
    (#:img #:%zed.image)
    (#:live #:%zed.live-coding)
    (#:rc #:%zed.resource-cache)

@@ -6,8 +6,8 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:dbg #:%zed.debug)
-   (#:ts #:%zed.transform-state))
+   (#:ts #:%zed.transform-state)
+   (#:util #:%zed.util))
   (:use #:cl)
   (:export
    #:game-object
@@ -95,7 +95,7 @@
 (declaim (inline pause-game-object))
 (defun pause-game-object (game-object)
   (declare (optimize speed))
-  (dbg::check (not (root-p game-object)))
+  (util::check (not (root-p game-object)))
   (setf (paused-p game-object) t)
   nil)
 

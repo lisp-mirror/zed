@@ -8,7 +8,6 @@
   (:local-nicknames
    (#:cam #:%zed.camera-state)
    (#:ctx #:%zed.context)
-   (#:dbg #:%zed.debug)
    (#:do #:%zed.draw-order)
    (#:gob #:%zed.game-object)
    (#:mat #:%zed.material)
@@ -18,6 +17,7 @@
    (#:ts #:%zed.transform-state)
    (#:tree #:%zed.tree)
    (#:tr.cam #:zed.trait.camera)
+   (#:util #:%zed.util)
    (#:vp #:%zed.viewport)
    (#:vp.mgr #:%zed.viewport.manager))
   (:use #:cl)
@@ -69,7 +69,7 @@
          (material (material render-trait))
          (func (mat.data::render-func (mat.def::data material))))
     (%zed.viewport::configure (viewport render-trait))
-    (dbg::with-debug-group (format nil "Game Object: ~a" (gob::label owner))
+    (util::with-debug-group (format nil "Game Object: ~a" (gob::label owner))
       (funcall func context owner material))
     nil))
 

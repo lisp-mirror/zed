@@ -8,11 +8,11 @@
   (:local-nicknames
    (#:clock #:%zed.clock)
    (#:ctx #:%zed.context)
-   (#:dbg #:%zed.debug)
    (#:do #:%zed.draw-order)
    (#:gob #:%zed.game-object)
    (#:tr #:%zed.transform)
    (#:trait #:%zed.trait)
+   (#:util #:%zed.util)
    (#:wl #:%zed.whitelist))
   (:use #:cl)
   (:shadow
@@ -142,7 +142,7 @@
           ;; the correct interpolation factor.
           (clock (ctx::clock context)))
       ;; Ensure the root is not moved when in debug mode.
-      (dbg::check (not (gob::root-p game-object)))
+      (util::check (not (gob::root-p game-object)))
       ;; Only in debug mode, error if the new parent is within the sub-tree rooted at the game
       ;; object.
       #-zed.release (%check-reparent-target game-object new-parent)
@@ -197,7 +197,7 @@
                  (remhash prefab-name table))
                nil)))
       #-zed.release
-      (dbg::check (not (gob::root-p game-object)))
+      (util::check (not (gob::root-p game-object)))
       (let ((parent (gob::parent game-object)))
         (dolist (child (gob::children game-object))
           (if reparent-p

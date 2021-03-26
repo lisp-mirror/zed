@@ -9,9 +9,9 @@
   ;; Internal aliases
   (:local-nicknames
    (#:ctx #:%zed.context)
-   (#:dbg #:%zed.debug)
    (#:img #:%zed.image)
-   (#:tp #:%zed.thread-pool))
+   (#:tp #:%zed.thread-pool)
+   (#:util #:%zed.util))
   (:use #:cl)
   (:shadow
    #:find
@@ -63,7 +63,7 @@
           (mipmaps-p data) mipmaps-p
           (parameters data) parameters
           (source data) source)
-    (when dbg::=context=
+    (when util::=context=
       (tp::enqueue (list :texture name)))
     nil))
 

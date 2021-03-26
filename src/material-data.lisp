@@ -8,7 +8,6 @@
   ;; Internal aliases
   (:local-nicknames
    (#:ctx #:%zed.context)
-   (#:dbg #:%zed.debug)
    (#:fb #:%zed.framebuffer)
    (#:fb.data #:%zed.framebuffer.data)
    (#:tp #:%zed.thread-pool))

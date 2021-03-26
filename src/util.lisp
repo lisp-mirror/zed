@@ -1,13 +1,15 @@
 (in-package #:cl-user)
 
-(defpackage #:%zed.debug
+(defpackage #:%zed.util
   ;; Third-party aliases
   (:local-nicknames
    (#:glob #:global-vars)
    (#:u #:golden-utils))
   (:use #:cl))
 
-(in-package #:%zed.debug)
+(in-package #:%zed.util)
+
+(glob:define-global-var =system-name= nil)
 
 ;;; The current context is bound to this variable throughout the lifetime of the game. However, this
 ;;; should not be used in code. This only exists for internal debugging purposes. It is a core

@@ -12,7 +12,6 @@
   (:local-nicknames
    (#:cfg #:%zed.config)
    (#:clock #:%zed.clock)
-   (#:dbg #:%zed.debug)
    (#:gob #:%zed.game-object)
    (#:in #:%zed.input)
    (#:in.mgr #:%zed.input.manager)
@@ -22,6 +21,7 @@
    (#:sbs #:%zed.shader-buffer-state)
    (#:shd #:%zed.shader-program)
    (#:tp #:%zed.thread-pool)
+   (#:util #:%zed.util)
    (#:vp.mgr #:%zed.viewport.manager)
    (#:win #:%zed.window)
    (#:wl #:%zed.whitelist))
@@ -93,15 +93,15 @@
   (setf (running-p context) nil))
 
 (defmacro with-context (context (config) &body body)
-  `(if dbg::=context=
+  `(if util::=context=
        (warn "There is a context already running.")
        (let* ((,context (make-context ,config)))
-         (setf dbg::=context= ,context)
+         (setf util::=context= ,context)
          (tp::with-thread-pool ()
            (unwind-protect
                 (progn
                   (wl::with-scope (:prelude)
                     (funcall (cfg::prelude ,config) ,context))
                   ,@body)
-             (setf dbg::=context= nil)
+             (setf util::=context= nil)
              (destroy ,context))))))

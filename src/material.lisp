@@ -7,7 +7,6 @@
   ;; Internal aliases
   (:local-nicknames
    (#:ctx #:%zed.context)
-   (#:dbg #:%zed.debug)
    (#:fb #:%zed.framebuffer)
    (#:gob #:%zed.game-object)
    (#:live #:%zed.live-coding)
