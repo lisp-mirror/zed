@@ -68,12 +68,13 @@
     (gl:bind-texture target 0)
     nil))
 
-(u:fn-> load-framebuffer-texture (tex.data::data u:ub16 u:ub16) img::image)
+(u:fn-> load-framebuffer-texture (ctx::context tex.data::data u:ub16 u:ub16) img::image)
 (declaim (inline load-framebuffer-texture))
-(defun load-framebuffer-texture (data width height)
+(defun load-framebuffer-texture (context data width height)
   (declare (optimize speed))
   (values
-   (img::load nil
+   (img::load context
+              nil
               :width width
               :height height
               :pixel-format (tex.data::pixel-format data)
@@ -82,8 +83,8 @@
 
 (defgeneric update (type texture source))
 
-(defgeneric load-source (data type source &key &allow-other-keys)
-  (:method :around (data type source &key)
+(defgeneric load-source (context data type source &key &allow-other-keys)
+  (:method :around (context data type source &key)
     (declare (optimize speed))
     (let* ((loaded (call-next-method))
            (source-list (u:flatten (u:ensure-list loaded))))
@@ -113,7 +114,12 @@
   (rc::with-resource-cache (context :texture name)
     (let* ((data (tex.data::find name))
            (type (tex.data::type data))
-           (source (load-source data type (tex.data::source data) :width width :height height))
+           (source (load-source context
+                                data
+                                type
+                                (tex.data::source data)
+                                :width width
+                                :height height))
            (texture (make-texture data type source)))
       (configure texture)
       texture)))

@@ -49,13 +49,13 @@
                                    (img::data image)))
     (gl:bind-texture :texture-cube-map 0)))
 
-(defmethod tex::load-source (data (type (eql :cube-map)) source &key width height)
+(defmethod tex::load-source (context data (type (eql :cube-map)) source &key width height)
   (declare (optimize speed))
   (let ((valid-keys '(:x+ :x- :y+ :y- :z+ :z-)))
     (cond
       ((typep source '(or null (integer 1 1)))
        (loop :repeat 6
-             :collect (tex::load-framebuffer-texture data width height)))
+             :collect (tex::load-framebuffer-texture context data width height)))
       ((and (u:plist-p source)
             (u:set-equal (u:plist-keys source) valid-keys)
             (every #'listp (u:plist-values source)))
@@ -63,5 +63,7 @@
              :collect k :into result
              :collect v :into result
              :finally (destructuring-bind (&key x+ x- y+ y- z+ z-) result
-                        (return (lp:pmapcar #'img::load (list x+ x- y+ y- z+ z-))))))
+                        (return (lp:pmapcar
+                                 (lambda (x) (img::load context x))
+                                 (list x+ x- y+ y- z+ z-))))))
       (t (error "Unsupported source for cube map texture: ~s." (tex.data::name data))))))
