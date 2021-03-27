@@ -39,11 +39,11 @@
                            data))
     (gl:bind-texture :texture-2d 0)))
 
-(defmethod tex::load-source (context data (type (eql :2d)) source &key width height)
+(defmethod tex::load-source (data (type (eql :2d)) source &key width height)
   (declare (optimize speed))
   (typecase source
     ((or null (integer 1 1))
-     (tex::load-framebuffer-texture context data width height))
+     (tex::load-framebuffer-texture data width height))
     (list
-     (img::load context (tex.data::source data)))
+     (img::load (tex.data::source data)))
     (t (error "Unsupported source for 2D texture: ~s." (tex.data::name data)))))

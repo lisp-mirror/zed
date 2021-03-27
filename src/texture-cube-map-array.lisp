@@ -49,9 +49,9 @@
                                              (img::data image))))
     (gl:bind-texture :texture-cube-map-array 0)))
 
-(defmethod tex::load-source (context data (type (eql :cube-map-array)) source &key width height)
+(defmethod tex::load-source (data (type (eql :cube-map-array)) source &key width height)
   (declare (optimize speed))
   (lp:pmapcar
    (lambda (x)
-     (tex::load-source context data :cube-map x :width width :height height))
+     (tex::load-source data :cube-map x :width width :height height))
    source))

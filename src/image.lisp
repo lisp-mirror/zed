@@ -36,15 +36,15 @@
   (:method (type path)
     (error "Unsupported image type ~s.~%~%Path: ~s" type path)))
 
-(defgeneric load (context asset &key &allow-other-keys))
+(defgeneric load (asset &key &allow-other-keys))
 
-(defmethod load (context (asset null) &key width height pixel-format pixel-type internal-format)
+(defmethod load ((asset null) &key width height pixel-format pixel-type internal-format)
   (make-image :width width
               :height height
               :pixel-format pixel-format
               :pixel-type pixel-type
               :internal-format internal-format))
 
-(defmethod load (context asset &key)
+(defmethod load (asset &key)
   (asset::with-asset (asset path data)
     (%load (get-type path) data)))
