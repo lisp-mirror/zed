@@ -3,6 +3,7 @@
 (defpackage #:%zed.core
   ;; Third-party aliases
   (:local-nicknames
+   (#:log #:verbose)
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
@@ -24,6 +25,7 @@
 ;; arguments, and then enters the main game loop.
 (defun start-game (&rest options)
   (let ((config (apply #'cfg::make-config options)))
+    (log:info :zed.core "Started ~a" (cfg::window-title config))
     (ctx::with-context context (config)
       (loop::start context
                    :profile-p (cfg::profile-p config)

@@ -3,6 +3,7 @@
 (defpackage #:%zed.input.gamepad
   ;; Third-party aliases
   (:local-nicknames
+   (#:log #:verbose)
    (#:sv #:static-vectors)
    (#:u #:golden-utils))
   ;; Internal aliases
@@ -104,6 +105,7 @@
       (setf (u:href (in.mgr::gamepad-instances manager) instance) gamepad
             (u:href (in.mgr::gamepad-ids manager) id) gamepad)
       (in.tr::in manager :gamepad :attach id)
+      (log:debug :zed.input "Gamepad attached: ~s" id)
       nil)))
 
 (u:fn-> detach (in.mgr::manager u:b32) null)
@@ -117,6 +119,7 @@
     (remhash id (in.mgr::gamepad-ids manager))
     (remhash instance instances)
     (in.tr::out manager :gamepad :attach id)
+    (log:debug :zed.input "Gamepad detached: ~s" id)
     nil))
 
 (u:fn-> analog-move (in.mgr::manager u:b32 u:ub32 u:b16) null)

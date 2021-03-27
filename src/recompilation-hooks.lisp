@@ -3,6 +3,7 @@
 (defpackage #:%zed.recompilation-hooks
   ;; Third-party aliases
   (:local-nicknames
+   (#:log #:verbose)
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
@@ -28,7 +29,7 @@
 (defmethod live::recompile ((type (eql :shader)) data)
   (shadow:recompile-shaders data)
   (dolist (x data)
-    (format t "Recompiled shader: ~s.~%" x)))
+    (log:debug :zed.recompile "Recompiled shader: ~s" x)))
 
 (defmethod live::recompile ((type (eql :texture)) data)
   (u:when-let ((texture (rc::find util::=context= :texture data)))
@@ -37,7 +38,7 @@
     (tex::load util::=context= data :width (tex::width texture) :height (tex::height texture))
     (dolist (material-name (tex::materials texture))
       (live::recompile :material material-name))
-    (format t "Recompiled texture: ~s~%" data)))
+    (log:debug :zed.recompile "Recompiled texture: ~s" data)))
 
 (defmethod live::recompile ((type (eql :material)) data)
   (u:when-let ((shader (mat.data::shader (mat.data::find data))))
@@ -45,7 +46,7 @@
   (u:when-let ((material (u:href (ctx::materials util::=context=) data)))
     (uni::make-uniforms util::=context= material)
     (mat::ensure-framebuffer util::=context= material))
-  (format t "Recompiled material: ~s~%" data))
+  (log:debug :zed.recompile "Recompiled material: ~s" data))
 
 (defmethod live::recompile ((type (eql :prefab)) data)
   (wl::with-scope (:prefab-recompile)
@@ -55,8 +56,9 @@
              (new-game-object (pf::load-prefab util::=context= data :parent parent)))
         (tr::translate new-game-object translation :replace-p t)
         (tree:destroy-game-object util::=context= game-object)))
-    (format t "Recompiled prefab: ~s.~%" data)))
+    (log:debug :zed.recompile "Recompiled prefab: ~s" data)))
 
 (defmethod live::recompile ((type (eql :viewport)) data)
   (u:when-let ((viewport (vp.mgr::find (ctx::viewports util::=context=) data)))
-    (vp::update viewport)))
+    (vp::update viewport)
+    (log:debug :zed.recompile "Recompiled viewport: ~s" data)))

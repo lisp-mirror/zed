@@ -3,6 +3,7 @@
 (defpackage #:%zed.image
   ;; Third-party aliases
   (:local-nicknames
+   (#:log #:verbose)
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
@@ -47,4 +48,7 @@
 
 (defmethod load (asset &key)
   (asset::with-asset (asset path data)
-    (%load (get-type path) data)))
+    (destructuring-bind (asset-system asset-path) asset
+      (log:info :zed.image "Loading image: ~a (~s)..." asset-path asset-system)
+      (prog1 (%load (get-type path) data)
+        (log:info :zed.image "Loaded image: ~a (~s)" asset-path asset-system)))))

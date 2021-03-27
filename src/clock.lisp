@@ -3,6 +3,7 @@
 (defpackage #:%zed.clock
   ;; Third-party aliases
   (:local-nicknames
+   (#:log #:verbose)
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
@@ -41,8 +42,10 @@
 
 (defun make-clock (config refresh-rate)
   (let ((delta-time (float (or (cfg::delta-time config) (/ refresh-rate)) 1f0)))
-    (%make-clock :init-time (get-internal-real-time)
-                 :delta-time delta-time)))
+    (prog1 (%make-clock :init-time (get-internal-real-time)
+                        :delta-time delta-time)
+      (log:debug :zed.clock "Initialized game clock: delta: ~,3f ms/frame"
+                 (* delta-time 1000f0)))))
 
 (declaim (inline get-time))
 (defun get-time (clock)

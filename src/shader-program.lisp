@@ -3,6 +3,7 @@
 (defpackage #:%zed.shader-program
   ;; Third-party aliases
   (:local-nicknames
+   (#:log #:verbose)
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
@@ -13,4 +14,6 @@
 (in-package #:%zed.shader-program)
 
 (defun register-shaders ()
-  (shadow:load-shaders (lambda (x) (tp::enqueue (list :shader x)))))
+  (let ((table (shadow:load-shaders (lambda (x) (tp::enqueue (list :shader x))))))
+    (log:info :zed.shader-program "Loaded ~d shader programs" (hash-table-count table))
+    table))

@@ -3,6 +3,7 @@
 (defpackage #:%zed.texture
   ;; Third-party aliases
   (:local-nicknames
+   (#:log #:verbose)
    (#:u #:golden-utils)
    (#:v4 #:origin.vec4))
   ;; Internal aliases
@@ -110,6 +111,7 @@
         texture)
 (defun load (context name &key width height)
   (rc::with-resource-cache (context :texture name)
+    (log:debug :zed.texture "Loading texture: ~s..." name)
     (let* ((data (tex.data::find name))
            (type (tex.data::type data))
            (source (load-source data
@@ -119,4 +121,5 @@
                                 :height height))
            (texture (make-texture data type source)))
       (configure texture)
+      (log:debug :zed.texture "Texture loaded: ~s" name)
       texture)))

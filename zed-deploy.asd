@@ -8,7 +8,8 @@
   :license "MIT"
   :source-control (:git "https://git.mfiano.net/mfiano/zed.git")
   :encoding :utf-8
-  :depends-on (#:zed)
+  :depends-on (#:verbose
+               #:zed)
   :pathname "src/deploy"
   :serial t
   :components

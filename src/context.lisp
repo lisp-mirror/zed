@@ -7,6 +7,7 @@
 (defpackage #:%zed.context
   ;; Third-party aliases
   (:local-nicknames
+   (#:v #:verbose)
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
@@ -17,6 +18,7 @@
    (#:in.mgr #:%zed.input.manager)
    (#:jobs #:%zed.jobs)
    (#:live #:%zed.live-coding)
+   (#:log #:%zed.logging)
    (#:mon #:%zed.monitor)
    (#:pack #:%zed.pack)
    (#:sbs #:%zed.shader-buffer-state)
@@ -55,35 +57,47 @@
 
 ;; Construct the context with everything needed to enter the main game loop.
 (defun make-context (config)
-  (let* ((window (win::make-window (cfg::window-width config)
-                                   (cfg::window-height config)
-                                   :title (cfg::window-title config)
-                                   :anti-alias-p (cfg::anti-alias-p config)))
-         (refresh-rate (mon::get-refresh-rate (win::monitor window))))
-    ;; Setup live coding support. This instructs SLIME or Sly's REPL to run inside our game loop.
-    (live::setup-repl)
-    ;; Load the pack file (if running in release mode).
-    (pack::read-pack)
-    ;; Register all defined shader programs with the thread pool so they are updated when recompiled
-    ;; at runtime.
-    (shd::register-shaders)
-    ;; Construct the context with references to the previously constructed state.
-    (%make-context :running-p t
-                   :clock (clock::make-clock config refresh-rate)
-                   :window window
-                   :input-manager (in::make-input-manager)
-                   :viewports (vp.mgr::make-manager window))))
+  (let ((success-p nil))
+    (unwind-protect
+         (let* ((window (win::make-window (cfg::window-width config)
+                                          (cfg::window-height config)
+                                          :title (cfg::window-title config)
+                                          :anti-alias-p (cfg::anti-alias-p config)))
+                (refresh-rate (mon::get-refresh-rate (win::monitor window))))
+           ;; Enable logging.
+           (log::start config)
+           ;; Setup live coding support. This instructs SLIME or Sly's REPL to run inside our game
+           ;; loop.
+           (live::setup-repl)
+           ;; Load the pack file (if running in release mode).
+           (pack::read-pack)
+           ;; Register all defined shader programs with the thread pool so they are updated when
+           ;; recompiled at runtime.
+           (shd::register-shaders)
+           ;; Construct the context with references to the previously constructed state.
+           (prog1 (%make-context :running-p t
+                                 :clock (clock::make-clock config refresh-rate)
+                                 :window window
+                                 :input-manager (in::make-input-manager)
+                                 :viewports (vp.mgr::make-manager window))
+             (setf success-p t)))
+      (unless success-p
+        (sdl2:quit*)))))
 
 ;; This is called when the main game loop exits to destroy the context. All code should call
 ;; #'shutdown instead, which initiates a graceful shutdown of the context.
 (defun destroy (context)
+  (v:info :zed.context "Destroying context...")
   ;; Destroy the input manager.
   (in::destroy (input-manager context))
   ;; Destroy the window, which takes care of cleaning up any foreign resources for the window and
   ;; associated OpenGL context.
   (win::destroy (window context))
+  ;; Stop logging.
+  (log::stop)
   ;; Force the Lisp implementation to perform a full garbage collection.
-  (tg:gc :full t))
+  (tg:gc :full t)
+  (v:info :zed.context "Context destroyed"))
 
 ;; Gracefully shut down the context. This instructs the main game loop to exit at the right time
 ;; (not mid-iteration), and initiates the graceful destruction of the context.
@@ -99,7 +113,9 @@
            (unwind-protect
                 (progn
                   (wl::with-scope (:prelude)
-                    (funcall (cfg::prelude ,config) ,context))
+                    (v:debug :zed.context "Executing prelude...")
+                    (funcall (cfg::prelude ,config) ,context)
+                    (v:debug :zed.context "Finished executing prelude"))
                   ,@body)
              (setf util::=context= nil)
              (destroy ,context))))))

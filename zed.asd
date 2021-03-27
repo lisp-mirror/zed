@@ -24,11 +24,14 @@
                #:trivial-garbage
                #:trivial-gray-streams
                #:uiop
-               #:umbra)
+               #:umbra
+               #:verbose)
   :pathname "src"
   :serial t
   :components
   ((:file "util")
+   (:file "config")
+   (:file "logging")
    (:file "ordered-class")
    (:file "slice-stream")
    (:file "red-black-tree")
@@ -36,7 +39,6 @@
    (:file "pack")
    (:file "asset")
    (:file "whitelist")
-   (:file "config")
    (:file "thread-pool")
    (:file "clock")
    (:file "live-coding")

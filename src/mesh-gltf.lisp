@@ -4,6 +4,7 @@
   ;; Third-party aliases
   (:local-nicknames
    (#:io #:fast-io)
+   (#:log #:verbose)
    (#:sv #:static-vectors)
    (#:u #:golden-utils))
   ;; Internal aliases
@@ -255,13 +256,17 @@
             (lambda (x) (draw-primitive/indexed primitive x))
             (lambda (x) (draw-primitive/vertices primitive x)))))
 
-(defun make-primitive (gltf data)
+(defun make-primitive (gltf mesh-name data)
   (let* ((vao (gl:gen-vertex-array))
          (primitive (%make-primitive :vao vao :mode (get-primitive-mode gltf data))))
     (gl:bind-vertex-array vao)
     (make-vertex-buffers gltf primitive data)
     (make-index-buffer gltf primitive data)
     (make-draw-func primitive)
+    (log:debug :zed.mesh.gltf "Loaded mesh: ~a, primitive: ~a (VAO: ~d)"
+               (gltf-name gltf)
+               mesh-name
+               vao)
     primitive))
 
 (defun parse-meshes (gltf)
@@ -272,7 +277,7 @@
         :for primitives = (map
                            'vector
                            (lambda (x)
-                             (make-primitive gltf x))
+                             (make-primitive gltf name x))
                            (get-property gltf "primitives" mesh))
         :do (setf (u:href (gltf-meshes gltf) name)
                   (make-mesh :name name :primitives primitives))))

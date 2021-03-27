@@ -3,6 +3,7 @@
 (defpackage #:%zed.opengl
   ;; Third-party aliases
   (:local-nicknames
+   (#:log #:verbose)
    (#:u #:golden-utils))
   (:use #:cl))
 
@@ -48,6 +49,7 @@
     (gl:depth-func +depth-mode+)
     (gl:pixel-store :unpack-alignment 1)
     (sdl2:gl-set-swap-interval 1)
+    (log:debug :zed.opengl "Created OpenGL context")
     context))
 
 ;; Destroy the OpenGL context. This is called during the destruction of the window.

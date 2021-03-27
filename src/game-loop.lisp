@@ -3,6 +3,7 @@
 (defpackage #:%zed.game-loop
   ;; Third-party aliases
   (:local-nicknames
+   (#:log #:verbose)
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
@@ -83,6 +84,7 @@
     ;; last run from being cleaned up at runtime causing frame drops.
     (tg:gc :full t)
     ;; Profile the game loop if the user requested to do so.
+    (log:debug :zed.game-loop "Entered game loop")
     (util::with-profiling (profile-p)
       ;; Actually start the main game loop.
       (u:while (ctx::running-p context)
