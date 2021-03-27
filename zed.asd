@@ -18,6 +18,7 @@
                #:origin
                #:pngload
                #:sdl2
+               #:sdl2-mixer
                #:shadow
                #:split-sequence
                #:static-vectors
@@ -45,6 +46,7 @@
    (:file "opengl")
    (:file "monitor")
    (:file "window")
+   (:file "audio")
    (:file "shader-program")
    (:file "shader-buffer-state")
    (:file "viewport-data")

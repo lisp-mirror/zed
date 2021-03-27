@@ -11,6 +11,7 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
+   (#:aud #:%zed.audio)
    (#:cfg #:%zed.config)
    (#:clock #:%zed.clock)
    (#:gob #:%zed.game-object)
@@ -59,28 +60,31 @@
 (defun make-context (config)
   (let ((success-p nil))
     (unwind-protect
-         (let* ((window (win::make-window (cfg::window-width config)
-                                          (cfg::window-height config)
-                                          :title (cfg::window-title config)
-                                          :anti-alias-p (cfg::anti-alias-p config)))
-                (refresh-rate (mon::get-refresh-rate (win::monitor window))))
+         (progn
            ;; Enable logging.
            (log::start config)
-           ;; Setup live coding support. This instructs SLIME or Sly's REPL to run inside our game
-           ;; loop.
-           (live::setup-repl)
-           ;; Load the pack file (if running in release mode).
-           (pack::read-pack)
-           ;; Register all defined shader programs with the thread pool so they are updated when
-           ;; recompiled at runtime.
-           (shd::register-shaders)
-           ;; Construct the context with references to the previously constructed state.
-           (prog1 (%make-context :running-p t
-                                 :clock (clock::make-clock config refresh-rate)
-                                 :window window
-                                 :input-manager (in::make-input-manager)
-                                 :viewports (vp.mgr::make-manager window))
-             (setf success-p t)))
+           (let* ((window (win::make-window (cfg::window-width config)
+                                            (cfg::window-height config)
+                                            :title (cfg::window-title config)
+                                            :anti-alias-p (cfg::anti-alias-p config)))
+                  (refresh-rate (mon::get-refresh-rate (win::monitor window))))
+             ;; Start the audio system.
+             (aud::start)
+             ;; Setup live coding support. This instructs SLIME or Sly's REPL to run inside our game
+             ;; loop.
+             (live::setup-repl)
+             ;; Load the pack file (if running in release mode).
+             (pack::read-pack)
+             ;; Register all defined shader programs with the thread pool so they are updated when
+             ;; recompiled at runtime.
+             (shd::register-shaders)
+             ;; Construct the context with references to the previously constructed state.
+             (prog1 (%make-context :running-p t
+                                   :clock (clock::make-clock config refresh-rate)
+                                   :window window
+                                   :input-manager (in::make-input-manager)
+                                   :viewports (vp.mgr::make-manager window))
+               (setf success-p t))))
       (unless success-p
         (sdl2:quit*)))))
 
@@ -93,6 +97,8 @@
   ;; Destroy the window, which takes care of cleaning up any foreign resources for the window and
   ;; associated OpenGL context.
   (win::destroy (window context))
+  ;; Stop the audio system
+  (aud::stop)
   ;; Stop logging.
   (log::stop)
   ;; Force the Lisp implementation to perform a full garbage collection.
