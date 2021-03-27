@@ -176,20 +176,18 @@
       (setf (position buffer) pos
             (end buffer) end))))
 
-(defmethod img::%load ((type (eql :hdr)) path)
-  (u:with-binary-input (in path)
-    (let* ((data (u:make-ub8-array 8192))
-           (buffer (make-buffer :stream in :data data))
-           (header (read-header buffer))
-           (width (getf header :width))
-           (height (getf header :height))
-           (data (u:make-ub32-array (* width height) #xffffffff)))
-      (loop :for y :below height
-            :do (read-scanline buffer width data :offset (* y width)))
-      (img::make-image :path path
-                       :width width
-                       :height height
-                       :pixel-format :rgb
-                       :pixel-type :unsigned-int-5-9-9-9-rev
-                       :internal-format :rgb9-e5
-                       :data data))))
+(defmethod img::%load ((type (eql :hdr)) stream)
+  (let* ((data (u:make-ub8-array 8192))
+         (buffer (make-buffer :stream stream :data data))
+         (header (read-header buffer))
+         (width (getf header :width))
+         (height (getf header :height))
+         (data (u:make-ub32-array (* width height) #xffffffff)))
+    (loop :for y :below height
+          :do (read-scanline buffer width data :offset (* y width)))
+    (img::make-image :width width
+                     :height height
+                     :pixel-format :rgb
+                     :pixel-type :unsigned-int-5-9-9-9-rev
+                     :internal-format :rgb9-e5
+                     :data data)))

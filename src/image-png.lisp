@@ -35,10 +35,9 @@
         (bit-depth (pngload:bit-depth image)))
     (u:format-symbol :keyword "~a~d" (subseq "RGBA" 0 channel-count) bit-depth)))
 
-(defmethod img::%load ((type (eql :png)) path)
-  (let ((image (pngload:load-file path :flatten t :flip-y t)))
-    (img::make-image :path path
-                     :width (pngload:width image)
+(defmethod img::%load ((type (eql :png)) stream)
+  (let ((image (pngload:load-stream stream :flatten t :flip-y t)))
+    (img::make-image :width (pngload:width image)
                      :height (pngload:height image)
                      :pixel-format (get-pixel-format image)
                      :pixel-type (get-pixel-type image)

@@ -18,6 +18,7 @@
    (#:jobs #:%zed.jobs)
    (#:live #:%zed.live-coding)
    (#:mon #:%zed.monitor)
+   (#:pack #:%zed.pack)
    (#:sbs #:%zed.shader-buffer-state)
    (#:shd #:%zed.shader-program)
    (#:tp #:%zed.thread-pool)
@@ -54,27 +55,24 @@
 
 ;; Construct the context with everything needed to enter the main game loop.
 (defun make-context (config)
-  (let* (;; Create a window for drawing.
-         (window (win::make-window (cfg::window-width config)
+  (let* ((window (win::make-window (cfg::window-width config)
                                    (cfg::window-height config)
                                    :title (cfg::window-title config)
                                    :anti-alias-p (cfg::anti-alias-p config)))
-         ;; Initialize the clock using either the user-supplied delta-time or defaulting to the
-         ;; inverse monitor refresh rate.
-         (clock (clock::make-clock config (mon::get-refresh-rate (win::monitor window))))
-         (input-manager (in::make-input-manager))
-         (viewport-manager (vp.mgr::make-manager window)))
+         (refresh-rate (mon::get-refresh-rate (win::monitor window))))
     ;; Setup live coding support. This instructs SLIME or Sly's REPL to run inside our game loop.
     (live::setup-repl)
+    ;; Load the pack file (if running in release mode).
+    (pack::read-pack)
     ;; Register all defined shader programs with the thread pool so they are updated when recompiled
     ;; at runtime.
     (shd::register-shaders)
     ;; Construct the context with references to the previously constructed state.
     (%make-context :running-p t
-                   :clock clock
+                   :clock (clock::make-clock config refresh-rate)
                    :window window
-                   :input-manager input-manager
-                   :viewports viewport-manager)))
+                   :input-manager (in::make-input-manager)
+                   :viewports (vp.mgr::make-manager window))))
 
 ;; This is called when the main game loop exits to destroy the context. All code should call
 ;; #'shutdown instead, which initiates a graceful shutdown of the context.

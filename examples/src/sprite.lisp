@@ -30,11 +30,12 @@
                     :duration 0.5)
    (z.render:render :layer 2)))
 
+(defun sprite-prelude (context)
+  (z:load-prefab context 'camera/orthographic)
+  (z:load-prefab context 'planet)
+  (z:load-prefab context 'ship))
+
 (defun sprite ()
-  (flet ((prelude (context)
-           (z:load-prefab context 'camera/orthographic)
-           (z:load-prefab context 'planet)
-           (z:load-prefab context 'ship)))
-    (z:start-game :window-width 1280
-                  :window-height 720
-                  :prelude #'prelude)))
+  (z:start-game :window-width 1280
+                :window-height 720
+                :prelude #'sprite-prelude))

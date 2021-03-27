@@ -6,14 +6,16 @@
   #-zed.release
   (error "You can only deploy by using the zed-deploy system."))
 
-(defun setup (system-name)
-  (if (asdf:find-system system-name nil)
-      (setf %zed.util::=system-name= system-name)
-      (error "System ~s could not be found." system-name))
-  ;; TODO: logging
-  ;; (log:stop log:*global-controller*)
-  #+sbcl (sb-ext:disable-debugger)
-  #+sbcl (sb-ext:gc :full t))
+(defun setup (file systems)
+  (let ((primary-system (first systems)))
+    (if (asdf:find-system primary-system nil)
+        (setf util::=system-name= primary-system)
+        (error "System ~s could not be found." primary-system))
+    ;; TODO: logging
+    ;; (log:stop log:*global-controller*)
+    (pack::make-pack :path (uiop:pathname-directory-pathname file) :systems systems)
+    #+sbcl (sb-ext:disable-debugger)
+    #+sbcl (sb-ext:gc :full t)))
 
 (defun dump-image (file top-level)
   (declare (ignorable file top-level))
@@ -27,7 +29,7 @@
          #+windows '(:application-type :gui)
          #-windows nil))
 
-(defun deploy (system-name file &rest options)
+(defun deploy (file systems &rest options)
   (check-features)
-  (setup system-name)
+  (setup file systems)
   (dump-image file (lambda () (apply #'z:start-game options))))

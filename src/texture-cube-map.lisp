@@ -37,8 +37,7 @@
                         height)
     (loop :for image :in source
           :for face :in faces
-          :do (img::path image)
-              (gl:tex-sub-image-2d face
+          :do (gl:tex-sub-image-2d face
                                    0
                                    0
                                    0

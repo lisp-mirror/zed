@@ -50,12 +50,12 @@
   (declare (optimize speed))
   (let* ((context (trait::context mesh))
          (name (name mesh))
-         (path (rc::resolve-path (asset mesh)))
-         (gltf (rc::with-resource-cache (context :mesh path)
-                 (gltf::load path)))
+         (asset (asset mesh))
+         (gltf (rc::with-resource-cache (context :mesh asset)
+                 (gltf::load asset)))
          (mesh-data (u:href (gltf::gltf-meshes gltf) name)))
     (unless mesh-data
-      (error "Mesh name ~s not found in mesh file ~s." name path))
+      (error "Mesh name ~s not found in mesh file ~s." name asset))
     (setf (primitive mesh) (svref (gltf::mesh-primitives mesh-data) (index mesh)))
     nil))
 

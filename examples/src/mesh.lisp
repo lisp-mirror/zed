@@ -33,10 +33,11 @@
                :asset '(:zed-examples "meshes/damaged-helmet.glb"))
   (z.render:render :material 'mesh))
 
+(defun mesh-prelude (context)
+  (z:load-prefab context 'camera/perspective)
+  (z:load-prefab context 'mesh))
+
 (defun mesh ()
-  (flet ((prelude (context)
-           (z:load-prefab context 'camera/perspective)
-           (z:load-prefab context 'mesh)))
-    (z:start-game :window-width 1280
-                  :window-height 720
-                  :prelude #'prelude)))
+  (z:start-game :window-width 1280
+                :window-height 720
+                :prelude #'mesh-prelude))

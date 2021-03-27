@@ -27,12 +27,3 @@
          (unless ,found-p
            (setf ,table (u:dict #'equalp))))
        (u:ensure-gethash ,key ,table (progn ,@body)))))
-
-(defun resolve-path (asset)
-  (destructuring-bind (system-name path) asset
-    (declare (ignorable system-name))
-    (let ((path (uiop:merge-pathnames* path #.(make-pathname :directory '(:relative "data")))))
-      #+zed.release
-      (uiop:merge-pathnames* path (uiop:pathname-directory-pathname (first sb-ext:*posix-argv*)))
-      #-zed.release
-      (asdf:system-relative-pathname system-name path))))

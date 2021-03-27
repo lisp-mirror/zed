@@ -3,11 +3,14 @@
 (defpackage #:%zed.input.gamepad
   ;; Third-party aliases
   (:local-nicknames
+   (#:sv #:static-vectors)
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
+   (#:asset #:%zed.asset)
    (#:in.mgr #:%zed.input.manager)
-   (#:in.tr #:%zed.input.transition))
+   (#:in.tr #:%zed.input.transition)
+   (#:ss #:%zed.slice-stream))
   (:use #:cl))
 
 (in-package #:%zed.input.gamepad)
@@ -53,10 +56,18 @@
        (u:format-symbol :keyword "GAMEPAD~d"
                         (1+ (hash-table-count (in.mgr::gamepad-instances manager)))))))
 
-;; TODO: Add gamepad mapping database when we can load files agnostic of asdf or relative to
-;; deployed binary.
+(defun load-gamepad-database ()
+  (let ((asset '(:zed "gamepad-db.txt")))
+    (asset::with-asset (asset path data :length-binding length)
+      (sv:with-static-vector (sv length)
+        (read-sequence sv data)
+        (sdl2-ffi.functions:sdl-game-controller-add-mappings-from-rw
+         (sdl2-ffi.functions:sdl-rw-from-mem (sv:static-vector-pointer sv) length)
+         1)))))
+
 (defun prepare-gamepads ()
   (sdl2:init* '(:gamecontroller))
+  (load-gamepad-database)
   (sdl2-ffi.functions:sdl-set-hint sdl2-ffi:+sdl-hint-joystick-allow-background-events+ "1"))
 
 (u:fn-> shutdown-gamepads (in.mgr::manager) null)

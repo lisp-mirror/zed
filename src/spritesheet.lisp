@@ -6,7 +6,9 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
+   (#:asset #:%zed.asset)
    (#:ctx #:%zed.context)
+   (#:pack #:%zed.pack)
    (#:rc #:%zed.resource-cache)
    (#:sbs #:%zed.shader-buffer-state))
   (:use #:cl)
@@ -49,14 +51,17 @@
   (or (u:href (sprites spritesheet) name)
       (error "Sprite ~s not found in spritesheet ~s." name (name spritesheet))))
 
+(defun read-spec-file (asset)
+  (asset::with-asset (asset path data :format :lisp)
+    data))
+
 (u:fn-> make-spritesheet (ctx::context list list) spritesheet)
 (defun make-spritesheet (context asset buffer-spec)
   (declare (optimize speed))
-  (let ((path (rc::resolve-path asset)))
-    (rc::with-resource-cache (context :spritesheet asset)
-      (let ((spritesheet (%make-spritesheet :name asset
-                                            :spec (u:safe-read-file-form path)
-                                            :vao (gl:gen-vertex-array))))
-        (apply #'sbs::make-buffer (ctx::shader-buffer-state context) asset buffer-spec)
-        (update-buffer spritesheet)
-        spritesheet))))
+  (rc::with-resource-cache (context :spritesheet asset)
+    (let ((spritesheet (%make-spritesheet :name asset
+                                          :spec (read-spec-file asset)
+                                          :vao (gl:gen-vertex-array))))
+      (apply #'sbs::make-buffer (ctx::shader-buffer-state context) asset buffer-spec)
+      (update-buffer spritesheet)
+      spritesheet)))

@@ -8,6 +8,7 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
+   (#:asset #:%zed.asset)
    (#:bin #:%zed.binary-parser))
   (:use #:cl)
   (:shadow
@@ -68,6 +69,7 @@
             (:predicate nil)
             (:copier nil))
   (name "" :type string)
+  (stream-length nil :type u:ub32)
   (buffer (io:make-input-buffer) :type io:input-buffer)
   (parse-tree (make-datastream) :type datastream)
   (json nil :type list)
@@ -131,8 +133,9 @@
     (setf (chunk-data chunk) data)))
 
 (defun parse-chunks (gltf)
-  (loop :with stream = (io:input-buffer-stream (gltf-buffer gltf))
-        :until (= (file-position stream) (file-length stream))
+  (loop :with buffer = (gltf-buffer gltf)
+        :with stream = (io:input-buffer-stream buffer)
+        :until (= (io:buffer-position buffer) (gltf-stream-length gltf))
         :collect (parse-chunk gltf)))
 
 (defun parse-datastream (gltf)
@@ -280,10 +283,10 @@
       (error "Mesh index ~d not found." index))
     (get-property gltf "primitives" (elt meshes index))))
 
-(defun load (path)
-  (u:with-binary-input (in path)
-    (let* ((buffer (io:make-input-buffer :stream in))
-           (gltf (make-gltf :name (pathname-name path) :buffer buffer)))
+(defun load (asset)
+  (asset::with-asset (asset path data :length-binding length)
+    (let* ((buffer (io:make-input-buffer :stream data))
+           (gltf (make-gltf :name (pathname-name path) :buffer buffer :stream-length length)))
       (setf (gltf-parse-tree gltf) (parse-datastream gltf))
       (parse-meshes gltf)
       (setf (gltf-buffers gltf) nil)

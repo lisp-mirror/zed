@@ -22,6 +22,7 @@
                #:split-sequence
                #:static-vectors
                #:trivial-garbage
+               #:trivial-gray-streams
                #:uiop
                #:umbra)
   :pathname "src"
@@ -29,8 +30,11 @@
   :components
   ((:file "util")
    (:file "ordered-class")
+   (:file "slice-stream")
    (:file "red-black-tree")
    (:file "binary-parser")
+   (:file "pack")
+   (:file "asset")
    (:file "whitelist")
    (:file "config")
    (:file "thread-pool")

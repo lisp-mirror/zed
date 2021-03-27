@@ -6,7 +6,7 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:rc #:%zed.resource-cache))
+   (#:asset #:%zed.asset))
   (:use #:cl)
   (:shadow
    #:load))
@@ -19,7 +19,6 @@
             (:conc-name nil)
             (:predicate nil)
             (:copier nil))
-  (path #p"" :type pathname)
   (width nil :type (or u:ub16 null))
   (height nil :type (or u:ub16 null))
   (pixel-format :rgba :type pixel-format)
@@ -28,11 +27,7 @@
   (data nil :type (or vector null)))
 
 (u:define-printer (image stream :type nil)
-  (format stream "IMAGE: ~a"
-          (u:if-let ((path (path image)))
-            (if (= (length (pathname-name path)) 0)
-                "(no data)"
-                path))))
+  (format stream "IMAGE"))
 
 (defun get-type (path)
   (u:make-keyword (string-upcase (pathname-type path))))
@@ -51,5 +46,5 @@
               :internal-format internal-format))
 
 (defmethod load (context asset &key)
-  (let ((path (rc::resolve-path asset)))
-    (%load (get-type path) path)))
+  (asset::with-asset (asset path data)
+    (%load (get-type path) data)))
