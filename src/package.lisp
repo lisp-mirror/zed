@@ -5,6 +5,8 @@
   (:use-reexport
    #:%zed.core
    #:%zed.game-object
+   #:%zed.geometry
+   #:%zed.geometry.layout.data
    #:%zed.input-interface
    #:%zed.material
    #:%zed.prefab

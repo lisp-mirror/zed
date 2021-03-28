@@ -15,4 +15,6 @@
    (:file "common")
    (:file "sprite")
    (:file "mesh-shader")
-   (:file "mesh")))
+   (:file "mesh")
+   (:file "geometry-shader")
+   (:file "geometry")))
