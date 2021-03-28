@@ -60,6 +60,7 @@
    (:file "input-window")
    (:file "input")
    (:file "transform-state")
+   (:file "trait-manager")
    (:file "game-object")
    (:file "jobs")
    (:file "context")

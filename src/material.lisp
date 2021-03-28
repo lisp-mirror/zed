@@ -13,6 +13,7 @@
    (#:mat.data #:%zed.material.data)
    (#:mat.def #:%zed.material.definition)
    (#:ogl #:%zed.opengl)
+   (#:tm #:%zed.trait.manager)
    (#:trait #:%zed.trait)
    (#:uni #:%zed.material.uniform)
    (#:wl #:%zed.whitelist))
@@ -94,7 +95,7 @@
                    `((gl:point-size ,point-size)))
                (u:do-hash-values (,x (mat.def::uniforms ,material))
                  (uni::resolve-func ,context ,game-object ,x))
-               (dolist (,x (gob::traits ,game-object))
+               (dolist (,x (tm::order (gob::traits ,game-object)))
                  (trait::call-hook ,x :render))
                (setf (mat.def::texture-unit-state ,material) 0)
                ,@(when disable

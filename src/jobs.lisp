@@ -6,7 +6,8 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:gob #:%zed.game-object))
+   (#:gob #:%zed.game-object)
+   (#:tm #:%zed.trait.manager))
   (:use #:cl))
 
 (in-package #:%zed.jobs)
@@ -27,8 +28,9 @@
   (dolist (job (enable-traits jobs))
     (destructuring-bind (game-object trait priority) job
       (declare (function priority))
-      (let ((new-traits (list* trait (gob::traits game-object))))
-        (setf (gob::traits game-object) (sort new-traits #'< :key priority)))))
+      (let* ((trait-manager (gob::traits game-object))
+             (new-order (list* trait (tm::order trait-manager))))
+        (setf (tm::order trait-manager) (sort new-order #'< :key priority)))))
   (setf (enable-traits jobs) nil)
   nil)
 
@@ -37,6 +39,7 @@
   (declare (optimize speed))
   (dolist (job (disable-traits jobs))
     (destructuring-bind (game-object . trait) job
-      (u:deletef (gob::traits game-object) trait)))
+      (let ((trait-manager (gob::traits game-object)))
+        (u:deletef (tm::order trait-manager) trait))))
   (setf (disable-traits jobs) nil)
   nil)

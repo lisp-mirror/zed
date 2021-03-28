@@ -6,6 +6,7 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
+   (#:tm #:%zed.trait.manager)
    (#:ts #:%zed.transform-state)
    (#:util #:%zed.util))
   (:use #:cl)
@@ -53,8 +54,8 @@
   (pause-mode :inherit :type pause-mode)
   ;; The transform state of the game object.
   (transform (ts::make-state) :type ts::state)
-  ;; A list of traits attached to this game object.
-  (traits nil :type list)
+  ;; An object that manages the currently attached traits this game object has.
+  (traits (tm::make-manager) :type tm::manager)
   ;; The name of the root prefab node this game object was created from, or NIL if it was created
   ;; from a child of a prefab, or manually
   (prefab-name nil :type symbol))
