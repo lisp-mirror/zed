@@ -26,8 +26,8 @@
 (in-package #:%zed.trait)
 
 (u:define-constant +slot-order+
-    '(%context %owner %priority %setup-hook %attach-hook %detach-hook %update-hook %pre-render-hook
-      %render-hook)
+    '(%%context %%owner %%priority %%setup-hook %%attach-hook %%detach-hook %%update-hook
+      %%pre-render-hook %%render-hook)
   :test #'equal)
 
 (u:define-constant +hook-names+
@@ -35,54 +35,54 @@
 
 (u:eval-always
   (oc::define-ordered-class trait ()
-    ((%context :reader context
-               :initarg context
-               :inline t
-               :type ctx::context)
-     (%owner :accessor owner
-             :inline t
-             :type (or gob::game-object null)
-             :initform nil)
-     (%priority :reader priority
+    ((%%context :reader context
+                :initarg context
                 :inline t
-                :type u:ub32
-                :initarg priority
-                :initform #.(1- (expt 2 32)))
-     (%setup-hook :reader setup-hook
-                  :inline t
-                  :type symbol
-                  :initarg setup
-                  :initform 'default-hook)
-     (%destroy-hook :reader destroy-hook
+                :type ctx::context)
+     (%%owner :accessor owner
+              :inline t
+              :type (or gob::game-object null)
+              :initform nil)
+     (%%priority :reader priority
+                 :inline t
+                 :type u:ub32
+                 :initarg priority
+                 :initform #.(1- (expt 2 32)))
+     (%%setup-hook :reader setup-hook
+                   :inline t
+                   :type symbol
+                   :initarg setup
+                   :initform 'default-hook)
+     (%%destroy-hook :reader destroy-hook
+                     :inline t
+                     :type symbol
+                     :initarg destroy
+                     :initform 'default-hook)
+     (%%attach-hook :reader attach-hook
                     :inline t
                     :type symbol
-                    :initarg destroy
+                    :initarg attach
                     :initform 'default-hook)
-     (%attach-hook :reader attach-hook
-                   :inline t
-                   :type symbol
-                   :initarg attach
-                   :initform 'default-hook)
-     (%detach-hook :reader detach-hook
-                   :inline t
-                   :type symbol
-                   :initarg detach
-                   :initform 'default-hook)
-     (%update-hook :reader update-hook
-                   :inline t
-                   :type symbol
-                   :initarg update
-                   :initform 'default-hook)
-     (%pre-render-hook :reader pre-render-hook
-                       :inline t
-                       :type symbol
-                       :initarg pre-render
-                       :initform 'default-hook)
-     (%render-hook :reader render-hook
-                   :inline t
-                   :type symbol
-                   :initarg render
-                   :initform 'default-hook))
+     (%%detach-hook :reader detach-hook
+                    :inline t
+                    :type symbol
+                    :initarg detach
+                    :initform 'default-hook)
+     (%%update-hook :reader update-hook
+                    :inline t
+                    :type symbol
+                    :initarg update
+                    :initform 'default-hook)
+     (%%pre-render-hook :reader pre-render-hook
+                        :inline t
+                        :type symbol
+                        :initarg pre-render
+                        :initform 'default-hook)
+     (%%render-hook :reader render-hook
+                    :inline t
+                    :type symbol
+                    :initarg render
+                    :initform 'default-hook))
     (:order #.+slot-order+)))
 
 (u:fn-> default-hook (trait) null)
