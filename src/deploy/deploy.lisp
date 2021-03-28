@@ -11,7 +11,6 @@
     (if (asdf:find-system primary-system nil)
         (setf util::=system-name= primary-system)
         (error "System ~s could not be found." primary-system))
-    ;; TODO: logging
     (log:stop log:*global-controller*)
     (pack::make-pack :path (uiop:pathname-directory-pathname file) :systems systems)
     #+sbcl (sb-ext:disable-debugger)
