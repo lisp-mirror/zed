@@ -36,18 +36,17 @@
 (u:eval-always
   (oc::define-ordered-class trait ()
     ((%context :reader context
-               :initarg :context
+               :initarg context
                :inline t
                :type ctx::context)
      (%owner :accessor owner
              :inline t
              :type (or gob::game-object null)
-             :initarg :owner
              :initform nil)
      (%priority :reader priority
                 :inline t
                 :type u:ub32
-                :initarg :priority
+                :initarg priority
                 :initform #.(1- (expt 2 32)))
      (%setup-hook :reader setup-hook
                   :inline t
@@ -105,7 +104,7 @@
   (when (or priority options)
     `((:default-initargs
        ,@(when priority
-           `(:priority ,priority))
+           `(priority ,priority))
        ,@(u:mappend
           (lambda (x)
             (destructuring-bind (key value) x
@@ -146,7 +145,7 @@
       (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
        :trait-attach-hook :trait-detach-hook :trait-update-hook)
     (if (subtypep type 'trait)
-        (let ((trait (apply #'make-instance type :context context args)))
+        (let ((trait (apply #'make-instance type 'context context args)))
           (call-hook trait :setup)
           trait)
         (error "Trait type ~s is not defined." type))))
