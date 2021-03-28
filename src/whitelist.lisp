@@ -65,5 +65,4 @@
   :trait-attach-hook
   :trait-detach-hook
   :trait-update-hook
-  :trait-pre-render-hook
   :trait-render-hook)

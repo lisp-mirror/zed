@@ -79,7 +79,6 @@
              :initform nil))
   (:setup setup)
   (:update update)
-  (:pre-render pre-render)
   (:render render))
 
 ;;; Hooks
@@ -111,16 +110,14 @@
             (setf (index sprite) index)))
       nil)))
 
-(defun pre-render (sprite)
-  (let* ((render-trait (trait:find-trait (trait::owner sprite) 'tr.ren::render))
-         (material (tr.ren::material render-trait)))
-    (mat::set-uniform material :sprite.index (index sprite))))
-
 (u:fn-> render (sprite) null)
 (defun render (sprite)
   (declare (optimize speed))
-  (let ((asset (asset sprite))
-        (buffer-state (ctx::shader-buffer-state (trait::context sprite))))
+  (let* ((asset (asset sprite))
+         (buffer-state (ctx::shader-buffer-state (trait::context sprite)))
+         (render-trait (trait:find-trait (trait::owner sprite) 'tr.ren::render))
+         (material (tr.ren::material render-trait)))
+    (mat::set-uniform material :sprite.index (index sprite))
     (sbs::with-buffers (buffer-state asset)
       (gl:bind-vertex-array (ss::vao (spritesheet sprite)))
       (gl:draw-arrays-instanced :triangle-strip 0 4 (instances sprite))

@@ -54,7 +54,7 @@
 (u:fn-> set-uniform (mat.def::material keyword t) null)
 (defun set-uniform (material key value)
   (declare (optimize speed))
-  (wl::with-allowed-scopes set-uniform (:trait-pre-render-hook)
+  (wl::with-allowed-scopes set-uniform (:trait-render-hook)
     (let ((uniforms (mat.def::uniforms material)))
       (unless (u:href uniforms key)
         (setf (u:href uniforms key) (uni::make-uniform :key key)))
@@ -92,8 +92,6 @@
                    `((gl:line-width ,line-width)))
                ,@(when point-size
                    `((gl:point-size ,point-size)))
-               (dolist (,x (gob::traits ,game-object))
-                 (trait::call-hook ,x :pre-render))
                (u:do-hash-values (,x (mat.def::uniforms ,material))
                  (uni::resolve-func ,context ,game-object ,x))
                (dolist (,x (gob::traits ,game-object))

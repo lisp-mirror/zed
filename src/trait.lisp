@@ -27,11 +27,11 @@
 
 (u:define-constant +slot-order+
     '(%%context %%owner %%priority %%setup-hook %%attach-hook %%detach-hook %%update-hook
-      %%pre-render-hook %%render-hook)
+      %%render-hook)
   :test #'equal)
 
 (u:define-constant +hook-names+
-    '(setup destroy attach detach update pre-render render) :test #'equal)
+    '(setup destroy attach detach update render) :test #'equal)
 
 (u:eval-always
   (oc::define-ordered-class trait ()
@@ -73,11 +73,6 @@
                     :type symbol
                     :initarg update
                     :initform 'default-hook)
-     (%%pre-render-hook :reader pre-render-hook
-                        :inline t
-                        :type symbol
-                        :initarg pre-render
-                        :initform 'default-hook)
      (%%render-hook :reader render-hook
                     :inline t
                     :type symbol

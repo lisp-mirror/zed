@@ -53,7 +53,7 @@
   (:setup setup)
   (:attach attach)
   (:detach detach)
-  (:pre-render pre-render))
+  (:render render))
 
 (u:fn-> draw-order-tree-sort (render render) boolean)
 (defun draw-order-tree-sort (x y)
@@ -112,8 +112,8 @@
     (do::deregister context render)
     nil))
 
-(u:fn-> pre-render (render) null)
-(defun pre-render (render)
+(u:fn-> render (render) null)
+(defun render (render)
   (declare (optimize speed))
   (u:when-let* ((context (trait::context render))
                 (owner (trait::owner render))
