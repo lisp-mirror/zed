@@ -51,11 +51,11 @@
 (defmethod live::recompile ((type (eql :prefab)) data)
   (wl::with-scope (:prefab-recompile)
     (dolist (game-object (u:href (ctx::prefabs util::=context=) data))
+      (tree:destroy-game-object util::=context= game-object)
       (let* ((parent (gob::parent game-object))
              (translation (tr::get-translation game-object))
              (new-game-object (pf::load-prefab util::=context= data :parent parent)))
-        (tr::translate new-game-object translation :replace-p t)
-        (tree:destroy-game-object util::=context= game-object)))
+        (tr::translate new-game-object translation :replace-p t)))
     (log::debug :zed.recompile "Recompiled prefab: ~s" data)))
 
 (defmethod live::recompile ((type (eql :viewport)) data)
