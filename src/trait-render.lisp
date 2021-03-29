@@ -88,7 +88,7 @@
 (u:fn-> setup (render) null)
 (defun setup (render)
   (declare (optimize speed))
-  (let* ((context (trait::context render)))
+  (let ((context (trait::context render)))
     (unless (ctx::draw-order context)
       (setf (ctx::draw-order context) (do::make-manager #'draw-order-tree-sort)))
     (setf (viewport render) (vp.mgr::ensure-viewport (ctx::viewports context)
