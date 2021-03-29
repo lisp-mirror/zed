@@ -10,7 +10,8 @@
   (:local-nicknames
    (#:asset #:%zed.asset)
    (#:bin #:%zed.binary-parser)
-   (#:log #:%zed.logging))
+   (#:log #:%zed.logging)
+   (#:v3 #:zed.math.vector3))
   (:use #:cl)
   (:shadow
    #:load))
@@ -38,6 +39,8 @@
   (component-type :unsigned-byte :type keyword)
   (vertex-buffers nil :type list)
   (index-buffer 0 :type u:ub32)
+  (extent-min (v3:zero) :type v3:vec)
+  (extent-max (v3:zero) :type v3:vec)
   (draw-func (constantly nil) :type function))
 
 (defstruct (mesh
@@ -220,7 +223,17 @@
       (push buffer (primitive-vertex-buffers primitive))
       (configure-attribute gltf attr accessor)
       (when (string= attr "POSITION")
-        (setf (primitive-element-count primitive) count)))))
+        (let ((min-extent (get-property gltf "min" accessor))
+              (max-extent (get-property gltf "max" accessor)))
+          (destructuring-bind (min-x min-y min-z) min-extent
+            (destructuring-bind (max-x max-y max-z) max-extent
+              (setf (primitive-element-count primitive) count
+                    (primitive-extent-min primitive) (v3:vec (float min-x 1f0)
+                                                             (float min-y 1f0)
+                                                             (float min-z 1f0))
+                    (primitive-extent-max primitive) (v3:vec (float max-x 1f0)
+                                                             (float max-y 1f0)
+                                                             (float max-z 1f0))))))))))
 
 (defun make-index-buffer (gltf primitive data)
   (u:when-let* ((indices (get-property gltf "indices" data))

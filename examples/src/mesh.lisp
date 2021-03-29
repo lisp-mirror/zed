@@ -26,9 +26,8 @@
               :use-ibl t)
    :features (:enable (:texture-cube-map-seamless))))
 
-(z:define-prefab mesh (:rotate (q:orient :local :x const:+pi/2+)
-                       :rotate-velocity (v3:velocity v3:+forward+ (- const:+pi/6+))
-                       :scale 17.0)
+(z:define-prefab mesh (:rotate-velocity (v3:velocity v3:+up+ const:+pi/6+)
+                       :scale 34.0)
   (z.mesh:mesh :name "helmet"
                :asset '(:zed-examples "meshes/damaged-helmet.glb"))
   (z.render:render :material 'mesh))
