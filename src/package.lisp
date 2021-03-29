@@ -1,8 +1,8 @@
-(in-package #:cl-user)
+(in-package #:defpackage+-user-1)
 
-(uiop:define-package #:zed
+(defpackage+ #:zed
   (:use #:cl)
-  (:use-reexport
+  (:inherit
    #:%zed.core
    #:%zed.game-object
    #:%zed.geometry
