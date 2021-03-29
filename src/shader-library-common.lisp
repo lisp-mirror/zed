@@ -14,7 +14,7 @@
 
 (defmacro mvlet* ((&rest bindings) &body body)
   (destructuring-bind (&optional car . cdr) bindings
-    (typecase car
+    (etypecase car
       (null
        `(progn ,@body))
       (list
