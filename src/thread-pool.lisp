@@ -4,7 +4,7 @@
   ;; Third-party aliases
   (:local-nicknames
    (#:glob #:global-vars)
-   (#:log #:verbose)
+   (#:log #:%zed.logging)
    (#:lp #:lparallel)
    (#:lpq #:lparallel.queue)
    (#:u #:golden-utils))
@@ -28,7 +28,7 @@
 (defun make-thread-pool ()
   (let* ((worker-count (cl-cpus:get-number-of-processors))
          (thread-pool (%make-thread-pool :worker-count worker-count)))
-    (log:debug :zed.thread-pool "Initialized thread-pool with ~d workers" worker-count)
+    (log::debug :zed.thread-pool "Initialized thread-pool with ~d workers" worker-count)
     thread-pool))
 
 (defmacro with-thread-pool (() &body body)

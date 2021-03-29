@@ -9,6 +9,12 @@
   (:local-nicknames
    (#:cfg #:%zed.config)
    (#:util #:%zed.util))
+  (:shadowing-import-from
+   #:verbose
+   #:trace
+   #:debug
+   #:info
+   #:error)
   (:use #:cl))
 
 (in-package #:%zed.logging)

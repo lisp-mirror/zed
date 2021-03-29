@@ -3,13 +3,13 @@
 (defpackage #:%zed.geometry
   ;; Third-party aliases
   (:local-nicknames
-   (#:log #:verbose)
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
    (#:geo.buf #:%zed.geometry.buffer)
    (#:geo.data #:%zed.geometry.data)
-   (#:geo.layout.data #:%zed.geometry.layout.data))
+   (#:geo.layout.data #:%zed.geometry.layout.data)
+   (#:log #:%zed.logging))
   (:use #:cl)
   (:shadow
    #:delete)
@@ -21,7 +21,7 @@
 (defun make-geometry (name)
   (let* ((geometry (funcall (u:href geo.data::=data= name)))
          (id (geo.data::id geometry)))
-    (log:debug :zed.geometry "Created geometry: ~s (VAO: ~d)" name id)
+    (log::debug :zed.geometry "Created geometry: ~s (VAO: ~d)" name id)
     geometry))
 
 (defun update (geometry buffer-name data)
@@ -43,7 +43,7 @@
         (id (geo.data::id geometry)))
     (gl:delete-buffers (geo.data::buffers geometry))
     (gl:delete-vertex-arrays (list id))
-    (log:debug :zed.geometry "Deleted geometry: ~s (VAO: ~d)" name id)))
+    (log::debug :zed.geometry "Deleted geometry: ~s (VAO: ~d)" name id)))
 
 (defmacro define-geometry (name options &body body)
   (declare (ignore options))

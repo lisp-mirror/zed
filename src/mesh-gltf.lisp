@@ -4,13 +4,13 @@
   ;; Third-party aliases
   (:local-nicknames
    (#:io #:fast-io)
-   (#:log #:verbose)
    (#:sv #:static-vectors)
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
    (#:asset #:%zed.asset)
-   (#:bin #:%zed.binary-parser))
+   (#:bin #:%zed.binary-parser)
+   (#:log #:%zed.logging))
   (:use #:cl)
   (:shadow
    #:load))
@@ -263,10 +263,10 @@
     (make-vertex-buffers gltf primitive data)
     (make-index-buffer gltf primitive data)
     (make-draw-func primitive)
-    (log:debug :zed.mesh.gltf "Loaded mesh: ~a, primitive: ~a (VAO: ~d)"
-               (gltf-name gltf)
-               mesh-name
-               vao)
+    (log::debug :zed.mesh.gltf "Loaded mesh: ~a, primitive: ~a (VAO: ~d)"
+                (gltf-name gltf)
+                mesh-name
+                vao)
     primitive))
 
 (defun parse-meshes (gltf)

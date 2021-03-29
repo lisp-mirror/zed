@@ -10,7 +10,7 @@
    (#:ctx #:%zed.context)
    (#:pack #:%zed.pack)
    (#:rc #:%zed.resource-cache)
-   (#:sbs #:%zed.shader-buffer-state))
+   (#:shd.mgr #:%zed.shader.manager))
   (:use #:cl)
   (:shadow
    #:find))
@@ -42,8 +42,8 @@
                 (setf (aref pos i) (vector x y)
                       (aref size i) (vector w h)
                       (u:href (sprites spritesheet) id) i)))
-        :finally (sbs::write name :path :pos :value pos)
-                 (sbs::write name :path :size :value size)))
+        :finally (shd.mgr::write name :path :pos :value pos)
+                 (shd.mgr::write name :path :size :value size)))
 
 (u:fn-> find (spritesheet string) u:ub16)
 (defun find (spritesheet name)
@@ -62,6 +62,6 @@
     (let ((spritesheet (%make-spritesheet :name asset
                                           :spec (read-spec-file asset)
                                           :vao (gl:gen-vertex-array))))
-      (apply #'sbs::make-buffer (ctx::shader-buffer-state context) asset buffer-spec)
+      (apply #'shd.mgr::make-buffer (ctx::shader-manager context) asset buffer-spec)
       (update-buffer spritesheet)
       spritesheet)))

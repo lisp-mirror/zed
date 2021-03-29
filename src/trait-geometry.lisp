@@ -3,12 +3,12 @@
 (defpackage #:zed.trait.geometry
   ;; Third-party aliases
   (:local-nicknames
-   (#:log #:verbose)
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
    (#:geo #:%zed.geometry)
    (#:geo.data #:%zed.geometry.data)
+   (#:log #:%zed.logging)
    (#:rc #:%zed.resource-cache)
    (#:trait #:%zed.trait))
   (:use #:cl)
@@ -61,7 +61,7 @@
     (let ((resource (if (cache-p geometry)
                         (rc::with-resource-cache (context :geometry name)
                           (prog1 (geo::make-geometry name)
-                            (log:debug :zed.trait.geometry "Cached geometry: ~s" name)))
+                            (log::debug :zed.trait.geometry "Cached geometry: ~s" name)))
                         (geo::make-geometry name))))
       (setf (resource geometry) resource)
       nil)))

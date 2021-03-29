@@ -3,10 +3,10 @@
 (defpackage #:%zed.window
   ;; Third-party packages
   (:local-nicknames
-   (#:log #:verbose)
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
+   (#:log #:%zed.logging)
    (#:ogl #:%zed.opengl)
    (#:mon #:%zed.monitor))
   (:use #:cl))
@@ -87,5 +87,5 @@
                                :height height
                                :title title)))
     (draw window)
-    (log:info :zed.window "Created window (~dx~d)" width height)
+    (log::info :zed.window "Created window (~dx~d)" width height)
     window))

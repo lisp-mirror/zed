@@ -1,11 +1,9 @@
 (in-package #:cl-user)
 
 (defpackage #:zed-deploy
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:log #:verbose))
   ;; Internal aliases
   (:local-nicknames
+   (#:log #:%zed.logging)
    (#:pack #:%zed.pack)
    (#:util #:%zed.util)
    (#:z #:zed))

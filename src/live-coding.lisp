@@ -3,11 +3,11 @@
 (defpackage #:%zed.live-coding
   ;; Third-party aliases
   (:local-nicknames
-   (#:log #:verbose)
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
-   (#:clock #:%zed.clock))
+   (#:clock #:%zed.clock)
+   (#:log #:%zed.logging))
   (:use #:cl))
 
 (in-package #:%zed.live-coding)
@@ -21,12 +21,12 @@
                        (declare (ignore hook))
                        (let ((,entry-time (clock::get-time ,clock))
                              (,hook ,previous-hook))
-                         (log:debug :zed.live-coding "Entered debugger")
+                         (log::debug :zed.live-coding "Entered debugger")
                          (locally (declare (optimize (speed 1)))
                            (unwind-protect (invoke-debugger condition)
-                             (log:debug :zed.live-coding
-                                        "Spent ~3$ seconds in the debugger"
-                                        (clock::adjust-pause-time ,clock ,entry-time))
+                             (log::debug :zed.live-coding
+                                         "Spent ~3$ seconds in the debugger"
+                                         (clock::adjust-pause-time ,clock ,entry-time))
                              nil))))))
          (restart-case (progn ,@body)
            (abort () :report "Zed: Skip processing current frame"))))))

@@ -7,7 +7,6 @@
 (defpackage #:%zed.context
   ;; Third-party aliases
   (:local-nicknames
-   (#:v #:verbose)
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
@@ -22,8 +21,7 @@
    (#:log #:%zed.logging)
    (#:mon #:%zed.monitor)
    (#:pack #:%zed.pack)
-   (#:sbs #:%zed.shader-buffer-state)
-   (#:shd #:%zed.shader-program)
+   (#:shd.mgr #:%zed.shader.manager)
    (#:tp #:%zed.thread-pool)
    (#:util #:%zed.util)
    (#:vp.mgr #:%zed.viewport.manager)
@@ -42,7 +40,7 @@
   (window nil :type win::window)
   (clock nil :type clock::clock)
   (input-manager nil :type in.mgr::manager)
-  (shader-buffer-state (sbs::make-state) :type sbs::state)
+  (shader-manager (shd.mgr::make-manager) :type shd.mgr::manager)
   (scene-tree (gob::make-root) :type gob::game-object)
   (jobs (jobs::make-jobs) :type jobs::jobs)
   (resource-cache (u:dict #'eq) :type hash-table)
@@ -77,7 +75,7 @@
              (pack::read-pack)
              ;; Register all defined shader programs with the thread pool so they are updated when
              ;; recompiled at runtime.
-             (shd::register-shaders)
+             (shd.mgr::register-shaders)
              ;; Construct the context with references to the previously constructed state.
              (prog1 (%make-context :running-p t
                                    :clock (clock::make-clock config refresh-rate)

@@ -3,11 +3,11 @@
 (defpackage #:zed.trait.mesh
   ;; Third-party aliases
   (:local-nicknames
-   (#:log #:verbose)
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
    (#:gltf #:%zed.mesh.gltf)
+   (#:log #:%zed.logging)
    (#:rc #:%zed.resource-cache)
    (#:trait #:%zed.trait))
   (:use #:cl)
@@ -55,9 +55,9 @@
          (gltf (rc::with-resource-cache (context :mesh asset)
                  (destructuring-bind (asset-system asset-path) asset
                    (prog1 (gltf::load asset)
-                     (log:debug :zed.trait.mesh "Cached mesh resource: ~a (~s)"
-                                asset-path
-                                asset-system)))))
+                     (log::debug :zed.trait.mesh "Cached mesh resource: ~a (~s)"
+                                 asset-path
+                                 asset-system)))))
          (mesh-data (u:href (gltf::gltf-meshes gltf) name)))
     (unless mesh-data
       (error "Mesh name ~s not found in mesh file ~s." name asset))
