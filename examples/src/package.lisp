@@ -20,6 +20,7 @@
    (#:z.geometry #:zed.trait.geometry)
    (#:z.mesh #:zed.trait.mesh)
    (#:z.render #:zed.trait.render)
+   (#:z.shd #:zed.shader)
    (#:z.sprite #:zed.trait.sprite))
   (:use #:cl)
   (:export

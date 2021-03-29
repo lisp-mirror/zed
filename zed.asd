@@ -8,8 +8,8 @@
                #:cffi
                #:cl-cpus
                #:cl-opengl
-               #:cl-slug
                #:closer-mop
+               #:defpackage-plus
                #:fast-io
                #:global-vars
                #:golden-utils
@@ -24,7 +24,6 @@
                #:trivial-garbage
                #:trivial-gray-streams
                #:uiop
-               #:umbra
                #:verbose)
   :pathname "src"
   :serial t
@@ -56,6 +55,11 @@
    (:file "window")
    (:file "audio")
    (:file "shader-manager")
+   (:file "shader-swizzle")
+   (:file "shader-library-package")
+   (:file "shader-library-common")
+   (:file "shader-library-color")
+   (:file "shader-library-sprite")
    (:file "viewport-data")
    (:file "viewport")
    (:file "viewport-manager")

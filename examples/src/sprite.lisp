@@ -4,7 +4,7 @@
   (:source (:zed-examples "textures/sprites.png")))
 
 (z:define-material sprite ()
-  (:shader umbra.sprite:sprite
+  (:shader z.shd:sprite
    :uniforms (:sprite.sampler 'sprites
               :opacity 1.0)
    :features (:depth-mode :lequal)))

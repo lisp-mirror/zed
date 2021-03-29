@@ -70,7 +70,7 @@
                        (clamp (dot v h) 0 1))))
 
 (defun diffuse ((material-info material-info))
-  (/ (diffuse-color material-info) +pi+))
+  (/ (diffuse-color material-info) pi))
 
 (defun specular-reflection ((material-info material-info)
                             (angular-info angular-info))
@@ -103,7 +103,7 @@
              (f (1+ (* (- (* n-dot-h alpha-roughness-squared)
                           n-dot-h)
                        n-dot-h))))
-        (/ alpha-roughness-squared (* +pi+ f f))))))
+        (/ alpha-roughness-squared (* pi f f))))))
 
 (defun get-point-shade ((point-to-light :vec3)
                         (material-info material-info)
@@ -209,18 +209,13 @@
          (mr-sample (texture sampler (vec3 uv +metal-roughness+)))
          (perceptual-roughness (* (.g mr-sample) roughness-factor))
          (metallic (* (.b mr-sample) metallic-factor))
-         (base-color (* (umbra.color:srgb->rgb
-                         (texture sampler (vec3 uv +albedo+)))
-                        base-color-factor))
-         (diffuse-color (* (.rgb base-color)
-                           (- (vec3 1) f0)
-                           (- 1 metallic)))
+         (base-color (* (srgb->rgb (texture sampler (vec3 uv +albedo+))) base-color-factor))
+         (diffuse-color (* (.rgb base-color) (- (vec3 1) f0) (- 1 metallic)))
          (specular-color (mix f0 (.rgb base-color) metallic))
          (perceptual-roughness (clamp perceptual-roughness 0 1))
          (metallic (clamp metallic 0 1))
          (alpha-roughness (* perceptual-roughness perceptual-roughness))
-         (reflectance (max (max (.r specular-color) (.g specular-color))
-                           (.b specular-color)))
+         (reflectance (max (max (.r specular-color) (.g specular-color)) (.b specular-color)))
          (specular-environment-r0 (.rgb specular-color))
          (specular-environment-r90 (vec3 (clamp (* reflectance 50) 0 1)))
          (material-info (make-material-info perceptual-roughness
@@ -232,14 +227,9 @@
          (color (vec3 0))
          (normal-w (get-normal sampler normal-scale uv world-pos normal))
          (ao (.r (texture sampler (vec3 uv +ao+))))
-         (emissive (* (.rgb (umbra.color:srgb->rgb
-                             (texture sampler (vec3 uv +emissive+))))
-                      emissive-factor)))
+         (emissive (* (.rgb (srgb->rgb (texture sampler (vec3 uv +emissive+)))) emissive-factor)))
     (when use-punctual
-      (incf color (apply-directional-light light
-                                           material-info
-                                           normal-w
-                                           view-dir)))
+      (incf color (apply-directional-light light material-info normal-w view-dir)))
     (when use-ibl
       (incf color (get-ibl-contribution material-info
                                         normal-w
@@ -248,8 +238,7 @@
                                         environment-sampler)))
     (setf color (mix color (* color ao) occlusion-strength))
     (incf color emissive)
-    (vec4 (umbra.color:rgb->srgb (umbra.color:tone-map/aces color 1))
-          (.a base-color))))
+    (vec4 (rgb->srgb (tone-map/aces color 1)) (.a base-color))))
 
 (define-shader mesh ()
   (:vertex (mesh/vertex mesh-attrs))

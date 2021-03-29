@@ -14,8 +14,3 @@
    #:%zed.trait
    #:%zed.tree
    #:%zed.viewport.data))
-
-(uiop:define-package #:zed.shader
-  (:use-reexport
-   #:shadow.glsl
-   #:umbra.common))

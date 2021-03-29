@@ -5,7 +5,6 @@
   :source-control (:git "https://git.mfiano.net/mfiano/zed.git")
   :encoding :utf-8
   :depends-on (#:golden-utils
-               #:umbra
                #:zed)
   :pathname "src"
   :serial t

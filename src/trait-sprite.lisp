@@ -11,6 +11,7 @@
    (#:mat #:%zed.material)
    (#:mat.def #:%zed.material.definition)
    (#:shd.mgr #:%zed.shader.manager)
+   (#:shd.lib #:zed.shader)
    (#:ss #:%zed.spritesheet)
    (#:tr.ren #:zed.trait.render)
    (#:trait #:%zed.trait)
@@ -56,7 +57,7 @@
                  :inline t
                  :type list
                  :initarg :buffer-spec
-                 :initform '(:spritesheet umbra.sprite:sprite))
+                 :initform '(:spritesheet shd.lib:sprite))
    (%spritesheet :accessor spritesheet
                  :inline t
                  :type ss::spritesheet
