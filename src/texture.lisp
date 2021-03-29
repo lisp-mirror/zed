@@ -3,8 +3,7 @@
 (defpackage #:%zed.texture
   ;; Third-party aliases
   (:local-nicknames
-   (#:u #:golden-utils)
-   (#:v4 #:origin.vec4))
+   (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
    (#:ctx #:%zed.context)

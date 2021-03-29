@@ -9,12 +9,12 @@
 
 (defpackage #:zed-examples
   (:local-nicknames
-   (#:const #:origin.constants)
-   (#:q #:origin.quat)
+   (#:const #:zed.math.constants)
+   (#:q #:zed.math.quaternion)
    (#:shader #:zed-examples.shader)
    (#:u #:golden-utils)
-   (#:v3 #:origin.vec3)
-   (#:v4 #:origin.vec4)
+   (#:v3 #:zed.math.vector3)
+   (#:v4 #:zed.math.vector4)
    (#:z #:zed)
    (#:z.camera #:zed.trait.camera)
    (#:z.geometry #:zed.trait.geometry)

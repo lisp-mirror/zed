@@ -3,18 +3,18 @@
 (defpackage #:zed.trait.camera
   ;; Third-party aliases
   (:local-nicknames
-   (#:const #:origin.constants)
-   (#:m3 #:origin.mat3)
-   (#:m4 #:origin.mat4)
-   (#:u #:golden-utils)
-   (#:v3 #:origin.vec3))
+   (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
    (#:cam.state #:%zed.camera-state)
+   (#:const #:zed.math.constants)
    (#:ctx #:%zed.context)
    (#:gob #:%zed.game-object)
+   (#:m3 #:zed.math.matrix3)
+   (#:m4 #:zed.math.matrix4)
    (#:trait #:%zed.trait)
-   (#:ts #:%zed.transform-state))
+   (#:ts #:%zed.transform-state)
+   (#:v3 #:zed.math.vector3))
   (:use #:cl)
   (:export
    #:camera

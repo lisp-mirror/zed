@@ -4,14 +4,14 @@
   ;; Third-party aliases
   (:local-nicknames
    (#:glob #:global-vars)
-   (#:u #:golden-utils)
-   (#:v4 #:origin.vec4))
+   (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
    (#:ctx #:%zed.context)
    (#:img #:%zed.image)
    (#:tp #:%zed.thread-pool)
-   (#:util #:%zed.util))
+   (#:util #:%zed.util)
+   (#:v4 #:zed.math.vector4))
   (:use #:cl)
   (:shadow
    #:find
@@ -77,7 +77,7 @@
   (destructuring-bind (&key
                          (depth-stencil-mode :depth-component)
                          (base-level 0)
-                         (border-color (v4:vec))
+                         (border-color (v4:zero))
                          (compare-func :lequal)
                          (compare-mode :none)
                          (lod-bias 0.0)

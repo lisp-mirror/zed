@@ -18,13 +18,13 @@
   (z.sprite:sprite :name "planet11"))
 
 (z:define-prefab ship (:template 'sprite
-                       :translate (v3:vec 0 -120)
-                       :scale 1)
+                       :translate (v3:vec 0.0 -120.0 0.0)
+                       :scale 1.0)
   (z.sprite:sprite :name "ship29")
   (z.render:render :layer 1)
   ((exhaust :template 'sprite
-            :translate (v3:vec 0 -145)
-            :scale (v3:vec 1 0.65 1))
+            :translate (v3:vec 0.0 -145.0 0.0)
+            :scale (v3:vec 1.0 0.65 1.0))
    (z.sprite:sprite :name "exhaust01-01"
                     :frames 8
                     :duration 0.5)

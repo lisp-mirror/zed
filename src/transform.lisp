@@ -3,17 +3,16 @@
 (defpackage #:%zed.transform
   ;; Third-party aliases
   (:local-nicknames
-   (#:m3 #:origin.mat3)
-   (#:m4 #:origin.mat4)
-   (#:q #:origin.quat)
-   (#:u #:golden-utils)
-   (#:v3 #:origin.vec3)
-   (#:v4 #:origin.vec4))
+   (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
    (#:ctx #:%zed.context)
    (#:gob #:%zed.game-object)
-   (#:ts #:%zed.transform-state))
+   (#:m4 #:zed.math.matrix4)
+   (#:q #:zed.math.quaternion)
+   (#:ts #:%zed.transform-state)
+   (#:v3 #:zed.math.vector3)
+   (#:v4 #:zed.math.vector4))
   (:use #:cl)
   (:shadow
    #:space))
@@ -147,32 +146,35 @@
 (u:fn-> transform-point (gob::game-object v3:vec &key (:space space)) v3:vec)
 (defun transform-point (game-object point &key (space :local))
   (declare (optimize speed))
-  (let ((world-matrix (ts::world-matrix (gob::transform game-object))))
-    (values
-     (v3:vec
-      (ecase space
-        (:local (m4:*v4 world-matrix (v4:vec point 1)))
-        (:world (m4:*v4 (m4:invert world-matrix) (v4:vec point 1))))))))
+  (let* ((world-matrix (ts::world-matrix (gob::transform game-object)))
+         (temp1 (v4:vec (v3:x point) (v3:y point) (v3:z point) 1.0))
+         (temp2 (ecase space
+                  (:local (m4:*v4 world-matrix temp1))
+                  (:world (m4:*v4 (m4:invert world-matrix) temp1)))))
+    (declare (dynamic-extent temp1))
+    (v3:vec (v4:x temp2) (v4:y temp2) (v4:z temp2))))
 
 (u:fn-> transform-vector (gob::game-object v3:vec &key (:space space)) v3:vec)
 (defun transform-vector (game-object vector &key (space :local))
   (declare (optimize speed))
-  (let ((world-matrix (ts::world-matrix (gob::transform game-object))))
+  (let* ((world-matrix (ts::world-matrix (gob::transform game-object)))
+         (temp1 (v4:vec (v3:x vector) (v3:y vector) (v3:z vector) 1.0))
+         (temp2 (ecase space
+                  (:local (m4:*v4 world-matrix temp1))
+                  (:world (m4:*v4 (m4:invert world-matrix) temp1)))))
+    (declare (dynamic-extent temp1))
     (m4:set-translation! world-matrix world-matrix v3:+zero+)
-    (values
-     (v3:vec
-      (ecase space
-        (:local (m4:*v4 world-matrix (v4:vec vector 1)))
-        (:world (m4:*v4 (m4:invert world-matrix) (v4:vec vector 1))))))))
+    (v3:vec (v4:x temp2) (v4:y temp2) (v4:z temp2))))
 
 (u:fn-> transform-direction (gob::game-object v3:vec &key (:space space)) v3:vec)
 (defun transform-direction (game-object direction &key (space :local))
   (declare (optimize speed))
-  (let ((world-matrix (ts::world-matrix (gob::transform game-object))))
+  (let* ((world-matrix (ts::world-matrix (gob::transform game-object)))
+         (temp1 (v4:vec (v3:x direction) (v3:y direction) (v3:z direction) 1.0))
+         (temp2 (ecase space
+                  (:local (m4:*v4 world-matrix temp1))
+                  (:world (m4:*v4 (m4:invert world-matrix) temp1)))))
+    (declare (dynamic-extent temp1))
     (m4:set-translation! world-matrix world-matrix v3:+zero+)
     (m4:normalize-rotation! world-matrix world-matrix)
-    (values
-     (v3:vec
-      (ecase space
-        (:local (m4:*v4 world-matrix (v4:vec direction 1)))
-        (:world (m4:*v4 (m4:invert world-matrix) (v4:vec direction 1))))))))
+    (v3:vec (v4:x temp2) (v4:y temp2) (v4:z temp2))))

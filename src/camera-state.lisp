@@ -3,17 +3,17 @@
 (defpackage #:%zed.camera-state
   ;; Third-party aliases
   (:local-nicknames
-   (#:const #:origin.constants)
-   (#:m3 #:origin.mat3)
-   (#:m4 #:origin.mat4)
-   (#:q #:origin.quat)
-   (#:u #:golden-utils)
-   (#:v3 #:origin.vec3))
+   (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
    (#:ctx #:%zed.context)
+   (#:const #:zed.math.constants)
    (#:gob #:%zed.game-object)
+   (#:m3 #:zed.math.matrix3)
+   (#:m4 #:zed.math.matrix4)
+   (#:q #:zed.math.quaternion)
    (#:ts #:%zed.transform-state)
+   (#:v3 #:zed.math.vector3)
    (#:win #:%zed.window))
   (:use #:cl))
 
@@ -27,8 +27,8 @@
             (:copier nil))
   (transform nil :type ts::state)
   (window nil :type win::window)
-  (view (m4:mat 1) :type m4:mat)
-  (projection (m4:mat 1) :type m4:mat))
+  (view (m4:id) :type m4:mat)
+  (projection (m4:id) :type m4:mat))
 
 (u:fn-> %update-projection/orthographic (state u:f32 u:f32 u:f32) null)
 (declaim (inline %update-projection/orthographic))
@@ -61,7 +61,7 @@
         (rotation #.(q:inverse
                      (q:rotate-euler
                       q:+id+
-                      (v3:vec (- (asin (/ (sqrt 3)))) 0 const::pi/4)))))
+                      (v3:vec (- (asin (/ (sqrt 3)))) 0.0 const::+pi/4+)))))
     (%update-projection/orthographic state zoom near far)
     (ts::initialize-rotation transform rotation)
     nil))

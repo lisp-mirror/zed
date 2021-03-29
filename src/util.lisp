@@ -44,7 +44,6 @@
                    (lambda (x)
                      (or (u:string-starts-with-p x "%ZED")
                          (u:string-starts-with-p x "ZED")
-                         (u:string-starts-with-p x "ORIGIN")
                          (u:string-starts-with-p x "CL-OPENGL")
                          (string= x "SHADOW")
                          (string= x "SDL2")))

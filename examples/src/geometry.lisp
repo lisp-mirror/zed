@@ -19,7 +19,7 @@
   (:shader shader:geometry
    :features (:disable (:cull-face))))
 
-(z:define-prefab tile (:rotate-velocity (v3:velocity v3:+right+ const:pi/2)
+(z:define-prefab tile (:rotate-velocity (v3:velocity v3:+right+ const:+pi/2+)
                        :scale 30.0)
   (z.geometry:geometry :name 'tile)
   (z.render:render :material 'tile))

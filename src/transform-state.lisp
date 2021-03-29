@@ -3,10 +3,12 @@
 (defpackage #:%zed.transform-state
   ;; Third-party aliases
   (:local-nicknames
-   (#:m4 #:origin.mat4)
-   (#:q #:origin.quat)
-   (#:u #:golden-utils)
-   (#:v3 #:origin.vec3))
+   (#:u #:golden-utils))
+  ;; Internal aliases
+  (:local-nicknames
+   (#:m4 #:zed.math.matrix4)
+   (#:q #:zed.math.quaternion)
+   (#:v3 #:zed.math.vector3))
   (:use #:cl))
 
 (in-package #:%zed.transform-state)
@@ -17,25 +19,25 @@
             (:conc-name nil)
             (:predicate nil)
             (:copier nil))
-  (translation/current (v3:vec) :type v3:vec)
-  (translation/previous (v3:vec) :type v3:vec)
-  (translation/incremental (v3:vec) :type v3:vec)
-  (translation/incremental-delta (v3:vec) :type v3:vec)
-  (translation/interpolated (v3:vec) :type v3:vec)
-  (rotation/current (q:quat 1) :type q:quat)
-  (rotation/previous (q:quat 1) :type q:quat)
-  (rotation/incremental (v3:vec) :type v3:vec)
-  (rotation/incremental-delta (q:quat 1) :type q:quat)
-  (rotation/interpolated (q:quat 1) :type q:quat)
-  (scale/current (v3:vec 1) :type v3:vec)
-  (scale/previous (v3:vec 1) :type v3:vec)
-  (scale/incremental (v3:vec) :type v3:vec)
-  (scale/incremental-delta (v3:vec) :type v3:vec)
-  (scale/interpolated (v3:vec) :type v3:vec)
-  (local-matrix (m4:mat 1) :type m4:mat)
-  (world-matrix (m4:mat 1) :type m4:mat)
-  (scaling-matrix (m4:mat 1) :type m4:mat)
-  (normal-matrix (m4:mat 1) :type m4:mat))
+  (translation/current (v3:zero) :type v3:vec)
+  (translation/previous (v3:zero) :type v3:vec)
+  (translation/incremental (v3:zero) :type v3:vec)
+  (translation/incremental-delta (v3:zero) :type v3:vec)
+  (translation/interpolated (v3:zero) :type v3:vec)
+  (rotation/current (q:id) :type q:quat)
+  (rotation/previous (q:id) :type q:quat)
+  (rotation/incremental (v3:zero) :type v3:vec)
+  (rotation/incremental-delta (q:id) :type q:quat)
+  (rotation/interpolated (q:id) :type q:quat)
+  (scale/current (v3:ones) :type v3:vec)
+  (scale/previous (v3:ones) :type v3:vec)
+  (scale/incremental (v3:zero) :type v3:vec)
+  (scale/incremental-delta (v3:zero) :type v3:vec)
+  (scale/interpolated (v3:zero) :type v3:vec)
+  (local-matrix (m4:id) :type m4:mat)
+  (world-matrix (m4:id) :type m4:mat)
+  (scaling-matrix (m4:id) :type m4:mat)
+  (normal-matrix (m4:id) :type m4:mat))
 
 (u:define-printer (state stream :type nil)
   (format stream "TRANSFORM-STATE"))
@@ -69,7 +71,7 @@
   (when initial
     (let ((initial (etypecase initial
                      (v3:vec (v3:copy initial))
-                     (real (v3:vec initial)))))
+                     (real (v3:uniform initial)))))
       (setf (scale/current state) initial
             (scale/previous state) (v3:copy initial))))
   (when velocity

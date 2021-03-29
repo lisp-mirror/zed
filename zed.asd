@@ -15,7 +15,6 @@
                #:golden-utils
                #:jsown
                #:lparallel
-               #:origin
                #:pngload
                #:sdl2
                #:sdl2-mixer
@@ -38,6 +37,15 @@
    (:file "red-black-tree")
    (:file "binary-parser")
    (:file "pack")
+   (:file "math-common")
+   (:file "math-constants")
+   (:file "math-vector2")
+   (:file "math-vector3")
+   (:file "math-vector4")
+   (:file "math-matrix2")
+   (:file "math-matrix3")
+   (:file "math-matrix4")
+   (:file "math-quaternion")
    (:file "asset")
    (:file "whitelist")
    (:file "thread-pool")

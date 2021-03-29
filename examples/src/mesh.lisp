@@ -10,10 +10,10 @@
 (z:define-material mesh ()
   (:shader shader:mesh
    :uniforms (:light.direction (v3:vec -0.7399 -0.6428 -0.1983)
-              :light.color (v3:vec 1)
+              :light.color (v3:ones)
               :light.intensity 2
               :sampler 'mesh
-              :base-color-factor (v4:vec 1)
+              :base-color-factor (v4:ones)
               :metallic-factor 1
               :roughness-factor 1
               :normal-scale 1
@@ -26,9 +26,9 @@
               :use-ibl t)
    :features (:enable (:texture-cube-map-seamless))))
 
-(z:define-prefab mesh (:rotate (q:orient :local :x const:pi/2)
-                       :rotate-velocity (v3:velocity v3:+forward+ (- const:pi/6))
-                       :scale 17)
+(z:define-prefab mesh (:rotate (q:orient :local :x const:+pi/2+)
+                       :rotate-velocity (v3:velocity v3:+forward+ (- const:+pi/6+))
+                       :scale 17.0)
   (z.mesh:mesh :name "helmet"
                :asset '(:zed-examples "meshes/damaged-helmet.glb"))
   (z.render:render :material 'mesh))
