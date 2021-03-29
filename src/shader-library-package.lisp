@@ -7,8 +7,7 @@
   ;; Internal aliases
   (:local-nicknames
    (#:sw #:%zed.shader.swizzle))
-  (:inherit-except #:cl #:defun #:defstruct #:defmacro)
-  (:inherit #:shadow.glsl #:vari)
+  (:inherit #:shadow.glsl)
   ;; Utilities
   (:export
    #:mvlet*
