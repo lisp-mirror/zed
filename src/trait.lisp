@@ -157,7 +157,7 @@
           `(wl::with-allowed-scopes make-trait
                (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
                 :trait-attach-hook :trait-detach-hook :trait-update-hook)
-             (let ((,trait (make-instance ',type :context ,context ,@args)))
+             (let ((,trait (make-instance ',type 'context ,context ,@args)))
                (funcall (fdefinition (setup-hook ,trait)) ,trait)
                ,trait)))
         whole)))
