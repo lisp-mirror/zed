@@ -9,7 +9,7 @@
    (#:ctx #:%zed.context)
    (#:gob #:%zed.game-object)
    (#:pf.def #:%zed.prefab.definitions)
-   (#:tr #:%zed.trait)
+   (#:tfm #:%zed.trait)
    (#:ts #:%zed.transform-state)
    (#:tree #:%zed.tree)
    (#:wl #:%zed.whitelist))
@@ -29,8 +29,8 @@
                            (funcall (pf.def::reference-func arg) factory)
                            arg))
               :into args
-            :finally (let ((trait (apply #'tr:make-trait context type args)))
-                       (tr:attach-trait game-object trait))))
+            :finally (let ((trait (apply #'tfm:make-trait context type args)))
+                       (tfm:attach-trait game-object trait))))
     (tree:spawn-game-object context
                             game-object
                             (u:if-let ((parent (pf.def::parent node)))

@@ -10,7 +10,7 @@
    (#:ctx #:%zed.context)
    (#:do #:%zed.draw-order)
    (#:gob #:%zed.game-object)
-   (#:tr #:%zed.transform)
+   (#:tfm #:%zed.transform)
    (#:trait #:%zed.trait)
    (#:util #:%zed.util)
    (#:wl #:%zed.whitelist))
@@ -163,7 +163,7 @@
       (when (eq (gob::pause-mode game-object) :inherit)
         (setf (gob::pause-mode game-object) (gob::pause-mode new-parent)))
       ;; Resolve the new world matrix for the moved game object.
-      (tr::resolve-world-matrix game-object (clock::alpha clock))
+      (tfm::resolve-world-matrix game-object (clock::alpha clock))
       ;; Return the updated game object.
       game-object)))
 

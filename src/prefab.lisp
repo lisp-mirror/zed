@@ -12,7 +12,6 @@
    (#:live #:%zed.live-coding)
    (#:pf.def #:%zed.prefab.definitions)
    (#:pf.fac #:%zed.prefab.factory)
-   (#:tr #:%zed.transform)
    (#:tree #:%zed.tree)
    (#:tp #:%zed.thread-pool)
    (#:util #:%zed.util)
