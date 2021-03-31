@@ -81,6 +81,13 @@
      (:local (ts::local-matrix (gob::transform game-object)))
      (:world (ts::world-matrix (gob::transform game-object))))))
 
+(u:fn-> get-transform (gob::game-object &key (:space space)) m4:mat)
+(defun get-transform (game-object &key (space :local))
+  (declare (optimize speed))
+  (ecase space
+    (:local (ts::local-matrix (gob::transform game-object)))
+    (:world (ts::world-matrix (gob::transform game-object)))))
+
 (u:fn-> translate (gob::game-object v3:vec &key (:replace-p boolean) (:instant-p boolean)) null)
 (defun translate (game-object vec &key replace-p instant-p)
   (declare (optimize speed))
