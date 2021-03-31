@@ -44,6 +44,11 @@
   (:setup setup)
   (:render render))
 
+(defun get-extents (mesh)
+  (let ((primitive (primitive mesh)))
+    (values (gltf::primitive-extent-min primitive)
+            (gltf::primitive-extent-max primitive))))
+
 ;;; Hooks
 
 (u:fn-> setup (mesh) null)
