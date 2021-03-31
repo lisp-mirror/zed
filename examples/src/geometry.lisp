@@ -25,6 +25,7 @@
   (z.render:render :material 'tile))
 
 (defun geometry-prelude (context)
+  (z:load-prefab context 'quitter)
   (z:load-prefab context 'camera/perspective)
   (z:load-prefab context 'tile))
 

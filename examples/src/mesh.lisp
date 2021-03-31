@@ -33,6 +33,7 @@
   (z.render:render :material 'mesh))
 
 (defun mesh-prelude (context)
+  (z:load-prefab context 'quitter)
   (z:load-prefab context 'camera/perspective)
   (z:load-prefab context 'mesh))
 

@@ -31,6 +31,7 @@
    (z.render:render :layer 2)))
 
 (defun sprite-prelude (context)
+  (z:load-prefab context 'quitter)
   (z:load-prefab context 'camera/orthographic)
   (z:load-prefab context 'planet)
   (z:load-prefab context 'ship))

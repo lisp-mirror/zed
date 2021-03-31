@@ -39,3 +39,18 @@
   (z.camera:camera :mode :isometric
                    :clip-near -1000.0
                    :clip-far 1000.0))
+
+(z:define-prefab quitter ()
+  (quitter))
+
+;;; Traits
+
+(z:define-trait quitter ()
+  ()
+  (:update quitter/update))
+
+(defun quitter/update (quitter)
+  (let ((context (z:context quitter)))
+    (when (or (z:on-button-enter context :key :escape)
+              (z:on-button-enter context :window :close))
+      (z:stop-game context))))
