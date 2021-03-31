@@ -12,7 +12,7 @@
    (#:gob #:%zed.game-object)
    (#:m3 #:zed.math.matrix3)
    (#:m4 #:zed.math.matrix4)
-   (#:trait #:%zed.trait)
+   (#:tr #:%zed.trait)
    (#:ts #:%zed.transform-state)
    (#:v3 #:zed.math.vector3))
   (:use #:cl)
@@ -22,7 +22,7 @@
 
 (in-package #:zed.trait.camera)
 
-(trait::define-internal-trait camera ()
+(tr::define-internal-trait camera ()
   ((%state :accessor state
            :inline t
            :type cam.state::state
@@ -62,7 +62,7 @@
   (:update update))
 
 (defun make-active (camera)
-  (let ((context (trait::context camera)))
+  (let ((context (tr:context camera)))
     (setf (ctx::active-camera context) camera)))
 
 (u:fn-> resolve-normal-matrix (ctx::context gob::game-object) m3:mat)
@@ -82,12 +82,12 @@
 
 (defun setup (camera)
   (setf (fov-y camera) (* (fov-y camera) const:+deg+))
-  (unless (ctx::active-camera (trait::context camera))
+  (unless (ctx::active-camera (tr:context camera))
     (make-active camera)))
 
 (defun attach (camera)
-  (let* ((context (trait::context camera))
-         (owner (trait::owner camera))
+  (let* ((context (tr:context camera))
+         (owner (tr::owner camera))
          (window (ctx::window context))
          (transform (gob::transform owner)))
     (setf (state camera) (cam.state::make-state :transform transform :window window))))

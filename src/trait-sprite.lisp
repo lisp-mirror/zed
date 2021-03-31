@@ -13,8 +13,8 @@
    (#:shd.mgr #:%zed.shader.manager)
    (#:shd.lib #:zed.shader)
    (#:ss #:%zed.spritesheet)
+   (#:tr #:%zed.trait)
    (#:tr.ren #:zed.trait.render)
-   (#:trait #:%zed.trait)
    (#:uni #:%zed.material.uniform))
   (:use #:cl)
   (:export
@@ -22,7 +22,7 @@
 
 (in-package #:zed.trait.sprite)
 
-(trait::define-internal-trait sprite ()
+(tr::define-internal-trait sprite ()
   ((%name :reader name
           :inline t
           :type string
@@ -87,7 +87,7 @@
 (u:fn-> setup (sprite) null)
 (defun setup (sprite)
   (declare (optimize speed))
-  (let* ((context (trait::context sprite))
+  (let* ((context (tr:context sprite))
          (spritesheet (ss::make-spritesheet context (asset sprite) (buffer-spec sprite))))
     (setf (spritesheet sprite) spritesheet
           (index sprite) (ss::find spritesheet (name sprite))
@@ -99,7 +99,7 @@
   (declare (optimize speed))
   (unless (pause-p sprite)
     (let* ((duration (duration sprite))
-           (clock (ctx::clock (trait::context sprite))))
+           (clock (ctx::clock (tr:context sprite))))
       (incf (elapsed sprite) (float (clock::frame-time clock) 1f0))
       (if (>= (elapsed sprite) duration)
           (setf (elapsed sprite) 0.0
@@ -115,8 +115,8 @@
 (defun render (sprite)
   (declare (optimize speed))
   (let* ((asset (asset sprite))
-         (shader-manager (ctx::shader-manager (trait::context sprite)))
-         (render-trait (trait:find-trait (trait::owner sprite) 'tr.ren::render))
+         (shader-manager (ctx::shader-manager (tr:context sprite)))
+         (render-trait (tr:find-trait (tr::owner sprite) 'tr.ren:render))
          (material (tr.ren::material render-trait)))
     (mat::set-uniform material :sprite.index (index sprite))
     (shd.mgr::with-buffers (shader-manager asset)

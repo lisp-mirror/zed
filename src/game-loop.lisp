@@ -17,7 +17,7 @@
    (#:tfm #:%zed.transform)
    (#:tm #:%zed.trait.manager)
    (#:tp #:%zed.thread-pool)
-   (#:trait #:%zed.trait)
+   (#:tr #:%zed.trait)
    (#:tr.ren #:zed.trait.render)
    (#:tree #:%zed.tree)
    (#:util #:%zed.util)
@@ -61,7 +61,7 @@
         (tfm::resolve-world-matrix game-object (clock::alpha clock)))
       (tree::walk-tree (game-object scene-tree)
         (dolist (trait (tm::order (gob::traits game-object)))
-          (trait::call-hook trait :update)))
+          (tr::call-hook trait :update)))
       nil)))
 
 (u:fn-> start (ctx::context &key (:profile-p boolean) (:frame-count (or fixnum null))) null)

@@ -167,9 +167,7 @@
 (u:fn-> find-trait (gob::game-object symbol) (or trait null))
 (defun find-trait (game-object type)
   (declare (optimize speed))
-  (u:when-let ((by-type (u:href (tm::by-type (gob::traits game-object)) type)))
-    (destructuring-bind (first . rest) by-type
-      (values first rest))))
+  (u:href (tm::by-type (gob::traits game-object)) type))
 
 (u:fn-> attach-trait (gob::game-object trait) null)
 (defun attach-trait (game-object trait)
@@ -181,13 +179,16 @@
       (error "Trait ~s is already attached to a game object." trait))
     (let* ((trait-manager (gob::traits game-object))
            (by-id (tm::by-id trait-manager))
+           (by-type (tm::by-type trait-manager))
+           (type (get-type trait))
            (jobs (ctx::jobs (context trait))))
-      (unless (u:href by-id trait)
-        (setf (owner trait) game-object
-              (u:href by-id trait) trait)
-        (push (list game-object trait #'priority) (jobs::enable-traits jobs))
-        (push trait (u:href (tm::by-type trait-manager) (get-type trait)))
-        (call-hook trait :attach))
+      (when (u:href by-type type)
+        (error "A game object can only have 1 trait of a given type attached to it."))
+      (setf (owner trait) game-object
+            (u:href by-id trait) trait
+            (u:href by-type type) trait)
+      (push (list game-object trait #'priority) (jobs::enable-traits jobs))
+      (call-hook trait :attach)
       nil)))
 
 (u:fn-> detach-trait (gob::game-object trait) null)
@@ -199,15 +200,12 @@
     (unless (eq game-object (owner trait))
       (error "Trait ~s is not attached to game object ~s." trait game-object))
     (let* ((trait-manager (gob::traits game-object))
-           (by-type (tm::by-type trait-manager))
-           (type (get-type trait))
            (jobs (ctx::jobs (context trait))))
       (call-hook trait :detach)
       (push (cons game-object trait) (jobs::disable-traits jobs))
       (setf (owner trait) nil)
       (remhash trait (tm::by-id trait-manager))
-      (when (zerop (length (u:deletef (the list (u:href by-type type)) trait)))
-        (remhash type by-type))
+      (remhash (get-type trait) (tm::by-type trait-manager))
       nil)))
 
 (u:fn-> detach-trait-type (gob::game-object symbol) null)

@@ -11,7 +11,7 @@
    (#:do #:%zed.draw-order)
    (#:gob #:%zed.game-object)
    (#:tfm #:%zed.transform)
-   (#:trait #:%zed.trait)
+   (#:tr #:%zed.trait)
    (#:util #:%zed.util)
    (#:wl #:%zed.whitelist))
   (:use #:cl)
@@ -203,7 +203,7 @@
           (if reparent-p
               (reparent-game-object context child parent)
               (destroy-game-object context child)))
-        (trait::destroy-all-traits game-object)
+        (tr::destroy-all-traits game-object)
         (deregister-prefab context game-object)
         (u:deletef (gob::children parent) game-object)
         nil))))

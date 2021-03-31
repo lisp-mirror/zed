@@ -9,14 +9,14 @@
    (#:gltf #:%zed.mesh.gltf)
    (#:log #:%zed.logging)
    (#:rc #:%zed.resource-cache)
-   (#:trait #:%zed.trait))
+   (#:tr #:%zed.trait))
   (:use #:cl)
   (:export
    #:mesh))
 
 (in-package #:zed.trait.mesh)
 
-(trait::define-internal-trait mesh ()
+(tr::define-internal-trait mesh ()
   ((%name :reader name
           :inline t
           :type (or string null)
@@ -54,7 +54,7 @@
 (u:fn-> setup (mesh) null)
 (defun setup (mesh)
   (declare (optimize speed))
-  (let* ((context (trait::context mesh))
+  (let* ((context (tr:context mesh))
          (name (name mesh))
          (asset (asset mesh))
          (gltf (rc::with-resource-cache (context :mesh asset)

@@ -10,14 +10,14 @@
    (#:geo.data #:%zed.geometry.data)
    (#:log #:%zed.logging)
    (#:rc #:%zed.resource-cache)
-   (#:trait #:%zed.trait))
+   (#:tr #:%zed.trait))
   (:use #:cl)
   (:export
    #:geometry))
 
 (in-package #:zed.trait.geometry)
 
-(trait::define-internal-trait geometry ()
+(tr::define-internal-trait geometry ()
   ((%name :reader name
           :inline t
           :type symbol
@@ -54,7 +54,7 @@
 (u:fn-> setup (geometry) null)
 (defun setup (geometry)
   (declare (optimize speed))
-  (let ((context (trait::context geometry))
+  (let ((context (tr:context geometry))
         (name (name geometry)))
     (unless name
       (error "Geometry trait ~s must have a name specified." geometry))

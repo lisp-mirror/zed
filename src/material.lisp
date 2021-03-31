@@ -14,7 +14,7 @@
    (#:mat.def #:%zed.material.definition)
    (#:ogl #:%zed.opengl)
    (#:tm #:%zed.trait.manager)
-   (#:trait #:%zed.trait)
+   (#:tr #:%zed.trait)
    (#:uni #:%zed.material.uniform)
    (#:wl #:%zed.whitelist))
   (:use #:cl)
@@ -96,7 +96,7 @@
                (u:do-hash-values (,x (mat.def::uniforms ,material))
                  (uni::resolve-func ,context ,game-object ,x))
                (dolist (,x (tm::order (gob::traits ,game-object)))
-                 (trait::call-hook ,x :render))
+                 (tr::call-hook ,x :render))
                (setf (mat.def::texture-unit-state ,material) 0)
                ,@(when disable
                    `((gl:enable ,@disable)))
