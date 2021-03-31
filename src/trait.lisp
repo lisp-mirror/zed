@@ -17,6 +17,8 @@
    #:find)
   (:export
    #:attach-trait
+   #:context
+   #:define-trait
    #:detach-all-traits
    #:detach-trait
    #:detach-trait-type
