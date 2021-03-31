@@ -120,12 +120,11 @@
                                      (v3:dot diagonal (m3:get-column! axis axes 2)))))
   nil)
 
-(u:fn-> update-visualization (box) null)
-(defun update-visualization (box)
+(u:fn-> update-visualization (box gob:game-object) null)
+(defun update-visualization (box visual)
   (declare (optimize speed))
-  (let ((game-object (tr::owner (collider box))))
-    (tfm::translate game-object (center box) :replace-p t)
-    (tfm::scale game-object (v3:- (max-extent box) (min-extent box)) :replace-p t))
+  (tfm::translate visual (center box) :replace-p t)
+  (tfm::scale visual (v3:- (max-extent box) (min-extent box)) :replace-p t)
   nil)
 
 (u:fn-> make-box (tr:trait) box)

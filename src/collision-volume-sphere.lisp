@@ -30,12 +30,11 @@
             (:copier nil))
   (radius 1.0 :type u:f32))
 
-(u:fn-> update-visualization (sphere) null)
-(defun update-visualization (sphere)
+(u:fn-> update-visualization (sphere gob:game-object) null)
+(defun update-visualization (sphere visual)
   (declare (optimize speed))
-  (let ((game-object (tr::owner (collider sphere))))
-    (tfm::translate game-object (center sphere) :replace-p t)
-    (tfm::scale game-object (v3:uniform (radius sphere)) :replace-p t))
+  (tfm::translate visual (center sphere) :replace-p t)
+  (tfm::scale visual (v3:uniform (radius sphere)) :replace-p t)
   nil)
 
 (u:fn-> make-sphere (tr:trait) sphere)

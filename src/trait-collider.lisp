@@ -26,6 +26,10 @@
                :type boolean
                :initarg :visible-p
                :initform t)
+   (%visual :accessor visual
+            :inline t
+            :type (or gob:game-object null)
+            :initform nil)
    (%volume-type :reader volume-type
                  :inline t
                  :type (or keyword null)
@@ -54,17 +58,18 @@
 
 (u:fn-> enable-visibility (collider) null)
 (defun enable-visibility (collider)
-  (declare (optimize speed))
   (let* ((context (tr::context collider))
          (owner (tr::owner collider))
+         (child (gob:make-game-object :label "collider-visualization"))
          (volume (volume collider))
          (mesh (tr::make-trait context
                                'tr.mesh:mesh
                                :asset '(:zed "meshes/colliders.glb")
                                :name (vol.struct::mesh-name volume)))
          (render (tr::make-trait context 'tr.ren:render :material 'collider)))
-    (tr::attach-trait owner mesh)
-    (tr::attach-trait owner render)
+    (tr::attach-trait child mesh)
+    (tr::attach-trait child render)
+    (setf (visual collider) (tree:spawn-game-object context child owner))
     nil))
 
 ;;; Hooks
@@ -86,13 +91,13 @@
   (let ((volume (volume collider)))
     (funcall (vol.struct::update-func volume) volume collider)
     (when (visible-p collider)
-      (funcall (vol.struct::update-visualization-func volume) volume)))
+      (funcall (vol.struct::update-visualization-func volume) volume (visual collider))))
   nil)
 
 (u:fn-> render (collider) null)
 (defun render (collider)
   (declare (optimize speed))
   (when (visible-p collider)
-    (let* ((render-trait (tr:find-trait (tr::owner collider) 'tr.ren:render))
+    (let* ((render-trait (tr:find-trait (visual collider) 'tr.ren:render))
            (material (tr.ren::material render-trait)))
       (mat::set-uniform material :contact (hit-p collider)))))
