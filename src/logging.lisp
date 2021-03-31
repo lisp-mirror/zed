@@ -4,17 +4,18 @@
   ;; Third-party packages
   (:local-nicknames
    (#:log #:verbose)
-   (#:u #:golden-utils))
+   (#:u #:golden-utils)
+   (#:v #:verbose))
   ;; Internal aliases
   (:local-nicknames
    (#:cfg #:%zed.config)
    (#:util #:%zed.util))
   (:shadowing-import-from
    #:verbose
-   #:trace
    #:debug
+   #:error
    #:info
-   #:error)
+   #:trace)
   (:use #:cl))
 
 (in-package #:%zed.logging)
