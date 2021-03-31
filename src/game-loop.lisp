@@ -45,8 +45,11 @@
     (lambda ()
       (declare (optimize speed))
       (wl::with-scope (:physics-phase)
-        (tree::walk-tree (x scene-tree)
-          (tfm::transform-game-object x delta-time))))))
+        (tree::walk-tree (game-object scene-tree)
+          (dolist (trait (tm::order (gob::traits game-object)))
+            (tr::call-hook trait :physics)))
+        (tree::walk-tree (game-object scene-tree)
+          (tfm::transform-game-object game-object delta-time))))))
 
 (u:fn-> run-update-phase (ctx::context) null)
 (defun run-update-phase (context)

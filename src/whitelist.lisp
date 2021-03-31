@@ -64,5 +64,6 @@
   :trait-destroy-hook
   :trait-attach-hook
   :trait-detach-hook
+  :trait-physics-hook
   :trait-update-hook
   :trait-render-hook)

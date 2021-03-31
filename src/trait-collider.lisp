@@ -21,16 +21,7 @@
 (in-package #:zed.trait.collider)
 
 (tr::define-internal-trait collider ()
-  ((%visible-p :reader visible-p
-               :inline t
-               :type boolean
-               :initarg :visible-p
-               :initform t)
-   (%visual :accessor visual
-            :inline t
-            :type (or gob:game-object null)
-            :initform nil)
-   (%volume-type :reader volume-type
+  ((%volume-type :reader volume-type
                  :inline t
                  :type (or keyword null)
                  :initarg :volume
@@ -39,12 +30,21 @@
             :inline t
             :type (or vol.struct::volume null)
             :initform nil)
+   (%visible-p :reader visible-p
+               :inline t
+               :type boolean
+               :initarg :visible-p
+               :initform t)
+   (%visual :accessor visual
+            :inline t
+            :type (or gob:game-object null)
+            :initform nil)
    (%hit-p :accessor hit-p
            :inline t
            :type boolean
            :initform nil))
   (:attach attach)
-  (:update update)
+  (:physics physics)
   (:render render))
 
 (mat::define-material collider ()
@@ -85,8 +85,8 @@
     (enable-visibility collider))
   nil)
 
-(u:fn-> update (collider) null)
-(defun update (collider)
+(u:fn-> physics (collider) null)
+(defun physics (collider)
   (declare (optimize speed))
   (let ((volume (volume collider)))
     (funcall (vol.struct::update-func volume) volume collider)

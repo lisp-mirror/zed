@@ -34,7 +34,7 @@
   :test #'equal)
 
 (u:define-constant +hook-names+
-    '(setup destroy attach detach update render) :test #'equal)
+    '(setup destroy attach detach physics update render) :test #'equal)
 
 (u:eval-always
   (oc::define-ordered-class trait ()
@@ -71,6 +71,11 @@
                     :type symbol
                     :initarg detach
                     :initform 'default-hook)
+     (%%physics-hook :reader physics-hook
+                     :inline t
+                     :type symbol
+                     :initarg physics
+                     :initform 'default-hook)
      (%%update-hook :reader update-hook
                     :inline t
                     :type symbol
@@ -85,8 +90,8 @@
 
 (u:fn-> default-hook (trait) null)
 (defun default-hook (trait)
-  (declare (optimize speed))
-  (declare (ignore trait))
+  (declare (optimize speed)
+           (ignore trait))
   nil)
 
 (u:fn-> get-type (trait) symbol)
@@ -141,7 +146,7 @@
   (declare (optimize speed))
   (wl::with-allowed-scopes make-trait
       (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
-       :trait-attach-hook :trait-detach-hook :trait-update-hook)
+       :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook)
     (if (subtypep type 'trait)
         (let ((trait (apply #'make-instance type 'context context args)))
           (call-hook trait :setup)
@@ -158,7 +163,7 @@
             (error "Trait type ~s is not defined." type))
           `(wl::with-allowed-scopes make-trait
                (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
-                :trait-attach-hook :trait-detach-hook :trait-update-hook)
+                :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook)
              (let ((,trait (make-instance ',type 'context ,context ,@args)))
                (funcall (fdefinition (setup-hook ,trait)) ,trait)
                ,trait)))
@@ -174,7 +179,7 @@
   (declare (optimize speed))
   (wl::with-allowed-scopes attach-trait
       (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
-       :trait-attach-hook :trait-detach-hook :trait-update-hook)
+       :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook)
     (when (owner trait)
       (error "Trait ~s is already attached to a game object." trait))
     (let* ((trait-manager (gob::traits game-object))
@@ -196,7 +201,7 @@
   (declare (optimize speed))
   (wl::with-allowed-scopes detach-trait
       (:prefab-recompile :trait-setup-hook :trait-destroy-hook :trait-attach-hook
-       :trait-detach-hook :trait-update-hook)
+       :trait-detach-hook :trait-physics-hook :trait-update-hook)
     (unless (eq game-object (owner trait))
       (error "Trait ~s is not attached to game object ~s." trait game-object))
     (let* ((trait-manager (gob::traits game-object))
@@ -225,7 +230,7 @@
   (declare (optimize speed))
   (wl::with-allowed-scopes destroy-trait
       (:prefab-recompile :trait-setup-hook :trait-destroy-hook :trait-attach-hook
-       :trait-detach-hook :trait-update-hook)
+       :trait-detach-hook :trait-physics-hook :trait-update-hook)
     (call-hook trait :destroy)
     (detach-trait (owner trait) trait))
   nil)

@@ -137,7 +137,7 @@
   (declare (optimize speed))
   (wl::with-allowed-scopes reparent-game-object
       (:prefab-instantiate :trait-setup-hook :trait-destroy-hook :trait-attach-hook
-       :trait-detach-hook :trait-update-hook)
+       :trait-detach-hook :trait-physics-hook :trait-update-hook)
     (let (;; We need the clock so we can resolve the world matrix of the newly placed game object
           ;; the correct interpolation factor.
           (clock (ctx::clock context)))
@@ -177,7 +177,7 @@
   (declare (optimize speed))
   (wl::with-allowed-scopes spawn-game-object
       (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
-       :trait-attach-hook :trait-detach-hook :trait-update-hook)
+       :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook)
     (reparent-game-object context game-object (or parent (ctx::scene-tree context)))
     (dolist (child (gob::children game-object))
       (spawn-game-object context child game-object))
@@ -188,7 +188,7 @@
   (declare (optimize speed))
   (wl::with-allowed-scopes destroy-game-object
       (:prefab-recompile :trait-setup-hook :trait-destroy-hook :trait-attach-hook
-       :trait-detach-hook :trait-update-hook)
+       :trait-detach-hook :trait-physics-hook :trait-update-hook)
     (flet ((deregister-prefab (context game-object)
              (u:when-let ((prefab-name (gob::prefab-name game-object))
                           (table (ctx::prefabs context)))
