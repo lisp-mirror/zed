@@ -17,6 +17,7 @@
    (#:v4 #:zed.math.vector4)
    (#:z #:zed)
    (#:z.camera #:zed.trait.camera)
+   (#:z.collider #:zed.trait.collider)
    (#:z.geometry #:zed.trait.geometry)
    (#:z.mesh #:zed.trait.mesh)
    (#:z.render #:zed.trait.render)
