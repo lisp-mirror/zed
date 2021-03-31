@@ -91,10 +91,6 @@
       (u:while (ctx::running-p context)
         (live::with-continuable (clock)
           (in::handle-events input-manager window viewport-manager)
-          ;; HACK: Remove this later when possible. This is just so we can easily stop the engine with
-          ;; the Escape key.
-          (when (in::on-button-enter input-manager :key :escape)
-            (ctx::shutdown context))
           ;; Perform one clock tick.
           (clock::tick clock refresh-rate physics-phase-func periodic-phase-func)
           ;; Perform update logic that needs to occur each frame.
