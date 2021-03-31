@@ -44,6 +44,8 @@
    (:file "math-matrix2")
    (:file "math-matrix3")
    (:file "math-matrix4")
+   (:file "math-point2d")
+   (:file "math-point3d")
    (:file "math-quaternion")
    (:file "asset")
    (:file "whitelist")
