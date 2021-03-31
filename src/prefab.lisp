@@ -98,18 +98,24 @@
 
 (defun parse-trait-args (data)
   (flet ((%parse (data func)
-           (apply #'u:dict
-                  (mapcan
-                   (lambda (x)
-                     (destructuring-bind (type options . args) x
-                       (declare (ignore options))
-                       (list type
-                             (u:plist->hash
-                              (loop :for (k v) :on args :by #'cddr
-                                    :collect k
-                                    :collect (funcall func v))
-                              :test #'eq))))
-                   data))))
+           (let ((seen-types nil))
+             (apply #'u:dict
+                    (mapcan
+                     (lambda (x)
+                       (destructuring-bind (type options . args) x
+                         (declare (ignore options))
+                         (when (member type seen-types)
+                           (error "A prefab node cannot have multiple traits of the same type.~%~%~
+                                   Duplicate trait type: ~s"
+                                  type))
+                         (prog1 (list type
+                                      (u:plist->hash
+                                       (loop :for (k v) :on args :by #'cddr
+                                             :collect k
+                                             :collect (funcall func v))
+                                       :test #'eq))
+                           (push type seen-types))))
+                     data)))))
     (values (%parse data (lambda (x) (nth 2 x)))
             (%parse data (lambda (x) (compile nil x))))))
 
