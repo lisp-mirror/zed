@@ -12,6 +12,7 @@
             (:conc-name nil)
             (:predicate nil)
             (:copier nil))
+  (event (sdl2:new-event) :type sdl2-ffi:sdl-event)
   (gamepad-instances (u:dict #'eq) :type hash-table)
   (gamepad-ids (u:dict #'eq) :type hash-table)
   (detached-gamepads nil :type list)

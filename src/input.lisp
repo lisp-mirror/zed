@@ -27,6 +27,7 @@
     manager))
 
 (defun destroy (manager)
+  (sdl2:free-event (in.mgr::event manager))
   (in.gp::shutdown-gamepads manager))
 
 (defmacro event-case ((event) &body handlers)
@@ -106,10 +107,9 @@
   (in.tr::enable-entering manager)
   (in.tr::disable-exiting manager)
   (in.mouse::reset-state manager)
-  (loop :with event = (sdl2:new-event)
+  (loop :with event = (in.mgr::event manager)
         :until (zerop (the u:ub32 (sdl2:next-event event :poll)))
-        :do (dispatch-event manager window viewports event)
-        :finally (sdl2:free-event event)))
+        :do (dispatch-event manager window viewports event)))
 
 (u:fn-> on-button-enter (in.mgr::manager &rest t) boolean)
 (declaim (inline on-button-enter))
