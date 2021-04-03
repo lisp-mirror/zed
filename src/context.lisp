@@ -13,16 +13,6 @@
                                        :anti-alias-p (config-anti-alias-p config)))
                   (refresh-rate (get-monitor-refresh-rate (window-monitor window)))
                   (collision-plan (or (config-collision-plan config) :default)))
-             ;; Start the audio system.
-             (start-audio)
-             ;; Setup live coding support. This instructs SLIME or Sly's REPL to run inside our game
-             ;; loop.
-             (setup-repl)
-             ;; Load the pack file (if running in release mode).
-             (read-pack)
-             ;; Register all defined shader programs with the thread pool so they are updated when
-             ;; recompiled at runtime.
-             (register-shaders)
              ;; Construct the context with references to the previously constructed state.
              (prog1 (%make-context :running-p t
                                    :clock (make-clock config refresh-rate)
@@ -30,6 +20,18 @@
                                    :input-manager (make-input-manager)
                                    :viewports (make-viewport-manager window)
                                    :collision-system (make-collision-system collision-plan))
+               ;; Setup live coding support. This instructs SLIME or Sly's REPL to run inside our
+               ;; game loop.
+               (setup-repl)
+               ;; Load the pack file (if running in release mode).
+               (read-pack)
+               ;; Start the audio system.
+               (start-audio)
+               ;; Register all defined shader programs with the thread pool so they are updated when
+               ;; recompiled at runtime.
+               (register-shaders)
+               ;; If we reached this point it means everything completed without signalling an error
+               ;; condition, and we can set the success flag.
                (setf success-p t))))
       (unless success-p
         (sdl2:quit*)))))
