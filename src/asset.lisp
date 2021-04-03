@@ -1,18 +1,6 @@
-(in-package #:cl-user)
+(in-package #:zed)
 
-(defpackage #:%zed.asset
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:pack #:%zed.pack)
-   (#:ss #:%zed.slice-stream))
-  (:use #:cl))
-
-(in-package #:%zed.asset)
-
-(defun resolve-path (asset)
+(defun resolve-asset-path (asset)
   (destructuring-bind (system-name path) asset
     #+zed.release
     (format nil "/~s/~a" system-name path)
@@ -21,10 +9,10 @@
       (asdf:system-relative-pathname system-name path))))
 
 (defmacro with-asset ((asset path data &key (length-binding '#:length) (format :binary)) &body body)
-  `(let ((,path (resolve-path ,asset)))
+  `(let ((,path (resolve-asset-path ,asset)))
      #+zed.release
-     (pack::with-pack-file (,data ,path :format ,format)
-       (let ((,length-binding (ss::length ,data)))
+     (with-pack-file (,data ,path :format ,format)
+       (let ((,length-binding (util.ss::length ,data)))
          (declare (ignorable ,length-binding))
          ,@body))
      #-zed.release

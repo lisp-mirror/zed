@@ -1,28 +1,6 @@
-(in-package #:cl-user)
-
-(defpackage #:zed.trait.sprite
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:clock #:%zed.clock)
-   (#:ctx #:%zed.context)
-   (#:mat #:%zed.material)
-   (#:mat.def #:%zed.material.definition)
-   (#:shd.mgr #:%zed.shader.manager)
-   (#:shd.lib #:zed.shader)
-   (#:ss #:%zed.spritesheet)
-   (#:tr #:%zed.trait)
-   (#:tr.ren #:zed.trait.render)
-   (#:uni #:%zed.material.uniform))
-  (:use #:cl)
-  (:export
-   #:sprite))
-
 (in-package #:zed.trait.sprite)
 
-(tr::define-internal-trait sprite ()
+(z::define-internal-trait sprite ()
   ((%name :reader name
           :inline t
           :type string
@@ -60,7 +38,7 @@
                  :initform '(:spritesheet shd.lib:sprite))
    (%spritesheet :accessor spritesheet
                  :inline t
-                 :type ss::spritesheet
+                 :type z::spritesheet
                  :initform nil)
    (%index :accessor index
            :inline t
@@ -87,10 +65,10 @@
 (u:fn-> setup (sprite) null)
 (defun setup (sprite)
   (declare (optimize speed))
-  (let* ((context (tr:context sprite))
-         (spritesheet (ss::make-spritesheet context (asset sprite) (buffer-spec sprite))))
+  (let* ((context (z:trait-context sprite))
+         (spritesheet (z::make-spritesheet context (asset sprite) (buffer-spec sprite))))
     (setf (spritesheet sprite) spritesheet
-          (index sprite) (ss::find spritesheet (name sprite))
+          (index sprite) (z::find-sprite spritesheet (name sprite))
           (initial-index sprite) (index sprite))
     nil))
 
@@ -99,8 +77,8 @@
   (declare (optimize speed))
   (unless (pause-p sprite)
     (let* ((duration (duration sprite))
-           (clock (ctx::clock (tr:context sprite))))
-      (incf (elapsed sprite) (float (clock::frame-time clock) 1f0))
+           (clock (z::context-clock (z:trait-context sprite))))
+      (incf (elapsed sprite) (float (z::clock-frame-time clock) 1f0))
       (if (>= (elapsed sprite) duration)
           (setf (elapsed sprite) 0.0
                 (pause-p sprite) (unless (repeat-p sprite) t))
@@ -115,12 +93,12 @@
 (defun render (sprite)
   (declare (optimize speed))
   (let* ((asset (asset sprite))
-         (shader-manager (ctx::shader-manager (tr:context sprite)))
-         (render-trait (tr:find-trait (tr::owner sprite) 'tr.ren:render))
+         (shader-manager (z::context-shader-manager (z:trait-context sprite)))
+         (render-trait (z:find-trait (z::trait-owner sprite) 'tr.ren:render))
          (material (tr.ren::material render-trait)))
-    (mat::set-uniform material :sprite.index (index sprite))
-    (shd.mgr::with-buffers (shader-manager asset)
-      (gl:bind-vertex-array (ss::vao (spritesheet sprite)))
+    (z::set-uniform material :sprite.index (index sprite))
+    (z::with-shader-buffers (shader-manager asset)
+      (gl:bind-vertex-array (z::spritesheet-vao (spritesheet sprite)))
       (gl:draw-arrays-instanced :triangle-strip 0 4 (instances sprite))
       (gl:bind-vertex-array 0))
     nil))

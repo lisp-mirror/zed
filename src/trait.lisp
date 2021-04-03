@@ -1,109 +1,81 @@
-(in-package #:cl-user)
+(in-package #:zed)
 
-(defpackage #:%zed.trait
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:ctx #:%zed.context)
-   (#:gob #:%zed.game-object)
-   (#:jobs #:%zed.jobs)
-   (#:oc #:%zed.ordered-class)
-   (#:tm #:%zed.trait.manager)
-   (#:wl #:%zed.whitelist))
-  (:use #:cl)
-  (:shadow
-   #:find)
-  (:export
-   #:attach-trait
-   #:context
-   #:define-trait
-   #:detach-all-traits
-   #:detach-trait
-   #:detach-trait-type
-   #:find-trait
-   #:make-trait
-   #:trait))
-
-(in-package #:%zed.trait)
-
-(u:define-constant +slot-order+
+(u:define-constant +trait-slot-order+
     '(%%context %%owner %%priority %%setup-hook %%attach-hook %%detach-hook %%update-hook
       %%render-hook)
   :test #'equal)
 
-(u:define-constant +hook-names+
+(u:define-constant +trait-hook-names+
     '(setup destroy attach detach physics update render) :test #'equal)
 
 (u:eval-always
-  (oc::define-ordered-class trait ()
-    ((%%context :reader context
+  (util.oc::define-ordered-class trait ()
+    ((%%context :reader trait-context
                 :initarg context
                 :inline t
-                :type ctx::context)
-     (%%owner :accessor owner
+                :type context)
+     (%%owner :accessor trait-owner
               :inline t
-              :type (or gob::game-object null)
+              :type (or game-object null)
               :initform nil)
-     (%%priority :reader priority
+     (%%priority :reader trait-priority
                  :inline t
                  :type u:ub32
                  :initarg priority
                  :initform #.(1- (expt 2 32)))
-     (%%setup-hook :reader setup-hook
+     (%%setup-hook :reader trait-setup-hook
                    :inline t
                    :type symbol
                    :initarg setup
-                   :initform 'default-hook)
-     (%%destroy-hook :reader destroy-hook
+                   :initform 'default-trait-hook)
+     (%%destroy-hook :reader trait-destroy-hook
                      :inline t
                      :type symbol
                      :initarg destroy
-                     :initform 'default-hook)
-     (%%attach-hook :reader attach-hook
+                     :initform 'default-trait-hook)
+     (%%attach-hook :reader trait-attach-hook
                     :inline t
                     :type symbol
                     :initarg attach
-                    :initform 'default-hook)
-     (%%detach-hook :reader detach-hook
+                    :initform 'default-trait-hook)
+     (%%detach-hook :reader trait-detach-hook
                     :inline t
                     :type symbol
                     :initarg detach
-                    :initform 'default-hook)
-     (%%physics-hook :reader physics-hook
+                    :initform 'default-trait-hook)
+     (%%physics-hook :reader trait-physics-hook
                      :inline t
                      :type symbol
                      :initarg physics
-                     :initform 'default-hook)
-     (%%update-hook :reader update-hook
+                     :initform 'default-trait-hook)
+     (%%update-hook :reader trait-update-hook
                     :inline t
                     :type symbol
                     :initarg update
-                    :initform 'default-hook)
-     (%%render-hook :reader render-hook
+                    :initform 'default-trait-hook)
+     (%%render-hook :reader trait-render-hook
                     :inline t
                     :type symbol
                     :initarg render
-                    :initform 'default-hook))
-    (:order #.+slot-order+)))
+                    :initform 'default-trait-hook))
+    (:order #.+trait-slot-order+)))
 
-(u:fn-> default-hook (trait) null)
-(defun default-hook (trait)
-  (declare (optimize speed)
-           (ignore trait))
-  nil)
-
-(u:fn-> get-type (trait) symbol)
-(declaim (inline get-type))
-(defun get-type (trait)
+(u:fn-> get-trait-type (trait) symbol)
+(declaim (inline get-trait-type))
+(defun get-trait-type (trait)
   (declare (optimize speed))
   (values (class-name (class-of trait))))
 
 (u:define-printer (trait stream :type nil)
-  (format stream "TRAIT: ~s" (get-type trait)))
+  (format stream "TRAIT: ~s" (get-trait-type trait)))
 
-(defun generate-initargs (type priority options)
+(u:fn-> default-trait-hook (trait) null)
+(defun default-trait-hook (trait)
+  (declare (optimize speed)
+           (ignore trait))
+  nil)
+
+(defun generate-trait-initargs (type priority options)
   (when (or priority options)
     `((:default-initargs
        ,@(when priority
@@ -111,9 +83,9 @@
        ,@(u:mappend
           (lambda (x)
             (destructuring-bind (key value) x
-              (let ((local-key (u:format-symbol :%zed.trait "~a" key)))
+              (let ((local-key (u:format-symbol :zed "~a" key)))
                 (ecase local-key
-                  (#.+hook-names+
+                  (#.+trait-hook-names+
                    (if (symbolp value)
                        `(,local-key ',value)
                        (error "~s for trait ~s should be an unquoted symbol but got: ~s"
@@ -124,32 +96,32 @@
 
 (defmacro define-internal-trait (type (&key priority) &body (slots . options))
   `(u:eval-always
-     (oc::define-ordered-class ,type (trait)
+     (util.oc::define-ordered-class ,type (trait)
        ,slots
-       (:order (,@+slot-order+ ,@(mapcar #'car slots)))
-       ,@(generate-initargs type priority options))))
+       (:order (,@+trait-slot-order+ ,@(mapcar #'car slots)))
+       ,@(generate-trait-initargs type priority options))))
 
 (defmacro define-trait (type (&key priority) &body (slots . options))
-  `(oc::define-ordered-class ,type (trait)
+  `(util.oc::define-ordered-class ,type (trait)
      ,slots
-     (:order ,+slot-order+)
-     ,@(generate-initargs type priority options)))
+     (:order ,+trait-slot-order+)
+     ,@(generate-trait-initargs type priority options)))
 
-(defmacro call-hook (trait hook-type)
-  `(wl::with-scope (,(u:format-symbol :keyword "TRAIT-~a-HOOK" hook-type))
-     (funcall (fdefinition (,(u:format-symbol :%zed.trait "~a-HOOK" hook-type) ,trait)) ,trait)))
+(defmacro call-trait-hook (trait hook-type)
+  `(with-scope (,(u:format-symbol :keyword "TRAIT-~a-HOOK" hook-type))
+     (funcall (fdefinition (,(u:format-symbol :zed "TRAIT-~a-HOOK" hook-type) ,trait)) ,trait)))
 
 ;; Create an instance of a trait of the given type. Slow path, for when the type is not a quoted
 ;; symbol.
-(u:fn-> make-trait (ctx::context symbol &rest t) trait)
+(u:fn-> make-trait (context symbol &rest t) trait)
 (defun make-trait (context type &rest args)
   (declare (optimize speed))
-  (wl::with-allowed-scopes make-trait
+  (with-allowed-scopes make-trait
       (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
        :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook)
     (if (subtypep type 'trait)
         (let ((trait (apply #'make-instance type 'context context args)))
-          (call-hook trait :setup)
+          (call-trait-hook trait :setup)
           trait)
         (error "Trait type ~s is not defined." type))))
 
@@ -161,83 +133,81 @@
         (let ((type (cadr type)))
           (unless (subtypep type 'trait)
             (error "Trait type ~s is not defined." type))
-          `(wl::with-allowed-scopes make-trait
+          `(with-allowed-scopes make-trait
                (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
                 :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook)
              (let ((,trait (make-instance ',type 'context ,context ,@args)))
-               (funcall (fdefinition (setup-hook ,trait)) ,trait)
+               (funcall (fdefinition (trait-setup-hook ,trait)) ,trait)
                ,trait)))
         whole)))
 
-(u:fn-> find-trait (gob::game-object symbol) (or trait null))
+(u:fn-> find-trait (game-object symbol) (or trait null))
 (defun find-trait (game-object type)
   (declare (optimize speed))
-  (u:href (tm::by-type (gob::traits game-object)) type))
+  (u:href (game-object-traits-by-type game-object) type))
 
-(u:fn-> attach-trait (gob::game-object trait) null)
+(u:fn-> attach-trait (game-object trait) null)
 (defun attach-trait (game-object trait)
   (declare (optimize speed))
-  (wl::with-allowed-scopes attach-trait
+  (with-allowed-scopes attach-trait
       (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
        :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook)
-    (when (owner trait)
+    (when (trait-owner trait)
       (error "Trait ~s is already attached to a game object." trait))
-    (let* ((trait-manager (gob::traits game-object))
-           (by-id (tm::by-id trait-manager))
-           (by-type (tm::by-type trait-manager))
-           (type (get-type trait))
-           (jobs (ctx::jobs (context trait))))
+    (let* ((by-id (game-object-traits-by-id game-object))
+           (by-type (game-object-traits-by-type game-object))
+           (type (get-trait-type trait))
+           (jobs (context-jobs (trait-context trait))))
       (when (u:href by-type type)
         (error "A game object can only have 1 trait of a given type attached to it."))
-      (setf (owner trait) game-object
+      (setf (trait-owner trait) game-object
             (u:href by-id trait) trait
             (u:href by-type type) trait)
-      (push (list game-object trait #'priority) (jobs::enable-traits jobs))
-      (call-hook trait :attach)
+      (push (list game-object trait #'trait-priority) (jobs-enable-traits jobs))
+      (call-trait-hook trait :attach)
       nil)))
 
-(u:fn-> detach-trait (gob::game-object trait) null)
+(u:fn-> detach-trait (game-object trait) null)
 (defun detach-trait (game-object trait)
   (declare (optimize speed))
-  (wl::with-allowed-scopes detach-trait
+  (with-allowed-scopes detach-trait
       (:prefab-recompile :trait-setup-hook :trait-destroy-hook :trait-attach-hook
        :trait-detach-hook :trait-physics-hook :trait-update-hook)
-    (unless (eq game-object (owner trait))
+    (unless (eq game-object (trait-owner trait))
       (error "Trait ~s is not attached to game object ~s." trait game-object))
-    (let* ((trait-manager (gob::traits game-object))
-           (jobs (ctx::jobs (context trait))))
-      (call-hook trait :detach)
-      (push (cons game-object trait) (jobs::disable-traits jobs))
-      (setf (owner trait) nil)
-      (remhash trait (tm::by-id trait-manager))
-      (remhash (get-type trait) (tm::by-type trait-manager))
+    (let ((jobs (context-jobs (trait-context trait))))
+      (call-trait-hook trait :detach)
+      (push (cons game-object trait) (jobs-disable-traits jobs))
+      (setf (trait-owner trait) nil)
+      (remhash trait (game-object-traits-by-id game-object))
+      (remhash (get-trait-type trait) (game-object-traits-by-type game-object))
       nil)))
 
-(u:fn-> detach-trait-type (gob::game-object symbol) null)
+(u:fn-> detach-trait-type (game-object symbol) null)
 (defun detach-trait-type (game-object type)
   (declare (optimize speed))
-  (dolist (trait (u:href (tm::by-type (gob::traits game-object)) type))
+  (dolist (trait (u:href (game-object-traits-by-type game-object) type))
     (detach-trait game-object trait)))
 
-(u:fn-> detach-all-traits (gob::game-object) null)
+(u:fn-> detach-all-traits (game-object) null)
 (defun detach-all-traits (game-object)
   (declare (optimize speed))
-  (dolist (trait (tm::order (gob::traits game-object)))
+  (dolist (trait (game-object-trait-order game-object))
     (detach-trait game-object trait)))
 
 (u:fn-> destroy-trait (trait) null)
 (defun destroy-trait (trait)
   (declare (optimize speed))
-  (wl::with-allowed-scopes destroy-trait
+  (with-allowed-scopes destroy-trait
       (:prefab-recompile :trait-setup-hook :trait-destroy-hook :trait-attach-hook
        :trait-detach-hook :trait-physics-hook :trait-update-hook)
-    (call-hook trait :destroy)
-    (detach-trait (owner trait) trait))
+    (call-trait-hook trait :destroy)
+    (detach-trait (trait-owner trait) trait))
   nil)
 
-(u:fn-> destroy-all-traits (gob::game-object) null)
+(u:fn-> destroy-all-traits (game-object) null)
 (defun destroy-all-traits (game-object)
   (declare (optimize speed))
-  (dolist (trait (tm::order (gob::traits game-object)))
+  (dolist (trait (game-object-trait-order game-object))
     (destroy-trait trait))
   nil)

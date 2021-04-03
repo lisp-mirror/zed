@@ -1,79 +1,57 @@
-(in-package #:cl-user)
+(in-package #:zed)
 
-(defpackage #:%zed.texture.data
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:glob #:global-vars)
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:ctx #:%zed.context)
-   (#:img #:%zed.image)
-   (#:tp #:%zed.thread-pool)
-   (#:util #:%zed.util)
-   (#:v4 #:zed.math.vector4))
-  (:use #:cl)
-  (:shadow
-   #:find
-   #:type)
-  (:export
-   #:define-texture))
+(deftype texture-source () '(or list (integer 1 #.(expt 2 16))))
 
-(in-package #:%zed.texture.data)
-
-(glob:define-global-var =data= (u:dict #'eq))
-
-(deftype source () '(or list (integer 1 #.(expt 2 16))))
-
-(defstruct (data
-            (:constructor %make-data)
-            (:conc-name nil)
+(defstruct (texture-data
+            (:constructor %make-texture-data)
             (:predicate nil)
             (:copier nil))
   (name nil :type symbol)
   (type nil :type symbol)
   (width nil :type (or u:ub16 null))
   (height nil :type (or u:ub16 null))
-  (pixel-format :rgba :type img::pixel-format)
+  (pixel-format :rgba :type image-pixel-format)
   (pixel-type :unsigned-byte :type keyword)
   (internal-format :rgba8 :type keyword)
   (mipmaps-p t :type boolean)
   (parameters nil :type list)
-  (source nil :type source))
+  (source nil :type texture-source))
 
-(u:define-printer (data stream :type nil)
-  (format stream "TEXTURE-DATA: ~s" (name data)))
+(u:define-printer (texture-data stream :type nil)
+  (format stream "TEXTURE-DATA: ~s" (texture-data-name texture-data)))
 
-(u:fn-> find (symbol) data)
-(declaim (inline find))
-(defun find (name)
+(glob:define-global-var =textures= (u:dict #'eq))
+
+(u:fn-> find-texture-data (symbol) texture-data)
+(declaim (inline find-texture-data))
+(defun find-texture-data (name)
   (declare (optimize speed))
-  (or (u:href =data= name)
+  (or (u:href =textures= name)
       (error "Texture ~s is not defined." name)))
 
-(defun update (name type source width height pixel-format pixel-type internal-format mipmaps-p
-               parameters)
-  (let ((data (find name)))
-    (setf (type data) type
-          (width data) width
-          (height data) height
-          (pixel-format data) (or pixel-format :rgba)
-          (pixel-type data) (or pixel-type :unsigned-byte)
-          (internal-format data) (or internal-format :rgba8)
-          (mipmaps-p data) mipmaps-p
-          (parameters data) parameters
-          (source data) source)
-    (when util::=context=
-      (tp::enqueue (list :texture name)))
+(defun update-texture-data (name type source width height pixel-format pixel-type internal-format
+                            mipmaps-p parameters)
+  (let ((data (find-texture-data name)))
+    (setf (texture-data-type data) type
+          (texture-data-width data) width
+          (texture-data-height data) height
+          (texture-data-pixel-format data) (or pixel-format :rgba)
+          (texture-data-pixel-type data) (or pixel-type :unsigned-byte)
+          (texture-data-internal-format data) (or internal-format :rgba8)
+          (texture-data-mipmaps-p data) mipmaps-p
+          (texture-data-parameters data) parameters
+          (texture-data-source data) source)
+    (when =context=
+      (thread-pool-enqueue (list :texture name)))
     nil))
 
-(defun make-data (name &rest args)
-  (let ((data (%make-data :name name)))
-    (setf (u:href =data= name) data)
-    (apply #'update name args)
+(defun make-texture-data (name &rest args)
+  (let ((data (%make-texture-data :name name)))
+    (setf (u:href =textures= name) data)
+    (apply #'update-texture-data name args)
     data))
 
-(defun make-parameters (args)
+(defun make-texture-data-parameters (args)
   (destructuring-bind (&key
                          (depth-stencil-mode :depth-component)
                          (base-level 0)
@@ -120,9 +98,9 @@
                          internal-format
                        &allow-other-keys)
       (car body)
-    (let ((parameters (make-parameters args)))
-      `(if (u:href =data= ',name)
-           (update ',name ,type ',source ,width ,height ,pixel-format ,pixel-type ,internal-format
-                   ,mipmaps-p ',parameters)
-           (make-data ',name ,type ',source ,width ,height ,pixel-format ,pixel-type
-                      ,internal-format ,mipmaps-p ',parameters)))))
+    (let ((parameters (make-texture-data-parameters args)))
+      `(if (u:href =textures= ',name)
+           (update-texture-data ',name ,type ',source ,width ,height ,pixel-format ,pixel-type
+                                ,internal-format ,mipmaps-p ',parameters)
+           (make-texture-data ',name ,type ',source ,width ,height ,pixel-format ,pixel-type
+                              ,internal-format ,mipmaps-p ',parameters)))))

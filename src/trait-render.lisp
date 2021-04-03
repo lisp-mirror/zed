@@ -1,32 +1,6 @@
-(in-package #:cl-user)
-
-(defpackage #:zed.trait.render
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:cam #:%zed.camera-state)
-   (#:ctx #:%zed.context)
-   (#:do #:%zed.draw-order)
-   (#:gob #:%zed.game-object)
-   (#:mat #:%zed.material)
-   (#:mat.data #:%zed.material.data)
-   (#:mat.def #:%zed.material.definition)
-   (#:tr #:%zed.trait)
-   (#:tr.cam #:zed.trait.camera)
-   (#:tree #:%zed.tree)
-   (#:ts #:%zed.transform-state)
-   (#:util #:%zed.util)
-   (#:vp #:%zed.viewport)
-   (#:vp.mgr #:%zed.viewport.manager))
-  (:use #:cl)
-  (:export
-   #:render))
-
 (in-package #:zed.trait.render)
 
-(tr::define-internal-trait render ()
+(z::define-internal-trait render ()
   ((%material-name :reader material-name
                    :inline t
                    :type symbol
@@ -34,7 +8,7 @@
                    :initform nil)
    (%material :accessor material
               :inline t
-              :type (or mat.def::material null)
+              :type (or z::material null)
               :initform nil)
    (%layer :reader layer
            :inline t
@@ -48,7 +22,7 @@
                    :initform :default)
    (%viewport :accessor viewport
               :inline t
-              :type vp::viewport
+              :type z::viewport
               :initform nil))
   (:setup setup)
   (:attach attach)
@@ -58,70 +32,70 @@
 (u:fn-> draw-order-tree-sort (render render) boolean)
 (defun draw-order-tree-sort (x y)
   (declare (optimize speed))
-  (< (+ (ash (layer x) 16) (gob::depth (tr::owner x)))
-     (+ (ash (layer y) 16) (gob::depth (tr::owner y)))))
+  (< (+ (ash (layer x) 16) (z::game-object-depth (z::trait-owner x)))
+     (+ (ash (layer y) 16) (z::game-object-depth (z::trait-owner y)))))
 
 (u:fn-> render-game-object (render) null)
 (defun render-game-object (render-trait)
   (declare (optimize speed))
-  (let* ((context (tr:context render-trait))
-         (owner (tr::owner render-trait))
+  (let* ((context (z:trait-context render-trait))
+         (owner (z::trait-owner render-trait))
          (material (material render-trait))
-         (func (mat.data::render-func (mat.def::data material))))
-    (%zed.viewport::configure (viewport render-trait))
-    (util::with-debug-group (format nil "Game Object: ~a" (gob::label owner))
+         (func (z::material-data-render-func (z::material-data material))))
+    (z::configure-viewport (viewport render-trait))
+    (z::with-debug-group (format nil "Game Object: ~a" (z::game-object-label owner))
       (funcall func context owner material))
     nil))
 
-(u:fn-> render-frame (ctx::context) null)
+(u:fn-> render-frame (z::context) null)
 (defun render-frame (context)
   (declare (optimize speed))
   ;; NOTE: This `when-let` is required: The tree is not created until the first render trait is
   ;; created, but the game loop calls this function unconditionally each frame.
-  (u:when-let ((draw-order (ctx::draw-order context)))
+  (u:when-let ((draw-order (z::context-draw-order context)))
     (gl:clear-color 0 0 0 1)
     (gl:clear :color-buffer :depth-buffer)
-    (do::map draw-order #'render-game-object)))
+    (z::map-draw-order draw-order #'render-game-object)))
 
 ;;; Hooks
 
 (u:fn-> setup (render) null)
 (defun setup (render)
   (declare (optimize speed))
-  (let ((context (tr:context render)))
-    (unless (ctx::draw-order context)
-      (setf (ctx::draw-order context) (do::make-manager #'draw-order-tree-sort)))
-    (setf (viewport render) (vp.mgr::ensure-viewport (ctx::viewports context)
-                                                     (viewport-name render)))
+  (let ((context (z:trait-context render)))
+    (unless (z::context-draw-order context)
+      (setf (z::context-draw-order context) (z::make-draw-order-manager #'draw-order-tree-sort)))
+    (setf (viewport render) (z::ensure-viewport (z::context-viewports context)
+                                                (viewport-name render)))
     nil))
 
 (u:fn-> attach (render) null)
 (defun attach (render)
   (declare (optimize speed))
   (u:if-let ((material-name (material-name render)))
-    (let ((context (tr:context render)))
-      (setf (material render) (mat::ensure-material context material-name))
-      (do::register context render)
+    (let ((context (z:trait-context render)))
+      (setf (material render) (z::ensure-material context material-name))
+      (z::register-draw-order context render)
       nil)
     (error "Render trait must have a material specified.")))
 
 (u:fn-> detach (render) null)
 (defun detach (render)
   (declare (optimize speed))
-  (let ((context (tr:context render)))
-    (do::deregister context render)
+  (let ((context (z:trait-context render)))
+    (z::deregister-draw-order context render)
     nil))
 
 (u:fn-> render (render) null)
 (defun render (render)
   (declare (optimize speed))
-  (u:when-let* ((context (tr:context render))
-                (owner (tr::owner render))
-                (camera (ctx::active-camera context))
+  (u:when-let* ((context (z:trait-context render))
+                (owner (z::trait-owner render))
+                (camera (z::context-active-camera context))
                 (camera-state (tr.cam::state camera))
-                (world-matrix (ts::world-matrix (gob::transform owner)))
+                (world-matrix (z::transform-state-world-matrix (z::game-object-transform owner)))
                 (material (material render)))
-    (mat::set-uniform material :model world-matrix)
-    (mat::set-uniform material :view (cam::view camera-state))
-    (mat::set-uniform material :proj (cam::projection camera-state))
+    (z::set-uniform material :model world-matrix)
+    (z::set-uniform material :view (z::camera-state-view camera-state))
+    (z::set-uniform material :proj (z::camera-state-projection camera-state))
     nil))

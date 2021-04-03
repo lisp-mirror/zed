@@ -1,29 +1,10 @@
-(in-package #:cl-user)
-
-(defpackage #:%zed.texture
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:ctx #:%zed.context)
-   (#:img #:%zed.image)
-   (#:live #:%zed.live-coding)
-   (#:log #:%zed.logging)
-   (#:rc #:%zed.resource-cache)
-   (#:tex.data #:%zed.texture.data))
-  (:use #:cl)
-  (:shadow
-   #:load))
-
-(in-package #:%zed.texture)
+(in-package #:zed)
 
 (defstruct (texture
             (:constructor %make-texture)
-            (:conc-name nil)
             (:predicate nil)
             (:copier nil))
-  (data nil :type (or tex.data::data null))
+  (data nil :type (or texture-data null))
   (target :texture-2d :type keyword)
   (id 0 :type u:ub16)
   (width nil :type (or u:ub16 null))
@@ -32,93 +13,104 @@
 
 (u:define-printer (texture stream :type nil)
   (format stream "TEXTURE: ~a"
-          (u:if-let ((data (data texture)))
-            (tex.data::name data)
+          (u:if-let ((data (texture-data texture)))
+            (texture-data-name data)
             "(no data)")))
 
-(u:fn-> calculate-mipmap-levels (tex.data::data u:ub16 u:ub16) u:ub8)
-(defun calculate-mipmap-levels (data width height)
+(u:fn-> calculate-texture-mipmap-levels (texture-data u:ub16 u:ub16) u:ub8)
+(defun calculate-texture-mipmap-levels (data width height)
   (declare (optimize speed))
-  (if (tex.data::mipmaps-p data)
+  (if (texture-data-mipmaps-p data)
       (loop :for i :of-type fixnum :from 0
             :while (or (> (ash width (- i)) 1)
                        (> (ash height (- i)) 1))
             :finally (return i))
       1))
 
-(u:fn-> bind (texture u:ub8) null)
-(declaim (inline bind))
-(defun bind (texture unit)
+(u:fn-> bind-texture (texture u:ub8) null)
+(declaim (inline bind-texture))
+(defun bind-texture (texture unit)
   (declare (optimize speed))
   (gl:active-texture unit)
-  (gl:bind-texture (target texture) (id texture)))
+  (gl:bind-texture (texture-target texture) (texture-id texture)))
 
-(u:fn-> configure (texture) null)
-(defun configure (texture)
+(u:fn-> configure-texture (texture) null)
+(defun configure-texture (texture)
   (declare (optimize speed))
-  (let ((id (id texture))
-        (target (target texture))
-        (data (data texture)))
+  (let ((id (texture-id texture))
+        (target (texture-target texture))
+        (data (texture-data texture)))
     (gl:bind-texture target id)
-    (when (tex.data::mipmaps-p data)
+    (when (texture-data-mipmaps-p data)
       (gl:generate-mipmap target))
-    (u:do-plist (k v (tex.data::parameters data))
+    (u:do-plist (k v (texture-data-parameters data))
       (gl:tex-parameter target k v))
     (gl:bind-texture target 0)
     nil))
 
-(u:fn-> load-framebuffer-texture (tex.data::data u:ub16 u:ub16) img::image)
+(u:fn-> load-framebuffer-texture (texture-data u:ub16 u:ub16) image)
 (declaim (inline load-framebuffer-texture))
 (defun load-framebuffer-texture (data width height)
   (declare (optimize speed))
   (values
-   (img::load nil
-              :width width
-              :height height
-              :pixel-format (tex.data::pixel-format data)
-              :pixel-type (tex.data::pixel-type data)
-              :internal-format (tex.data::internal-format data))))
+   (load-image nil
+               :width width
+               :height height
+               :pixel-format (texture-data-pixel-format data)
+               :pixel-type (texture-data-pixel-type data)
+               :internal-format (texture-data-internal-format data))))
 
-(defgeneric update (type texture source))
+(defgeneric update-texture (type texture source))
 
-(defgeneric load-source (data type source &key &allow-other-keys)
+(defgeneric load-texture-source (data type source &key &allow-other-keys)
   (:method :around (data type source &key)
     (declare (optimize speed))
     (let* ((loaded (call-next-method))
            (source-list (u:flatten (u:ensure-list loaded))))
-      (unless (and (every #'img::width source-list)
-                   (every #'img::height source-list))
-        (error "Texture ~s does not have a width and height set."
-               (tex.data::name data)))
+      (unless (and (every #'image-width source-list)
+                   (every #'image-height source-list))
+        (error "Texture ~s does not have a width and height set." (texture-data-name data)))
       loaded)))
 
-(u:fn-> make-target (keyword) keyword)
-(declaim (inline make-target))
-(defun make-target (type)
+(u:fn-> make-texture-target (keyword) keyword)
+(declaim (inline make-texture-target))
+(defun make-texture-target (type)
   (declare (optimize speed))
   (values (u:format-symbol :keyword "TEXTURE-~a" type)))
 
-(u:fn-> make-texture (tex.data::data keyword (or img::image list)) texture)
+(u:fn-> make-texture (texture-data keyword (or image list)) texture)
 (defun make-texture (data type source)
   (declare (optimize speed))
-  (let ((texture (%make-texture :data data :target (make-target type))))
-    (update type texture source)
+  (let ((texture (%make-texture :data data :target (make-texture-target type))))
+    (update-texture type texture source)
     texture))
 
-(u:fn-> load
-        (ctx::context symbol &key (:width (or u:ub16 null)) (:height (or u:ub16 null)))
+(u:fn-> load-texture
+        (context symbol &key (:width (or u:ub16 null)) (:height (or u:ub16 null)))
         texture)
-(defun load (context name &key width height)
-  (rc::with-resource-cache (context :texture name)
-    (log::debug :zed.texture "Loading texture: ~s..." name)
-    (let* ((data (tex.data::find name))
-           (type (tex.data::type data))
-           (source (load-source data
-                                type
-                                (tex.data::source data)
-                                :width width
-                                :height height))
+(defun load-texture (context name &key width height)
+  (with-resource-cache (context :texture name)
+    (v:debug :zed "Loading texture: ~s..." name)
+    (let* ((data (find-texture-data name))
+           (type (texture-data-type data))
+           (source (load-texture-source data
+                                        type
+                                        (texture-data-source data)
+                                        :width width
+                                        :height height))
            (texture (make-texture data type source)))
-      (configure texture)
-      (log::debug :zed.texture "Texture loaded: ~s" name)
+      (configure-texture texture)
+      (v:debug :zed "Texture loaded: ~s" name)
       texture)))
+
+(defmethod recompile ((type (eql :texture)) data)
+  (u:when-let ((texture (find-resource =context= :texture data)))
+    (gl:delete-texture (texture-id texture))
+    (delete-resource =context= :texture data)
+    (load-texture =context=
+                  data
+                  :width (texture-width texture)
+                  :height (texture-height texture))
+    (dolist (material-name (texture-materials texture))
+      (recompile :material material-name))
+    (v:debug :zed "Recompiled texture: ~s" data)))

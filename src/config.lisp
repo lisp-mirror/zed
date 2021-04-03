@@ -1,15 +1,6 @@
-(in-package #:cl-user)
-
-(defpackage #:%zed.config
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  (:use #:cl))
-
-(in-package #:%zed.config)
+(in-package #:zed)
 
 (defstruct (config
-            (:conc-name nil)
             (:predicate nil)
             (:copier nil))
   (profile-p nil :type boolean)
@@ -21,4 +12,5 @@
   (anti-alias-p t :type boolean)
   (delta-time nil :type (or real null))
   (log-repl-level :debug :type keyword)
-  (log-repl-categories '(:zed) :type list))
+  (log-repl-categories '(:zed) :type list)
+  (collision-plan nil :type symbol))

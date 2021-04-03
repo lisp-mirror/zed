@@ -1,28 +1,3 @@
-(in-package #:cl-user)
-
-(defpackage #:zed.math.point3d
-  (:local-nicknames
-   (#:u #:golden-utils)
-   (#:v3 #:zed.math.vector3)
-   (#:v4 #:zed.math.vector4)
-   (#:m4 #:zed.math.matrix4))
-  (:use #:cl)
-  (:import-from
-   #:zed.math.vector3
-   #:x
-   #:y
-   #:z)
-  (:export
-   #:distance
-   #:distance-squared
-   #:find-min-max
-   #:point
-   #:translate
-   #:unproject
-   #:x
-   #:y
-   #:z))
-
 (in-package #:zed.math.point3d)
 
 (deftype point () 'v3:vec)

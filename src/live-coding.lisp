@@ -1,16 +1,4 @@
-(in-package #:cl-user)
-
-(defpackage #:%zed.live-coding
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:clock #:%zed.clock)
-   (#:log #:%zed.logging))
-  (:use #:cl))
-
-(in-package #:%zed.live-coding)
+(in-package #:zed)
 
 (defmacro with-continuable ((clock) &body body)
   (u:with-gensyms (entry-time previous-hook)
@@ -19,14 +7,14 @@
       `(let* ((,previous-hook ,hook)
               (,hook (lambda (condition hook)
                        (declare (ignore hook))
-                       (let ((,entry-time (clock::get-time ,clock))
+                       (let ((,entry-time (get-clock-time ,clock))
                              (,hook ,previous-hook))
-                         (log::debug :zed.live-coding "Entered debugger")
+                         (v:debug :zed "Entered debugger")
                          (locally (declare (optimize (speed 1)))
                            (unwind-protect (invoke-debugger condition)
-                             (log::debug :zed.live-coding
-                                         "Spent ~3$ seconds in the debugger"
-                                         (clock::adjust-pause-time ,clock ,entry-time))
+                             (v:debug :zed
+                                      "Spent ~3$ seconds in the debugger"
+                                      (adjust-clock-pause-time ,clock ,entry-time))
                              nil))))))
          (restart-case (progn ,@body)
            (abort () :report "Zed: Skip processing current frame"))))))
@@ -42,16 +30,16 @@
                     (case repl-package
                       (:slynk
                        `(lambda (clock)
-                          (let ((before-time (clock::get-time clock)))
+                          (let ((before-time (get-clock-time clock)))
                             (,(find-symbol "PROCESS-REQUESTS" :slynk) t)
-                            (clock::adjust-pause-time clock before-time))))
+                            (adjust-clock-pause-time clock before-time))))
                       (:swank
                        `(lambda (clock)
                           (u:when-let ((repl (or ,(find-symbol "*EMACS-CONNECTION*" :swank)
                                                  (,(find-symbol "DEFAULT-CONNECTION" :swank))))
                                        (before-time (get-time)))
                             (,(find-symbol "HANDLE-REQUESTS" :swank) repl t)
-                            (clock::adjust-pause-time clock before-time))))
+                            (adjust-clock-pause-time clock before-time))))
                       (t (constantly nil))))
            (compile 'send-to-repl
                     (if (eq repl-package :slynk)

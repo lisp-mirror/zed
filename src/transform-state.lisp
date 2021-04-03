@@ -1,22 +1,8 @@
-(in-package #:cl-user)
+(in-package #:zed)
 
-(defpackage #:%zed.transform-state
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:m4 #:zed.math.matrix4)
-   (#:q #:zed.math.quaternion)
-   (#:v3 #:zed.math.vector3))
-  (:use #:cl))
-
-(in-package #:%zed.transform-state)
-
-(declaim (inline %make-state))
-(defstruct (state
-            (:constructor %make-state)
-            (:conc-name nil)
+(declaim (inline %make-transform-state))
+(defstruct (transform-state
+            (:constructor %make-transform-state)
             (:predicate nil)
             (:copier nil))
   (translation/current (v3:zero) :type v3:vec)
@@ -39,82 +25,89 @@
   (scaling-matrix (m4:id) :type m4:mat)
   (normal-matrix (m4:id) :type m4:mat))
 
-(u:define-printer (state stream :type nil)
+(u:define-printer (transform-state stream :type nil)
   (format stream "TRANSFORM-STATE"))
 
-(u:fn-> initialize-translation (state &optional (or v3:vec null) (or v3:vec null)) null)
-(declaim (inline initialize-translation))
-(defun initialize-translation (state &optional initial velocity)
+(u:fn-> initialize-translate-state
+        (transform-state &optional (or v3:vec null) (or v3:vec null))
+        null)
+(declaim (inline initialize-translate-state))
+(defun initialize-translate-state (state &optional initial velocity)
   (declare (optimize speed))
   (when initial
-    (setf (translation/current state) (v3:copy initial)
-          (translation/previous state) (v3:copy initial)))
+    (setf (transform-state-translation/current state) (v3:copy initial)
+          (transform-state-translation/previous state) (v3:copy initial)))
   (when velocity
-    (setf (translation/incremental state) (v3:copy velocity)))
+    (setf (transform-state-translation/incremental state) (v3:copy velocity)))
   nil)
 
-(u:fn-> initialize-rotation (state &optional (or q:quat null) (or v3:vec null)) null)
-(declaim (inline initialize-rotation))
-(defun initialize-rotation (state &optional initial velocity)
+(u:fn-> initialize-rotate-state
+        (transform-state &optional (or q:quat null) (or v3:vec null))
+        null)
+(declaim (inline initialize-rotate-state))
+(defun initialize-rotate-state (state &optional initial velocity)
   (declare (optimize speed))
   (when initial
-    (setf (rotation/current state) (q:copy initial)
-          (rotation/previous state) (q:copy initial)))
+    (setf (transform-state-rotation/current state) (q:copy initial)
+          (transform-state-rotation/previous state) (q:copy initial)))
   (when velocity
-    (setf (rotation/incremental state) (v3:copy velocity)))
+    (setf (transform-state-rotation/incremental state) (v3:copy velocity)))
   nil)
 
-(u:fn-> initialize-scale (state &optional (or v3:vec real null) (or v3:vec null)) null)
-(declaim (inline initialize-scale))
-(defun initialize-scale (state &optional initial velocity)
+(u:fn-> initialize-scale-state
+        (transform-state &optional (or v3:vec real null) (or v3:vec null))
+        null)
+(declaim (inline initialize-scale-state))
+(defun initialize-scale-state (state &optional initial velocity)
   (declare (optimize speed))
   (when initial
     (let ((initial (etypecase initial
                      (v3:vec (v3:copy initial))
                      (real (v3:uniform initial)))))
-      (setf (scale/current state) initial
-            (scale/previous state) (v3:copy initial))))
+      (setf (transform-state-scale/current state) initial
+            (transform-state-scale/previous state) (v3:copy initial))))
   (when velocity
-    (setf (scale/incremental state) (v3:copy velocity)))
+    (setf (transform-state-scale/incremental state) (v3:copy velocity)))
   nil)
 
-(defun make-state (&key translate translate/velocity rotate rotate/velocity scale scale/velocity)
+(defun make-transform-state (&key translate translate/velocity rotate rotate/velocity scale
+                               scale/velocity)
   (declare (optimize speed))
-  (let ((state (%make-state)))
-    (initialize-translation state translate translate/velocity)
-    (initialize-rotation state rotate rotate/velocity)
-    (initialize-scale state scale scale/velocity)
+  (let ((state (%make-transform-state)))
+    (initialize-translate-state state translate translate/velocity)
+    (initialize-rotate-state state rotate rotate/velocity)
+    (initialize-scale-state state scale scale/velocity)
     state))
 
-(u:fn-> transform/translation (state u:f32) null)
-(declaim (inline transform/translation))
-(defun transform/translation (state delta)
+(u:fn-> transform-translate-state (transform-state u:f32) null)
+(declaim (inline transform-translate-state))
+(defun transform-translate-state (state delta)
   (declare (optimize speed))
-  (let ((current (translation/current state))
-        (incremental-delta (translation/incremental-delta state)))
-    (v3:copy! (translation/previous state) current)
-    (v3:scale! incremental-delta (translation/incremental state) delta)
+  (let ((current (transform-state-translation/current state))
+        (incremental-delta (transform-state-translation/incremental-delta state)))
+    (v3:copy! (transform-state-translation/previous state) current)
+    (v3:scale! incremental-delta (transform-state-translation/incremental state) delta)
     (v3:+! current current incremental-delta)
     nil))
 
-(u:fn-> transform/rotation (state u:f32) null)
-(declaim (inline transform/rotation))
-(defun transform/rotation (state delta)
+(u:fn-> transform-rotate-state (transform-state u:f32) null)
+(declaim (inline transform-rotate-state))
+(defun transform-rotate-state (state delta)
   (declare (optimize speed))
-  (let ((current (rotation/current state))
-        (incremental-delta (rotation/incremental-delta state)))
-    (q:copy! (rotation/previous state) current)
-    (q:from-velocity! incremental-delta (rotation/incremental state) delta)
+  (let ((current (transform-state-rotation/current state))
+        (incremental-delta (transform-state-rotation/incremental-delta state)))
+    (q:copy! (transform-state-rotation/previous state) current)
+    (q:from-velocity! incremental-delta (transform-state-rotation/incremental state) delta)
     (q:rotate! current current incremental-delta)
     nil))
 
-(u:fn-> transform/scale (state u:f32) null)
-(declaim (inline transform/scale))
-(defun transform/scale (state delta)
+(u:fn-> transform-scale-state (transform-state u:f32) null)
+(declaim (inline transform-scale-state))
+(defun transform-scale-state (state delta)
   (declare (optimize speed))
-  (let ((current (scale/current state))
-        (incremental-delta (scale/incremental-delta state)))
-    (v3:copy! (scale/previous state) current)
-    (v3:scale! incremental-delta (scale/incremental state) delta)
+  (let ((current (transform-state-scale/current state))
+        (incremental-delta (transform-state-scale/incremental-delta state)))
+    (v3:copy! (transform-state-scale/previous state) current)
+    (v3:scale! incremental-delta (transform-state-scale/incremental state) delta)
     (v3:+! current current incremental-delta)
     nil))

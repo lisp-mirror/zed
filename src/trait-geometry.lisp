@@ -1,23 +1,6 @@
-(in-package #:cl-user)
-
-(defpackage #:zed.trait.geometry
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:geo #:%zed.geometry)
-   (#:geo.data #:%zed.geometry.data)
-   (#:log #:%zed.logging)
-   (#:rc #:%zed.resource-cache)
-   (#:tr #:%zed.trait))
-  (:use #:cl)
-  (:export
-   #:geometry))
-
 (in-package #:zed.trait.geometry)
 
-(tr::define-internal-trait geometry ()
+(z::define-internal-trait geometry ()
   ((%name :reader name
           :inline t
           :type symbol
@@ -35,7 +18,7 @@
              :initform t)
    (%resource :accessor resource
               :inline t
-              :type (or geo.data::data null)
+              :type (or z::geometry-data null)
               :initform nil)
    (%data :reader data
           :inline t
@@ -54,15 +37,15 @@
 (u:fn-> setup (geometry) null)
 (defun setup (geometry)
   (declare (optimize speed))
-  (let ((context (tr:context geometry))
+  (let ((context (z:trait-context geometry))
         (name (name geometry)))
     (unless name
       (error "Geometry trait ~s must have a name specified." geometry))
     (let ((resource (if (cache-p geometry)
-                        (rc::with-resource-cache (context :geometry name)
-                          (prog1 (geo::make-geometry name)
-                            (log::debug :zed.trait.geometry "Cached geometry: ~s" name)))
-                        (geo::make-geometry name))))
+                        (z::with-resource-cache (context :geometry name)
+                          (prog1 (z::make-geometry name)
+                            (v:debug :zed "Cached geometry: ~s" name)))
+                        (z::make-geometry name))))
       (setf (resource geometry) resource)
       nil)))
 
@@ -73,10 +56,10 @@
     (when (dirty-p geometry)
       (let ((data (data geometry)))
         (u:do-hash (k v data)
-          (geo::update resource k v))
+          (z::update-geometry resource k v))
         (clrhash data)
         (setf (dirty-p geometry) nil)))
-    (geo::draw (resource geometry) (instance-count geometry))
+    (z::draw-geometry (resource geometry) (instance-count geometry))
     nil))
 
 (u:fn-> destroy (geometry) null)
@@ -84,5 +67,5 @@
   (declare (optimize speed))
   (u:when-let ((resource (resource geometry)))
     (unless (cache-p geometry)
-      (geo::delete resource)))
+      (z::delete-geometry resource)))
   nil)

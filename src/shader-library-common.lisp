@@ -1,6 +1,6 @@
 (in-package #:zed.shader)
 
-(sw::generate-swizzle-operators)
+(generate-swizzle-operators)
 
 (defstruct mesh-attrs
   (mesh/pos :vec3)

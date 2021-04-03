@@ -1,20 +1,6 @@
-(in-package #:cl-user)
+(in-package #:zed)
 
-(defpackage #:%zed.geometry.group
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:geo.attr #:%zed.geometry.attribute))
-  (:use #:cl)
-  (:shadow
-   #:format))
-
-(in-package #:%zed.geometry.group)
-
-(defstruct (group
-            (:conc-name nil)
+(defstruct (geometry-group
             (:predicate nil)
             (:copier nil))
   (name nil :type symbol)
@@ -23,13 +9,13 @@
   (attributes (u:dict #'eq) :type hash-table)
   (attribute-order nil :type list))
 
-(defun make-groups (layout-spec)
+(defun make-geometry-groups (layout-data)
   (let ((groups (u:dict #'eq))
         (order nil))
-    (dolist (group-spec layout-spec)
-      (destructuring-bind (name (&key (format :interleaved) (divisor 0)) . attributes) group-spec
-        (u:mvlet* ((attributes attribute-order (geo.attr::make-attributes attributes))
-                   (group (make-group
+    (dolist (group-data layout-data)
+      (destructuring-bind (name (&key (format :interleaved) (divisor 0)) . attributes) group-data
+        (u:mvlet* ((attributes attribute-order (make-geometry-attributes attributes))
+                   (group (make-geometry-group
                            :name name
                            :format format
                            :divisor divisor
@@ -39,35 +25,35 @@
           (setf (u:href groups name) group))))
     (values groups (nreverse order))))
 
-(defun get-buffer-count (group)
-  (ecase (format group)
-    (:separate (hash-table-count (attributes group)))
+(defun get-geometry-buffer-count (group)
+  (ecase (geometry-group-format group)
+    (:separate (hash-table-count (geometry-group-attributes group)))
     (:interleaved 1)))
 
-(defun get-attribute-size (group)
-  (reduce #'+ (u:hash-values (attributes group)) :key #'geo.attr::get-size))
+(defun get-geometry-group-attribute-size (group)
+  (reduce #'+ (u:hash-values (geometry-group-attributes group)) :key #'get-geometry-attribute-size))
 
-(defun configure/separate (group index buffers)
-  (loop :for attribute-name :in (attribute-order group)
-        :for attribute = (u:href (attributes group) attribute-name)
+(defun configure-geometry-group/separate (group index buffers)
+  (loop :for attribute-name :in (geometry-group-attribute-order group)
+        :for attribute = (u:href (geometry-group-attributes group) attribute-name)
         :for i :from index
         :for buffer :across buffers
-        :for divisor = (divisor group)
+        :for divisor = (geometry-group-divisor group)
         :do (gl:bind-buffer :array-buffer buffer)
-            (geo.attr::configure attribute i 0 0 divisor)))
+            (configure-geometry-attribute attribute i 0 0 divisor)))
 
-(defun configure/interleaved (group index buffers)
+(defun configure-geometry-group/interleaved (group index buffers)
   (gl:bind-buffer :array-buffer (aref buffers 0))
-  (loop :with stride = (get-attribute-size group)
+  (loop :with stride = (get-geometry-group-attribute-size group)
         :with offset = 0
-        :for attribute-name :in (attribute-order group)
-        :for attribute = (u:href (attributes group) attribute-name)
+        :for attribute-name :in (geometry-group-attribute-order group)
+        :for attribute = (u:href (geometry-group-attributes group) attribute-name)
         :for i :from index
-        :for divisor = (divisor group)
-        :do (geo.attr::configure attribute i stride offset divisor)
-            (incf offset (geo.attr::get-size attribute))))
+        :for divisor = (geometry-group-divisor group)
+        :do (configure-geometry-attribute attribute i stride offset divisor)
+            (incf offset (get-geometry-attribute-size attribute))))
 
-(defun configure (group index buffers)
-  (ecase (format group)
-    (:separate (configure/separate group index buffers))
-    (:interleaved (configure/interleaved group index buffers))))
+(defun configure-geometry-group (group index buffers)
+  (ecase (geometry-group-format group)
+    (:separate (configure-geometry-group/separate group index buffers))
+    (:interleaved (configure-geometry-group/interleaved group index buffers))))

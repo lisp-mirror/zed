@@ -1,35 +1,13 @@
-(in-package #:cl-user)
-
-(defpackage #:zed.trait.camera
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:cam.state #:%zed.camera-state)
-   (#:const #:zed.math.constants)
-   (#:ctx #:%zed.context)
-   (#:gob #:%zed.game-object)
-   (#:m3 #:zed.math.matrix3)
-   (#:m4 #:zed.math.matrix4)
-   (#:tr #:%zed.trait)
-   (#:ts #:%zed.transform-state)
-   (#:v3 #:zed.math.vector3))
-  (:use #:cl)
-  (:export
-   #:camera
-   #:resolve-normal-matrix))
-
 (in-package #:zed.trait.camera)
 
-(tr::define-internal-trait camera ()
+(z::define-internal-trait camera ()
   ((%state :accessor state
            :inline t
-           :type cam.state::state
+           :type z::camera-state
            :initform nil)
    (%mode :reader mode
           :inline t
-          :type cam.state::mode
+          :type z::camera-mode
           :initarg :mode
           :initform :perspective)
    (%clip-near :reader clip-near
@@ -62,18 +40,20 @@
   (:update update))
 
 (defun make-active (camera)
-  (let ((context (tr:context camera)))
-    (setf (ctx::active-camera context) camera)))
+  (let ((context (z:trait-context camera)))
+    (setf (z::context-active-camera context) camera)))
 
-(u:fn-> resolve-normal-matrix (ctx::context gob::game-object) m3:mat)
+(u:fn-> resolve-normal-matrix (z::context z:game-object) m3:mat)
 (defun resolve-normal-matrix (context game-object)
   (declare (optimize speed))
-  (let* ((transform-state (gob::transform game-object))
-         (normal-matrix (ts::normal-matrix transform-state)))
-    (u:when-let* ((camera (ctx::active-camera context))
+  (let* ((transform-state (z::game-object-transform game-object))
+         (normal-matrix (z::transform-state-normal-matrix transform-state)))
+    (u:when-let* ((camera (z::context-active-camera context))
                   (state (state camera)))
-      (m4:set-translation! normal-matrix (ts::world-matrix transform-state) v3:+zero+)
-      (m4:*! normal-matrix (cam.state::view state) normal-matrix)
+      (m4:set-translation! normal-matrix
+                           (z::transform-state-world-matrix transform-state)
+                           v3:+zero+)
+      (m4:*! normal-matrix (z::camera-state-view state) normal-matrix)
       (m4:invert! normal-matrix normal-matrix)
       (m4:transpose! normal-matrix normal-matrix))
     (m4:rotation-to-mat3 normal-matrix)))
@@ -82,22 +62,22 @@
 
 (defun setup (camera)
   (setf (fov-y camera) (* (fov-y camera) const:+deg+))
-  (unless (ctx::active-camera (tr:context camera))
+  (unless (z::context-active-camera (z:trait-context camera))
     (make-active camera)))
 
 (defun attach (camera)
-  (let* ((context (tr:context camera))
-         (owner (tr::owner camera))
-         (window (ctx::window context))
-         (transform (gob::transform owner)))
-    (setf (state camera) (cam.state::make-state :transform transform :window window))))
+  (let* ((context (z:trait-context camera))
+         (owner (z::trait-owner camera))
+         (window (z::context-window context))
+         (transform (z::game-object-transform owner)))
+    (setf (state camera) (z::make-camera-state :transform transform :window window))))
 
 (defun update (camera)
   (let ((state (state camera)))
-    (cam.state::update-view state (translate-view-p camera))
-    (cam.state::update-projection state
-                                  (mode camera)
-                                  (fov-y camera)
-                                  (zoom camera)
-                                  (clip-near camera)
-                                  (clip-far camera))))
+    (z::update-camera-view state (translate-view-p camera))
+    (z::update-camera-projection state
+                                 (mode camera)
+                                 (fov-y camera)
+                                 (zoom camera)
+                                 (clip-near camera)
+                                 (clip-far camera))))

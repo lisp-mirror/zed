@@ -1,15 +1,4 @@
-(in-package #:cl-user)
-
-(defpackage #:%zed.opengl
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:log #:%zed.logging))
-  (:use #:cl))
-
-(in-package #:%zed.opengl)
+(in-package #:zed)
 
 (u:define-constant +enabled-capabilities+ '(:blend :cull-face :depth-test :dither :multisample)
   :test #'equal)
@@ -33,7 +22,7 @@
 ;; Prepare the OpenGL context. This must be called before an SDL2 window is created, as it informs
 ;; SDL2 how the context is to be configured when the window is created.
 ;; NOTE: This framework only supports OpenGL version 4.3, so we hard-code that here.
-(defun prepare-context (&key anti-alias-p)
+(defun prepare-opengl-context (&key anti-alias-p)
   (sdl2:gl-set-attrs :context-major-version 4
                      :context-minor-version 3
                      :context-profile-mask 1
@@ -43,7 +32,7 @@
 
 ;; Create the OpenGL context. This must be called after the SDL2 window is created to finish up
 ;; configuring the OpenGL context.
-(defun make-context (window-handle)
+(defun make-opengl-context (window-handle)
   (let ((context (sdl2:gl-create-context window-handle)))
     (apply #'gl:enable +enabled-capabilities+)
     (apply #'gl:disable +disabled-capabilities+)
@@ -51,9 +40,9 @@
     (gl:depth-func +depth-mode+)
     (gl:pixel-store :unpack-alignment 1)
     (sdl2:gl-set-swap-interval 1)
-    (log::debug :zed.opengl "Created OpenGL context")
+    (v:debug :zed "Created OpenGL context")
     context))
 
 ;; Destroy the OpenGL context. This is called during the destruction of the window.
-(defun destroy (context)
+(defun destroy-opengl-context (context)
   (sdl2:gl-delete-context context))

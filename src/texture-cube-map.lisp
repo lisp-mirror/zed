@@ -1,38 +1,24 @@
-(in-package #:cl-user)
+(in-package #:zed)
 
-(defpackage #:%zed.texture.cube-map
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:lp #:lparallel)
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:img #:%zed.image)
-   (#:tex #:%zed.texture)
-   (#:tex.data #:%zed.texture.data))
-  (:use #:cl))
-
-(in-package #:%zed.texture.cube-map)
-
-(defmethod tex::update ((type (eql :cube-map)) texture source)
+(defmethod update-texture ((type (eql :cube-map)) texture source)
   (declare (optimize speed))
   (let* ((id (gl:gen-texture))
          (layer0 (first source))
-         (width (img::width layer0))
-         (height (img::height layer0))
+         (width (image-width layer0))
+         (height (image-height layer0))
          (faces '(:texture-cube-map-positive-x
                   :texture-cube-map-negative-x
                   :texture-cube-map-positive-y
                   :texture-cube-map-negative-y
                   :texture-cube-map-positive-z
                   :texture-cube-map-negative-z)))
-    (setf (tex::id texture) id
-          (tex::width texture) width
-          (tex::height texture) height)
+    (setf (texture-id texture) id
+          (texture-width texture) width
+          (texture-height texture) height)
     (gl:bind-texture :texture-cube-map id)
     (%gl:tex-storage-2d :texture-cube-map
-                        (tex::calculate-mipmap-levels (tex::data texture) width height)
-                        (img::internal-format layer0)
+                        (calculate-texture-mipmap-levels (texture-data texture) width height)
+                        (image-internal-format layer0)
                         width
                         height)
     (loop :for image :in source
@@ -41,20 +27,20 @@
                                    0
                                    0
                                    0
-                                   (img::width image)
-                                   (img::height image)
-                                   (img::pixel-format image)
-                                   (img::pixel-type image)
-                                   (img::data image)))
+                                   (image-width image)
+                                   (image-height image)
+                                   (image-pixel-format image)
+                                   (image-pixel-type image)
+                                   (image-data image)))
     (gl:bind-texture :texture-cube-map 0)))
 
-(defmethod tex::load-source (data (type (eql :cube-map)) source &key width height)
+(defmethod load-texture-source (data (type (eql :cube-map)) source &key width height)
   (declare (optimize speed))
   (let ((valid-keys '(:x+ :x- :y+ :y- :z+ :z-)))
     (cond
       ((typep source '(or null (integer 1 1)))
        (loop :repeat 6
-             :collect (tex::load-framebuffer-texture data width height)))
+             :collect (load-framebuffer-texture data width height)))
       ((and (u:plist-p source)
             (u:set-equal (u:plist-keys source) valid-keys)
             (every #'listp (u:plist-values source)))
@@ -62,5 +48,5 @@
              :collect k :into result
              :collect v :into result
              :finally (destructuring-bind (&key x+ x- y+ y- z+ z-) result
-                        (return (lp:pmapcar #'img::load (list x+ x- y+ y- z+ z-))))))
-      (t (error "Unsupported source for cube map texture: ~s." (tex.data::name data))))))
+                        (return (lp:pmapcar #'load-image (list x+ x- y+ y- z+ z-))))))
+      (t (error "Unsupported source for cube map texture: ~s." (texture-data-name data))))))

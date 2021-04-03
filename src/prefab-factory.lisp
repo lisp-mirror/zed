@@ -1,81 +1,64 @@
-(in-package #:cl-user)
+(in-package #:zed)
 
-(defpackage #:%zed.prefab.factory
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:ctx #:%zed.context)
-   (#:gob #:%zed.game-object)
-   (#:pf.def #:%zed.prefab.definitions)
-   (#:tfm #:%zed.trait)
-   (#:ts #:%zed.transform-state)
-   (#:tree #:%zed.tree)
-   (#:wl #:%zed.whitelist))
-  (:use #:cl))
-
-(in-package #:%zed.prefab.factory)
-
-(defun realize-game-object (context node root)
-  (let* ((factory (pf.def::factory (pf.def::prefab node)))
-         (game-objects (pf.def::factory-game-objects factory))
-         (game-object (u:href game-objects (pf.def::path node))))
-    (u:do-hash (type args (pf.def::trait-thunked-args node))
+(defun realize-prefab-node (context node root)
+  (let* ((factory (prefab-factory (prefab-node-prefab node)))
+         (game-objects (prefab-factory-game-objects factory))
+         (game-object (u:href game-objects (prefab-node-path node))))
+    (u:do-hash (type args (prefab-node-trait-thunked-args node))
       (loop :for (k v) :on (u:hash->plist args) :by #'cddr
             :collect k :into args
             :collect (let ((arg (funcall v)))
-                       (if (typep arg 'pf.def::reference)
-                           (funcall (pf.def::reference-func arg) factory)
+                       (if (typep arg 'prefab-reference)
+                           (funcall (prefab-reference-func arg) factory)
                            arg))
               :into args
-            :finally (let ((trait (apply #'tfm:make-trait context type args)))
-                       (tfm:attach-trait game-object trait))))
-    (tree:spawn-game-object context
-                            game-object
-                            (u:if-let ((parent (pf.def::parent node)))
-                              (u:href game-objects (pf.def::path parent))
-                              root))
+            :finally (let ((trait (apply #'make-trait context type args)))
+                       (attach-trait game-object trait))))
+    (spawn-game-object context
+                       game-object
+                       (u:if-let ((parent (prefab-node-parent node)))
+                         (u:href game-objects (prefab-node-path parent))
+                         root))
     game-object))
 
-(defun register-root (context prefab)
-  (let* ((factory (pf.def::factory prefab))
-         (root (u:href (pf.def::factory-game-objects factory)
-                       (pf.def::path (pf.def::root prefab))))
-         (prefab-name (pf.def::name prefab)))
-    (push root (u:href (ctx::prefabs context) prefab-name))
-    (setf (gob::prefab-name root) prefab-name)
+(defun register-prefab-root (context prefab)
+  (let* ((factory (prefab-factory prefab))
+         (root (u:href (prefab-factory-game-objects factory)
+                       (prefab-node-path (prefab-root prefab))))
+         (prefab-name (prefab-name prefab)))
+    (push root (u:href (context-prefabs context) prefab-name))
+    (setf (game-object-prefab-name root) prefab-name)
     root))
 
-(defun initialize-transforms (game-object node)
-  (let ((node-options (pf.def::options node))
-        (transform (gob::transform game-object)))
-    (ts::initialize-translation transform
+(defun initialize-prefab-node-transforms (game-object node)
+  (let ((node-options (prefab-node-options node))
+        (transform (game-object-transform game-object)))
+    (initialize-translate-state transform
                                 (u:href node-options :translate)
                                 (u:href node-options :translate-velocity))
-    (ts::initialize-rotation transform
+    (initialize-rotate-state transform
                              (u:href node-options :rotate)
                              (u:href node-options :rotate-velocity))
-    (ts::initialize-scale transform
-                          (u:href node-options :scale)
-                          (u:href node-options :scale-velocity))))
+    (initialize-scale-state transform
+                            (u:href node-options :scale)
+                            (u:href node-options :scale-velocity))))
 
-(defun make-func (prefab)
+(defun make-prefab-factory-function (prefab)
   (lambda (context &key parent)
-    (let ((factory (pf.def::factory prefab))
-          (nodes (pf.def::nodes prefab)))
+    (let ((factory (prefab-factory prefab))
+          (nodes (prefab-nodes prefab)))
       (u:do-hash (path node nodes)
         (let* ((label (format nil "~(~a~)" (first (last path))))
-               (game-object (gob:make-game-object :label label)))
-          (initialize-transforms game-object node)
-          (setf (u:href (pf.def::factory-game-objects factory) path) game-object)))
+               (game-object (make-game-object :label label)))
+          (initialize-prefab-node-transforms game-object node)
+          (setf (u:href (prefab-factory-game-objects factory) path) game-object)))
       (u:do-hash-values (node nodes)
-        (setf (pf.def::factory-current-node factory) node)
-        (wl::with-scope (:prefab-instantiate)
-          (realize-game-object context node parent)))
-      (setf (pf.def::factory-current-node factory) nil)
-      (register-root context prefab))))
+        (setf (prefab-factory-current-node factory) node)
+        (with-scope (:prefab-instantiate)
+          (realize-prefab-node context node parent)))
+      (setf (prefab-factory-current-node factory) nil)
+      (register-prefab-root context prefab))))
 
-(defun build (prefab)
-  (let ((factory (pf.def::factory prefab)))
-    (setf (pf.def::factory-func factory) (make-func prefab))))
+(defun build-prefab (prefab)
+  (let ((factory (prefab-factory prefab)))
+    (setf (prefab-factory-func factory) (make-prefab-factory-function prefab))))

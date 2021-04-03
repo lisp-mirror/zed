@@ -1,12 +1,4 @@
-(in-package #:cl-user)
-
-(defpackage #:%zed.binary-parser
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:io #:fast-io))
-  (:use #:cl))
-
-(in-package #:%zed.binary-parser)
+(in-package #:%zed.utility.binary-parser)
 
 (defun get-string-length (buffer byte-count null-terminated-p)
   (let* ((sequence (io:input-buffer-vector buffer))

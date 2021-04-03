@@ -50,7 +50,7 @@
   (:update quitter/update))
 
 (defun quitter/update (quitter)
-  (let ((context (z:context quitter)))
+  (let ((context (z:trait-context quitter)))
     (when (or (z:on-button-enter context :key :escape)
               (z:on-button-enter context :window :close))
       (z:stop-game context))))

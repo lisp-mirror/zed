@@ -1,15 +1,7 @@
-(in-package #:cl-user)
-
-(defpackage #:%zed.shader.swizzle
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  (:use #:cl))
-
-(in-package #:%zed.shader.swizzle)
+(in-package #:zed.shader)
 
 (u:eval-always
-  (defun %swizzle/combinations (n items)
+  (cl:defun %swizzle/combinations (n items)
     (if (= n 1)
         (mapcar #'list items)
         (mapcan
@@ -20,7 +12,7 @@
             (%swizzle/combinations (1- n) items)))
          items)))
 
-  (defun %swizzle/component-groups (size)
+  (cl:defun %swizzle/component-groups (size)
     (loop :for masks :in '((x y z w) (r g b a) (s t p q))
           :append
           (loop :with set = (subseq masks 0 size)
@@ -28,13 +20,13 @@
                 :for items = (%swizzle/combinations i set)
                 :append (mapcar (lambda (x) (format nil "~{~a~}" x)) items))))
 
-  (defun %swizzle/char-position (components index)
+  (cl:defun %swizzle/char-position (components index)
     (let ((char (char components index)))
       (or (position char "XYZW")
           (position char "RGBA")
           (position char "STPQ"))))
 
-  (defmacro generate-swizzle-operators ()
+  (cl:defmacro generate-swizzle-operators ()
     (flet ((map-swizzle (mask)
              (u:make-keyword
               (map 'string

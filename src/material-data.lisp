@@ -1,27 +1,7 @@
-(in-package #:cl-user)
+(in-package #:zed)
 
-(defpackage #:%zed.material.data
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:glob #:global-vars)
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:ctx #:%zed.context)
-   (#:fb #:%zed.framebuffer)
-   (#:fb.data #:%zed.framebuffer.data)
-   (#:tp #:%zed.thread-pool))
-  (:use #:cl)
-  (:shadow
-   #:find))
-
-(in-package #:%zed.material.data)
-
-(glob:define-global-var =data= (u:dict #'eq))
-
-(defstruct (data
-            (:constructor %make-data)
-            (:conc-name nil)
+(defstruct (material-data
+            (:constructor %make-material-data)
             (:predicate nil)
             (:copier nil))
   (name nil :type symbol)
@@ -35,92 +15,93 @@
   (attachments nil :type list)
   (render-func (constantly nil) :type function))
 
-(u:define-printer (data stream :type nil)
-  (format stream "MATERIAL-DATA: ~s" (name data)))
+(u:define-printer (material-data stream :type nil)
+  (format stream "MATERIAL-DATA: ~s" (material-data-name material-data)))
 
-(defun find (name)
-  (or (u:href =data= name)
+(glob:define-global-var =materials= (u:dict #'eq))
+
+(defun find-material-data (name)
+  (or (u:href =materials= name)
       (error "Material ~s is not defined." name)))
 
-(defun find-master (data)
-  (let* ((master-name (master data))
-         (master-data (u:href =data= master-name)))
+(defun find-material-data-master (data)
+  (let* ((master-name (material-data-master data))
+         (master-data (u:href =materials= master-name)))
     (when (and master-name (not master-data))
       (error "Material ~s inherits from the unknown master ~s."
-             (name data)
+             (material-data-name data)
              master-name))
     master-data))
 
-(defun copy-uniforms (data)
+(defun copy-material-data-uniforms (data)
   (let ((uniforms (u:dict #'eq)))
     (labels ((copy (value)
                (typecase value
                  (sequence (map-into (copy-seq value) #'copy value))
                  (t value))))
       (when data
-        (u:do-hash (k v (effective-uniforms data))
+        (u:do-hash (k v (material-data-effective-uniforms data))
           (setf (u:href uniforms k) (copy v))))
       uniforms)))
 
-(defun update-uniforms (data uniform-data)
-  (let* ((master-data (find-master data))
+(defun update-material-data-uniforms (data uniform-data)
+  (let* ((master-data (find-material-data-master data))
          (new-direct (apply #'u:dict #'eq uniform-data))
-         (new-effective (u:hash-merge (copy-uniforms master-data) new-direct)))
-    (clrhash (direct-uniforms data))
+         (new-effective (u:hash-merge (copy-material-data-uniforms master-data) new-direct)))
+    (clrhash (material-data-direct-uniforms data))
     (u:do-hash (k v new-direct)
-      (setf (u:href (direct-uniforms data) k) v))
-    (clrhash (effective-uniforms data))
+      (setf (u:href (material-data-direct-uniforms data) k) v))
+    (clrhash (material-data-effective-uniforms data))
     (u:do-hash (k v new-effective)
-      (setf (u:href (effective-uniforms data) k) v))))
+      (setf (u:href (material-data-effective-uniforms data) k) v))))
 
-(defun update-relationships (data)
-  (u:when-let ((master (u:href =data= (master data))))
-    (pushnew (name data) (slaves master))))
+(defun update-material-data-relationships (data)
+  (u:when-let ((master (u:href =materials= (material-data-master data))))
+    (pushnew (material-data-name data) (material-data-slaves master))))
 
-(defun update-framebuffer-link (material-name framebuffer-name)
-  (u:do-hash-values (v fb.data::=data=)
-    (dolist (framebuffer-material-name (fb.data::materials v))
+(defun update-material-data-framebuffer-link (material-name framebuffer-name)
+  (u:do-hash-values (v =framebuffers=)
+    (dolist (framebuffer-material-name (framebuffer-data-materials v))
       (when (eq material-name framebuffer-material-name)
-        (u:deletef (fb.data::materials v) framebuffer-material-name))))
+        (u:deletef (framebuffer-data-materials v) framebuffer-material-name))))
   (when framebuffer-name
-    (push material-name (fb.data::materials (fb.data::find framebuffer-name)))))
+    (push material-name (framebuffer-data-materials (find-framebuffer-data framebuffer-name)))))
 
-(defun update (name master shader uniforms pass output func)
-  (let* ((data (find name))
-         (master-data (u:href =data= master))
-         (shader (or shader (and master-data (shader master-data))))
-         (shader-definition (shadow:find-shader-definition shader)))
-    (when (and shader (not shader-definition))
-      (error "Shader program ~s is not found for material ~s." shader name))
+(defun update-material-data (name master shader uniforms pass output func)
+  (let* ((data (find-material-data name))
+         (master-data (u:href =materials= master))
+         (shader (or shader (and master-data (material-data-shader master-data)))))
     (destructuring-bind (&optional framebuffer attachments) output
-      (setf (master data) master
-            (shader data) shader
-            (pass data) (or pass :default)
-            (framebuffer data) framebuffer
-            (attachments data) attachments
-            (render-func data) func)
-      (update-framebuffer-link name framebuffer)
-      (update-uniforms data uniforms)
-      (update-relationships data)
-      (tp::enqueue (list :material name))
-      (update-slaves data))))
+      (setf (material-data-master data) master
+            (material-data-shader data) shader
+            (material-data-pass data) (or pass :default)
+            (material-data-framebuffer data) framebuffer
+            (material-data-attachments data) attachments
+            (material-data-render-func data) func)
+      (update-material-data-framebuffer-link name framebuffer)
+      (update-material-data-uniforms data uniforms)
+      (update-material-data-relationships data)
+      (thread-pool-enqueue (list :material name))
+      (update-material-data-slaves data))))
 
-(defun update-slaves (master-data)
-  (dolist (slave-name (slaves master-data))
-    (let ((slave (find slave-name)))
-      (update (name slave)
-              (name master-data)
-              (or (shader slave)
-                  (shader master-data))
-              (u:hash->plist (direct-uniforms slave))
-              (or (pass slave)
-                  (pass master-data))
-              (list (or (framebuffer slave) (framebuffer master-data))
-                    (or (attachments slave) (attachments master-data)))
-              (render-func slave)))))
+(defun update-material-data-slaves (master-data)
+  (dolist (slave-name (material-data-slaves master-data))
+    (let ((slave (find-material-data slave-name)))
+      (update-material-data (material-data-name slave)
+                            (material-data-name master-data)
+                            (or (material-data-shader slave)
+                                (material-data-shader master-data))
+                            (u:hash->plist (material-data-direct-uniforms slave))
+                            (or (material-data-pass slave)
+                                (material-data-pass master-data))
+                            (list (or (material-data-framebuffer slave)
+                                      (material-data-framebuffer master-data))
+                                  (or (material-data-attachments slave)
+                                      (material-data-attachments master-data)))
+                            (material-data-render-func slave)))))
 
-(defun make-data (name master shader uniforms pass output func)
-  (let ((data (%make-data :name name)))
-    (setf (u:href =data= name) data)
-    (update name master shader uniforms pass output func)
+(defun make-material-data (name master shader uniforms pass output func)
+  (let ((data (%make-material-data :name name)))
+    (setf (u:href =materials= name) data)
+    (update-material-data name master shader uniforms pass output func)
     data))

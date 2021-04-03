@@ -1,16 +1,4 @@
-(in-package #:cl-user)
-
-(defpackage #:%zed.input.keyboard
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:in.mgr #:%zed.input.manager)
-   (#:in.tr #:%zed.input.transition))
-  (:use #:cl))
-
-(in-package #:%zed.input.keyboard)
+(in-package #:zed)
 
 (u:define-constant +key-names+
     #(:unknown nil nil nil :a :b :c :d :e :f :g :h :i :j :k :l :m :n :o :p :q :r :s :t :u :v :w :x
@@ -40,17 +28,17 @@
       :kbdillumtoggle :kbdillumdown :kbdillumup :eject :sleep)
   :test #'equalp)
 
-(u:fn-> up (in.mgr::manager u:ub32) null)
-(declaim (inline up))
-(defun up (manager key)
+(u:fn-> input-event/key-up (input-manager u:ub32) null)
+(declaim (inline input-event/key-up))
+(defun input-event/key-up (manager key)
   (declare (optimize speed))
-  (in.tr::out manager :key (aref +key-names+ key))
-  (in.tr::out manager :key :any)
+  (input-transition-out manager :key (aref +key-names+ key))
+  (input-transition-out manager :key :any)
   nil)
 
-(u:fn-> down (in.mgr::manager u:ub32) null)
-(declaim (inline down))
-(defun down (manager key)
+(u:fn-> input-event/key-down (input-manager u:ub32) null)
+(declaim (inline input-event/key-down))
+(defun input-event/key-down (manager key)
   (declare (optimize speed))
-  (in.tr::in manager :key (aref +key-names+ key))
-  (in.tr::in manager :key :any))
+  (input-transition-in manager :key (aref +key-names+ key))
+  (input-transition-in manager :key :any))

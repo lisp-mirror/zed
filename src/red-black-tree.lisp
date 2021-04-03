@@ -1,16 +1,4 @@
-(in-package #:cl-user)
-
-(defpackage #:%zed.red-black-tree
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:use #:cl)
-  (:shadow
-   #:delete
-   #:find))
-
-(in-package #:%zed.red-black-tree)
+(in-package #:%zed.utility.red-black-tree)
 
 (defstruct (tree
             (:constructor %make-tree)
@@ -23,7 +11,7 @@
   (sort-func #'< :type function))
 
 (u:define-printer (tree stream :type nil)
-  (format stream "RB-TREE"))
+  (format stream "RED-BLACK-TREE"))
 
 (declaim (inline %make-node))
 (defstruct (node
@@ -40,7 +28,7 @@
   (value nil :type t))
 
 (u:define-printer (node stream :type nil)
-  (format stream "RB-TREE NODE"))
+  (format stream "RED-BLACK-TREE-NODE"))
 
 (u:fn-> make-node (tree t) node)
 (defun make-node (tree item)
@@ -161,7 +149,8 @@
                (setf (color (parent node)) :black
                      (color (parent (parent node))) :red)
                (rotate-right tree (parent (parent node))))))
-          (let ((y (left (parent (parent node)))))
+          (let ((y (left
+                    (parent (parent node)))))
             (cond
               ((eq (color y) :red)
                (setf (color (parent node)) :black

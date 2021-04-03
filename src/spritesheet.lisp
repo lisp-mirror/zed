@@ -1,25 +1,7 @@
-(in-package #:cl-user)
-
-(defpackage #:%zed.spritesheet
-  ;; Third-party aliases
-  (:local-nicknames
-   (#:u #:golden-utils))
-  ;; Internal aliases
-  (:local-nicknames
-   (#:asset #:%zed.asset)
-   (#:ctx #:%zed.context)
-   (#:pack #:%zed.pack)
-   (#:rc #:%zed.resource-cache)
-   (#:shd.mgr #:%zed.shader.manager))
-  (:use #:cl)
-  (:shadow
-   #:find))
-
-(in-package #:%zed.spritesheet)
+(in-package #:zed)
 
 (defstruct (spritesheet
             (:constructor %make-spritesheet)
-            (:conc-name nil)
             (:predicate nil)
             (:copier nil))
   (name nil :type list)
@@ -27,11 +9,11 @@
   (vao 0 :type u:ub16)
   (sprites (u:dict #'equalp) :type hash-table))
 
-(u:fn-> update-buffer (spritesheet) null)
-(defun update-buffer (spritesheet)
+(u:fn-> update-spritesheet-buffer (spritesheet) null)
+(defun update-spritesheet-buffer (spritesheet)
   (declare (optimize speed))
-  (loop :with name = (name spritesheet)
-        :with spec = (spec spritesheet)
+  (loop :with name = (spritesheet-name spritesheet)
+        :with spec = (spritesheet-spec spritesheet)
         :with count = (length spec)
         :with pos = (make-array count)
         :with size = (make-array count)
@@ -41,27 +23,27 @@
               (when (and id x y w h)
                 (setf (aref pos i) (vector x y)
                       (aref size i) (vector w h)
-                      (u:href (sprites spritesheet) id) i)))
-        :finally (shd.mgr::write name :path :pos :value pos)
-                 (shd.mgr::write name :path :size :value size)))
+                      (u:href (spritesheet-sprites spritesheet) id) i)))
+        :finally (write-shader-buffer name :path :pos :value pos)
+                 (write-shader-buffer name :path :size :value size)))
 
-(u:fn-> find (spritesheet string) u:ub16)
-(defun find (spritesheet name)
+(u:fn-> find-sprite (spritesheet string) u:ub16)
+(defun find-sprite (spritesheet name)
   (declare (optimize speed))
-  (or (u:href (sprites spritesheet) name)
-      (error "Sprite ~s not found in spritesheet ~s." name (name spritesheet))))
+  (or (u:href (spritesheet-sprites spritesheet) name)
+      (error "Sprite ~s not found in spritesheet ~s." name (spritesheet-name spritesheet))))
 
-(defun read-spec-file (asset)
-  (asset::with-asset (asset path data :format :lisp)
+(defun read-spritesheet-spec-file (asset)
+  (with-asset (asset path data :format :lisp)
     data))
 
-(u:fn-> make-spritesheet (ctx::context list list) spritesheet)
+(u:fn-> make-spritesheet (context list list) spritesheet)
 (defun make-spritesheet (context asset buffer-spec)
   (declare (optimize speed))
-  (rc::with-resource-cache (context :spritesheet asset)
+  (with-resource-cache (context :spritesheet asset)
     (let ((spritesheet (%make-spritesheet :name asset
-                                          :spec (read-spec-file asset)
+                                          :spec (read-spritesheet-spec-file asset)
                                           :vao (gl:gen-vertex-array))))
-      (apply #'shd.mgr::make-buffer (ctx::shader-manager context) asset buffer-spec)
-      (update-buffer spritesheet)
+      (apply #'make-shader-buffer (context-shader-manager context) asset buffer-spec)
+      (update-spritesheet-buffer spritesheet)
       spritesheet)))

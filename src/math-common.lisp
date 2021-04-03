@@ -1,13 +1,3 @@
-(in-package #:cl-user)
-
-(defpackage #:%zed.math.common
-  ;; Third-party packages
-  (:local-nicknames
-   (#:u #:golden-utils))
-  (:use #:cl)
-  (:shadow
-   #:=))
-
 (in-package #:%zed.math.common)
 
 (defun make-accessor-symbol (prefix &rest args)

@@ -9,10 +9,10 @@
 (defun setup (file systems)
   (let ((primary-system (first systems)))
     (if (asdf:find-system primary-system nil)
-        (setf util::=system-name= primary-system)
+        (setf z::=system-name= primary-system)
         (error "System ~s could not be found." primary-system))
     (v:stop v:*global-controller*)
-    (pack::make-pack :path (uiop:pathname-directory-pathname file) :systems systems)
+    (z::make-pack :path (uiop:pathname-directory-pathname file) :systems systems)
     #+sbcl (sb-ext:disable-debugger)
     #+sbcl (sb-ext:gc :full t)))
 
