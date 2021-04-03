@@ -35,7 +35,7 @@
                  :inline t
                  :type list
                  :initarg :buffer-spec
-                 :initform '(:spritesheet shd.lib:sprite))
+                 :initform '(:spritesheet zsl:sprite))
    (%spritesheet :accessor spritesheet
                  :inline t
                  :type z::spritesheet

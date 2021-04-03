@@ -41,10 +41,10 @@
 
 (defpackage #:zed.trait.sprite
   (:local-nicknames
-   (#:shd.lib #:zed.shader)
    (#:tr.ren #:zed.trait.render)
    (#:u #:golden-utils)
-   (#:z #:zed))
+   (#:z #:zed)
+   (#:zsl #:zed.shader-library))
   (:use #:cl)
   (:export
    #:sprite))
@@ -55,7 +55,8 @@
    (#:tr.ren #:zed.trait.render)
    (#:u #:golden-utils)
    (#:v3 #:zed.math.vector3)
-   (#:z #:zed))
+   (#:z #:zed)
+   (#:zsl #:zed.shader-library))
   (:use #:cl)
   (:export
    #:collider))

@@ -1,4 +1,4 @@
-(in-package #:zed.shader)
+(in-package #:zed.shader-library)
 
 (generate-swizzle-operators)
 

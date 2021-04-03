@@ -1,4 +1,4 @@
-(in-package #:zed.shader)
+(in-package #:zed.shader-library)
 
 (defstruct sprite-data
   (sampler :sampler-2d :accessor sampler)

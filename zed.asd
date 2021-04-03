@@ -30,8 +30,10 @@
   :components
   ((:file "package-util")
    (:file "package-math")
+   (:file "package-shader-library")
    (:file "package-core")
    (:file "package-trait")
+   (:file "package-nicknames")
    (:file "math-common")
    (:file "math-constants")
    (:file "math-vector2")

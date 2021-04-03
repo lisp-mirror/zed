@@ -1,4 +1,4 @@
-(in-package #:zed.shader)
+(in-package #:zed.shader-library)
 
 (defconstant +gamma+ (/ 2.2))
 (defconstant +gamma-inverse+ 2.2)

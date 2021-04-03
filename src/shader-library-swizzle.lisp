@@ -1,4 +1,4 @@
-(in-package #:zed.shader)
+(in-package #:zed.shader-library)
 
 (u:eval-always
   (cl:defun %swizzle/combinations (n items)

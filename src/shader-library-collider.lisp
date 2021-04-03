@@ -1,4 +1,4 @@
-(in-package #:zed.shader)
+(in-package #:zed.shader-library)
 
 (defun collider/vertex ((mesh-attrs mesh-attrs)
                         &uniforms

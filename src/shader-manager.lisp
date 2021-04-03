@@ -11,7 +11,7 @@
 
 (defun register-shaders ()
   (let ((table (shadow:load-shaders (lambda (x) (thread-pool-enqueue (list :shader x))))))
-    (v:info :zed.shader "Loaded ~d shader programs" (hash-table-count table))
+    (v:info :zed "Loaded ~d shader programs" (hash-table-count table))
     table))
 
 (defun get-shader-buffer-binding (manager)
