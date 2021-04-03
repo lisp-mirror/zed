@@ -37,3 +37,15 @@
 
 (defun saturate ((x :vec4))
   (clamp x 0.0 1.0))
+
+(defun log10 ((x :float))
+  (* (log2 x) 0.30103))
+
+(defun log10 ((x :vec2))
+  (* (log2 x) 0.30103))
+
+(defun log10 ((x :vec3))
+  (* (log2 x) 0.30103))
+
+(defun log10 ((x :vec4))
+  (* (log2 x) 0.30103))

@@ -28,7 +28,7 @@
                 (vec4 (.r color) (.yzx p))))
          (d (- (.x q) (min (.w q) (.y q))))
          (h (abs (+ (/ (- (.w q) (.y q))
-                       (+ (* 6 d) +epsilon+))
+                       (+ (* 6 d) 1e-7))
                     (.z q)))))
     (vec3 h d (.x q))))
 
@@ -37,7 +37,7 @@
 
 (defun rgb->hsv ((color :vec3))
   (let* ((hcv (rgb->hcv color))
-         (s (/ (.y hcv) (+ (.z hcv) +epsilon+))))
+         (s (/ (.y hcv) (+ (.z hcv) 1e-7))))
     (vec3 (.x hcv) s (.z hcv))))
 
 (defun rgb->hsv ((color :vec4))
@@ -56,8 +56,8 @@
          (y (dot color hcy-weights))
          (z (dot (hue->rgb (.x hcv)) hcy-weights)))
     (if (< y z)
-        (multf (.y hcv) (/ z (+ +epsilon+ y)))
-        (multf (.y hcv) (/ (- 1 z) (- (1+ +epsilon+) y))))
+        (multf (.y hcv) (/ z (+ 1e-7 y)))
+        (multf (.y hcv) (/ (- 1 z) (- (1+ 1e-7) y))))
     (vec3 (.xy hcv) y)))
 
 (defun rgb->hcy ((color :vec4))
@@ -80,7 +80,7 @@
 (defun rgb->hsl ((color :vec3))
   (let* ((hcv (rgb->hcv color))
          (l (- (.z hcv) (* (.y hcv) 0.5)))
-         (s (/ (.y hcv) (- 1 (+ (abs (1- (* l 2)))) +epsilon+))))
+         (s (/ (.y hcv) (- 1 (+ (abs (1- (* l 2)))) 1e-7))))
     (vec3 (.x hcv) s l)))
 
 (defun rgb->hsl ((color :vec4))
