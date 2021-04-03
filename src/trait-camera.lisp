@@ -1,13 +1,9 @@
 (in-package #:zed.trait.camera)
 
 (z::define-internal-trait camera ()
-  ((%state :accessor state
-           :inline t
-           :type z::camera-state
-           :initform nil)
-   (%mode :reader mode
+  ((%mode :reader mode
           :inline t
-          :type z::camera-mode
+          :type (member :perspective :orthographic :isometric)
           :initarg :mode
           :initform :perspective)
    (%clip-near :reader clip-near
@@ -34,10 +30,78 @@
                       :inline t
                       :type boolean
                       :initarg :translate-view-p
-                      :initform t))
+                      :initform t)
+   (%view :reader view
+          :inline t
+          :type m4:mat
+          :initform (m4:id))
+   (%projection :reader projection
+                :inline t
+                :type m4:mat
+                :initform (m4:id)))
   (:setup setup)
-  (:attach attach)
   (:update update))
+
+(u:fn-> update-projection/orthographic (camera) null)
+(declaim (inline update-projection/orthographic))
+(defun update-projection/orthographic (camera)
+  (declare (optimize speed))
+  (let* ((context (z:trait-context camera))
+         (window (z::context-window context))
+         (zoom (zoom camera))
+         (w (/ (z::window-width window) zoom 2.0))
+         (h (/ (z::window-height window) zoom 2.0)))
+    (m4:ortho! (projection camera) (- w) w (- h) h (clip-near camera) (clip-far camera))
+    nil))
+
+(u:fn-> update-projection/perspective (camera) null)
+(declaim (inline update-projection/perspective))
+(defun update-projection/perspective (camera)
+  (declare (optimize speed))
+  (let* ((context (z:trait-context camera))
+         (window (z::context-window context)))
+    (m4:perspective! (projection camera)
+                     (/ (fov-y camera) (zoom camera))
+                     (/ (float (z::window-width window) 1f0)
+                        (float (z::window-height window) 1f0))
+                     (clip-near camera)
+                     (clip-far camera))
+    nil))
+
+(u:fn-> update-projection/isometric (camera) null)
+(declaim (inline update-projection/isometric))
+(defun update-projection/isometric (camera)
+  (declare (optimize speed))
+  (let* ((owner (z::trait-owner camera))
+         (transform (z::game-object-transform owner))
+         (rotation #.(q:inverse
+                      (q:rotate-euler
+                       q:+id+
+                       (v3:vec (- (asin (/ (sqrt 3)))) 0.0 const::+pi/4+)))))
+    (update-projection/orthographic camera)
+    (z::initialize-rotate-state transform rotation)
+    nil))
+
+(u:fn-> update-projection (camera) null)
+(defun update-projection (camera)
+  (declare (optimize speed))
+  (ecase (mode camera)
+    (:orthographic (update-projection/orthographic camera))
+    (:perspective (update-projection/perspective camera))
+    (:isometric (update-projection/isometric camera))))
+
+(u:fn-> update-view (camera) null)
+(defun update-view (camera)
+  (declare (optimize speed))
+  (let* ((world-matrix (m4:copy (z::get-transform (z::trait-owner camera) :space :world)))
+         (view (view camera))
+         (eye (m4:get-translation world-matrix))
+         (target (v3:+ eye (v3:negate (m4:rotation-axis-to-vec3 world-matrix :z))))
+         (up (m4:rotation-axis-to-vec3 world-matrix :y)))
+    (m4:look-at! view eye target up)
+    (unless (translate-view-p camera)
+      (m4:set-translation! view view v3:+zero+))
+    nil))
 
 (defun make-active (camera)
   (let ((context (z:trait-context camera)))
@@ -48,12 +112,11 @@
   (declare (optimize speed))
   (let* ((transform-state (z::game-object-transform game-object))
          (normal-matrix (z::transform-state-normal-matrix transform-state)))
-    (u:when-let* ((camera (z::context-active-camera context))
-                  (state (state camera)))
+    (u:when-let ((camera (z::context-active-camera context)))
       (m4:set-translation! normal-matrix
                            (z::transform-state-world-matrix transform-state)
                            v3:+zero+)
-      (m4:*! normal-matrix (z::camera-state-view state) normal-matrix)
+      (m4:*! normal-matrix (view camera) normal-matrix)
       (m4:invert! normal-matrix normal-matrix)
       (m4:transpose! normal-matrix normal-matrix))
     (m4:rotation-to-mat3 normal-matrix)))
@@ -65,19 +128,6 @@
   (unless (z::context-active-camera (z:trait-context camera))
     (make-active camera)))
 
-(defun attach (camera)
-  (let* ((context (z:trait-context camera))
-         (owner (z::trait-owner camera))
-         (window (z::context-window context))
-         (transform (z::game-object-transform owner)))
-    (setf (state camera) (z::make-camera-state :transform transform :window window))))
-
 (defun update (camera)
-  (let ((state (state camera)))
-    (z::update-camera-view state (translate-view-p camera))
-    (z::update-camera-projection state
-                                 (mode camera)
-                                 (fov-y camera)
-                                 (zoom camera)
-                                 (clip-near camera)
-                                 (clip-far camera))))
+  (update-view camera)
+  (update-projection camera))

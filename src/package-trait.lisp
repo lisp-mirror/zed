@@ -5,6 +5,7 @@
    (#:const #:zed.math.constants)
    (#:m3 #:zed.math.matrix3)
    (#:m4 #:zed.math.matrix4)
+   (#:q #:zed.math.quaternion)
    (#:u #:golden-utils)
    (#:v3 #:zed.math.vector3)
    (#:z #:zed))

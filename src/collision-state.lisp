@@ -1,5 +1,11 @@
 (in-package #:zed)
 
+(defstruct (collision-state
+            (:predicate nil)
+            (:copier nil))
+  (contact-count 0 :type fixnum)
+  (hit-p nil :type boolean))
+
 (u:fn-> collision-state-enter (collision-state collision-state) null)
 (defun collision-enter (state1 state2)
   (declare (optimize speed))
