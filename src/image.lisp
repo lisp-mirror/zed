@@ -34,6 +34,6 @@
 (defmethod load-image (asset &key)
   (with-asset (asset path data)
     (destructuring-bind (asset-system asset-path) asset
-      (v:info :zed.image "Loading image: ~a (~s)..." asset-path asset-system)
+      (v:info :zed "Loading image: ~a (~s)..." asset-path asset-system)
       (prog1 (%load-image (get-image-type path) data)
-        (v:info :zed.image "Loaded image: ~a (~s)" asset-path asset-system)))))
+        (v:info :zed "Loaded image: ~a (~s)" asset-path asset-system)))))

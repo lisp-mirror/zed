@@ -37,7 +37,7 @@
 ;; This is called when the main game loop exits to destroy the context. All code should call
 ;; #'shutdown instead, which initiates a graceful shutdown of the context.
 (defun destroy-context (context)
-  (v:info :zed.context "Destroying context...")
+  (v:info :zed "Destroying context...")
   ;; Destroy the input manager.
   (destroy-input-manager (context-input-manager context))
   ;; Destroy the window, which takes care of cleaning up any foreign resources for the window and
@@ -49,7 +49,7 @@
   (stop-logging)
   ;; Force the Lisp implementation to perform a full garbage collection.
   (tg:gc :full t)
-  (v:info :zed.context "Context destroyed"))
+  (v:info :zed "Context destroyed"))
 
 ;; Gracefully shut down the context. This instructs the main game loop to exit at the right time
 ;; (not mid-iteration), and initiates the graceful destruction of the context.
