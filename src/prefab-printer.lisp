@@ -1,0 +1,31 @@
+(in-package #:zed)
+
+(defun prefab-printer/find-children (prefab node)
+  (loop :with nodes = (prefab-nodes prefab)
+        :for path :in (u:hash-keys nodes)
+        :when (equal (butlast path)
+                     (prefab-node-path node))
+          :collect (u:href nodes path)))
+
+(defun prefab-printer/print-node (path level)
+  (let ((padding (make-string (* level 2) :initial-element #\space)))
+    (format t "~aGame object: ~s~%" padding (nth level path))))
+
+(defun prefab-printer/print-components (node level)
+  (let ((padding (make-string (+ (* level 2) 2) :initial-element #\space)))
+    (u:do-hash (k v (prefab-node-trait-args node))
+      (format t "~aTrait: ~s~%" padding k)
+      (u:do-hash (k v v)
+        (format t "~a  ~s ~s~%" padding k v)))))
+
+(defun print-prefab (name)
+  (let ((prefab (u:href =prefabs= name)))
+    (labels ((recurse (node level)
+               (let ((path (prefab-node-path node))
+                     (children (prefab-printer/find-children prefab node)))
+                 (prefab-printer/print-node path level)
+                 (prefab-printer/print-components node level)
+                 (format t "~%")
+                 (when children
+                   (map nil (lambda (x) (recurse x (1+ level))) children)))))
+      (recurse (prefab-root prefab) 0))))

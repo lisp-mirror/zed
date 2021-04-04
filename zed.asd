@@ -104,6 +104,7 @@
    (:file "spritesheet")
    (:file "prefab-factory")
    (:file "prefab")
+   (:file "prefab-printer")
    (:file "texture-data")
    (:file "texture")
    (:file "texture-2d")
