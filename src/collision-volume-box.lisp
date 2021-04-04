@@ -102,10 +102,10 @@
   nil)
 
 (u:fn-> update-collision-volume-box-visualization (collision-volume-box game-object) null)
-(defun update-collision-volume-box-visualization (box visual)
+(defun update-collision-volume-box-visualization (box owner)
   (declare (optimize speed))
-  (translate visual (collision-volume-center box) :replace-p t)
-  (scale visual
+  (translate owner (collision-volume-center box) :replace-p t)
+  (scale owner
          (v3:- (collision-volume-box-max-extent box)
                (collision-volume-box-min-extent box))
          :replace-p t)

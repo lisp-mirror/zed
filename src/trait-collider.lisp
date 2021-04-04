@@ -15,10 +15,6 @@
                :type boolean
                :initarg :visible-p
                :initform t)
-   (%visual :accessor visual
-            :inline t
-            :type (or z:game-object null)
-            :initform nil)
    (%layer :reader layer
            :inline t
            :type symbol
@@ -54,19 +50,21 @@
 
 (u:fn-> enable-visibility (collider) null)
 (defun enable-visibility (collider)
-  (let* ((context (z:trait-context collider))
-         (owner (z::trait-owner collider))
-         (child (z:make-game-object :label "collider-visualization"))
-         (volume (volume collider))
-         (mesh (z::make-trait context
+  (let ((context (z:trait-context collider))
+        (owner (z::trait-owner collider)))
+    (when (or (z:find-trait owner 'tr.mesh:mesh)
+              (z:find-trait owner 'tr.ren:render))
+      (error "Game object ~a has a visible collider, but it must not also have a mesh or render ~
+              trait."
+             owner))
+    (let ((mesh (z:make-trait context
                               'tr.mesh:mesh
                               :asset '(:zed "meshes/colliders.glb")
-                              :name (z::collision-volume-mesh-name volume)))
-         (render (z:make-trait context 'tr.ren:render :material 'collider)))
-    (z:attach-trait child mesh)
-    (z:attach-trait child render)
-    (setf (visual collider) (z:spawn-game-object context child owner))
-    nil))
+                              :name (z::collision-volume-mesh-name (volume collider))))
+          (render (z:make-trait context 'tr.ren:render :material 'collider)))
+      (z:attach-trait owner mesh)
+      (z:attach-trait owner render)
+      nil)))
 
 (u:fn-> enter (collider collider) null)
 (defun enter (collider1 collider2)
@@ -153,22 +151,23 @@
 (u:fn-> detach (collider) null)
 (defun detach (collider)
   (declare (optimize speed))
-  (z::deregister-collider collider (layer collider))
+  (z::deregister-collider (print collider) (layer collider))
   nil)
 
 (u:fn-> physics (collider) null)
 (defun physics (collider)
   (declare (optimize speed))
-  (let ((volume (volume collider)))
+  (let ((owner (z::trait-owner collider))
+        (volume (volume collider)))
     (funcall (z::collision-volume-update-func volume) volume collider)
     (when (visible-p collider)
-      (funcall (z::collision-volume-update-visualization-func volume) volume (visual collider))))
+      (funcall (z::collision-volume-update-visualization-func volume) volume owner)))
   nil)
 
 (u:fn-> render (collider) null)
 (defun render (collider)
   (declare (optimize speed))
   (when (visible-p collider)
-    (let* ((render-trait (z:find-trait (visual collider) 'tr.ren:render))
+    (let* ((render-trait (z:find-trait (z::trait-owner collider) 'tr.ren:render))
            (material (tr.ren::material render-trait)))
       (z::set-uniform material :contact (hit-p collider)))))
