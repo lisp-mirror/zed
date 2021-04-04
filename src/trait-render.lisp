@@ -52,9 +52,7 @@
 (u:fn-> render-frame (z::context) null)
 (defun render-frame (context)
   (declare (optimize speed))
-  ;; NOTE: This `when-let` is required: The tree is not created until the first render trait is
-  ;; created, but the game loop calls this function unconditionally each frame.
-  (u:when-let ((draw-order (z::context-draw-order context)))
+  (let ((draw-order (z::context-draw-order context)))
     (gl:clear-color 0 0 0 1)
     (gl:clear :color-buffer :depth-buffer)
     (z::map-draw-order draw-order #'render-game-object)))
@@ -65,8 +63,6 @@
 (defun setup (render)
   (declare (optimize speed))
   (let ((context (z:trait-context render)))
-    (unless (z::context-draw-order context)
-      (setf (z::context-draw-order context) (z::make-draw-order-manager #'draw-order-tree-sort)))
     (setf (viewport render) (z::ensure-viewport (z::context-viewports context)
                                                 (viewport-name render)))
     nil))
