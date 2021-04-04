@@ -321,6 +321,11 @@
   (let* ((factory (prefab-factory (prefab-node-prefab node)))
          (game-objects (prefab-factory-game-objects factory))
          (game-object (u:href game-objects (prefab-node-path node))))
+    (spawn-game-object context
+                       game-object
+                       (u:if-let ((parent (prefab-node-parent node)))
+                         (u:href game-objects (prefab-node-path parent))
+                         root))
     (u:do-hash (type args (prefab-node-trait-thunked-args node))
       (loop :for (k v) :on (u:hash->plist args) :by #'cddr
             :collect k :into args
@@ -331,11 +336,6 @@
               :into args
             :finally (let ((trait (apply #'make-trait context type args)))
                        (attach-trait game-object trait))))
-    (spawn-game-object context
-                       game-object
-                       (u:if-let ((parent (prefab-node-parent node)))
-                         (u:href game-objects (prefab-node-path parent))
-                         root))
     game-object))
 
 (defun register-prefab-root (context prefab)
