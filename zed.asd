@@ -102,7 +102,6 @@
    (:file "resource-cache")
    (:file "transform")
    (:file "spritesheet")
-   (:file "prefab-factory")
    (:file "prefab")
    (:file "prefab-printer")
    (:file "texture-data")
