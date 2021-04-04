@@ -151,7 +151,7 @@
 (u:fn-> detach (collider) null)
 (defun detach (collider)
   (declare (optimize speed))
-  (z::deregister-collider (print collider) (layer collider))
+  (z::deregister-collider collider (layer collider))
   nil)
 
 (u:fn-> physics (collider) null)

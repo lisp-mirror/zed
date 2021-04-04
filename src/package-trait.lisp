@@ -62,3 +62,11 @@
    #:continue)
   (:export
    #:collider))
+
+(defpackage #:zed.trait.sphere
+  (:local-nicknames
+   (#:z #:zed)
+   (#:zsl #:zed.shader-library))
+  (:use #:cl)
+  (:export
+   #:sphere))
