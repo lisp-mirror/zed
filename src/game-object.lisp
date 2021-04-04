@@ -36,7 +36,6 @@
   ;; An object that manages the currently attached traits this game object has.
   (traits-by-id (u:dict #'eq) :type hash-table)
   (traits-by-type (u:dict #'eq) :type hash-table)
-  (trait-order nil :type list)
   ;; The name of the root prefab node this game object was created from, or NIL if it was created
   ;; from a child of a prefab, or manually
   (prefab-name nil :type symbol))

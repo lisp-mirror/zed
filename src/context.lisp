@@ -18,6 +18,7 @@
                                    :clock (make-clock config refresh-rate)
                                    :window window
                                    :input-manager (make-input-manager)
+                                   :trait-manager (make-trait-manager :order (sort-trait-types))
                                    :viewports (make-viewport-manager window)
                                    :collision-system (make-collision-system collision-plan))
                ;; Setup live coding support. This instructs SLIME or Sly's REPL to run inside our

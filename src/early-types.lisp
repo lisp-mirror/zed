@@ -25,14 +25,17 @@
 (u:define-printer (draw-order-manager stream :type nil)
   (format stream "DRAW-ORDER-MANAGER"))
 
-(defstruct (jobs
+(defstruct (trait-manager
             (:predicate nil)
             (:copier nil))
-  (enable-traits nil :type list)
-  (disable-traits nil :type list))
+  (order nil :type list)
+  (registered (make-array 32 :fill-pointer 0 :adjustable t) :type (vector trait))
+  (unregistered (make-array 32 :fill-pointer 0 :adjustable t) :type (vector trait))
+  (active-by-type (u:dict #'eq) :type hash-table)
+  (active-by-id (u:dict #'eq) :type hash-table))
 
-(u:define-printer (jobs stream :type nil)
-  (format stream "JOBS"))
+(u:define-printer (trait-manager stream :type nil)
+  (format stream "TRAIT-MANAGER"))
 
 (glob:define-global-var =context= nil)
 
@@ -46,7 +49,7 @@
   (input-manager nil :type input-manager)
   (shader-manager (make-shader-manager) :type shader-manager)
   (scene-tree (make-root-game-object) :type game-object)
-  (jobs (make-jobs) :type jobs)
+  (trait-manager (make-trait-manager) :type trait-manager)
   (resource-cache (u:dict #'eq) :type hash-table)
   (framebuffers (u:dict #'eq) :type hash-table)
   (materials (u:dict #'eq) :type hash-table)

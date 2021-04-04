@@ -1,8 +1,7 @@
 (in-package #:zed)
 
 (u:define-constant +trait-slot-order+
-    '(%%context %%owner %%priority %%setup-hook %%attach-hook %%detach-hook %%update-hook
-      %%render-hook)
+    '(%%context %%owner %%setup-hook %%attach-hook %%detach-hook %%update-hook %%render-hook)
   :test #'equal)
 
 (u:define-constant +trait-hook-names+
@@ -18,11 +17,6 @@
               :inline t
               :type (or game-object null)
               :initform nil)
-     (%%priority :reader trait-priority
-                 :inline t
-                 :type u:ub32
-                 :initarg priority
-                 :initform #.(1- (expt 2 32)))
      (%%setup-hook :reader trait-setup-hook
                    :inline t
                    :type symbol
@@ -75,11 +69,9 @@
            (ignore trait))
   nil)
 
-(defun generate-trait-initargs (type priority options)
-  (when (or priority options)
+(defun generate-trait-initargs (type options)
+  (when options
     `((:default-initargs
-       ,@(when priority
-           `(priority ,priority))
        ,@(u:mappend
           (lambda (x)
             (destructuring-bind (key value) x
@@ -94,18 +86,38 @@
                               value)))))))
           options)))))
 
-(defmacro define-internal-trait (type (&key priority) &body (slots . options))
-  `(u:eval-always
-     (util.oc::define-ordered-class ,type (trait)
-       ,slots
-       (:order (,@+trait-slot-order+ ,@(mapcar #'car slots)))
-       ,@(generate-trait-initargs type priority options))))
+(defmacro define-internal-trait (type (&key order) &body (slots . options))
+  (destructuring-bind (&key before after) order
+    `(progn
+       (u:eval-always
+         (util.oc::define-ordered-class ,type (trait)
+           ,slots
+           (:order (,@+trait-slot-order+ ,@(mapcar #'car slots)))
+           ,@(generate-trait-initargs type options)))
+       (setf (u:href =trait-order= ',type)
+             '(:before ,(u:ensure-list before)
+               :after ,(u:ensure-list after)))
+       (sort-trait-types)
+       (thread-pool-enqueue (list :trait ',type)))))
 
-(defmacro define-trait (type (&key priority) &body (slots . options))
-  `(util.oc::define-ordered-class ,type (trait)
-     ,slots
-     (:order ,+trait-slot-order+)
-     ,@(generate-trait-initargs type priority options)))
+(defmacro define-trait (type (&key order) &body (slots . options))
+  (destructuring-bind (&key before after) order
+    `(progn
+       (u:eval-always
+         (util.oc::define-ordered-class ,type (trait)
+           ,slots
+           (:order ,+trait-slot-order+)
+           ,@(generate-trait-initargs type options)))
+       (setf (u:href =trait-order= ',type)
+             '(:before ,(u:ensure-list before)
+               :after ,(u:ensure-list after)))
+       (sort-trait-types)
+       (thread-pool-enqueue (list :trait ',type)))))
+
+(defmethod recompile ((type (eql :trait)) data)
+  (let ((trait-manager (context-trait-manager =context=)))
+    (setf (trait-manager-order trait-manager) (sort-trait-types))
+    (v:debug :zed "Recompiled trait: ~s" data)))
 
 (defmacro call-trait-hook (trait hook-type)
   `(with-scope (,(u:format-symbol :keyword "TRAIT-~a-HOOK" hook-type))
@@ -156,14 +168,13 @@
       (error "Trait ~s is already attached to a game object." trait))
     (let* ((by-id (game-object-traits-by-id game-object))
            (by-type (game-object-traits-by-type game-object))
-           (type (get-trait-type trait))
-           (jobs (context-jobs (trait-context trait))))
+           (type (get-trait-type trait)))
       (when (u:href by-type type)
         (error "A game object can only have 1 trait of a given type attached to it."))
+      (register-trait trait)
       (setf (trait-owner trait) game-object
             (u:href by-id trait) trait
             (u:href by-type type) trait)
-      (push (list game-object trait #'trait-priority) (jobs-enable-traits jobs))
       (call-trait-hook trait :attach)
       nil)))
 
@@ -175,13 +186,12 @@
        :trait-detach-hook :trait-physics-hook :trait-update-hook)
     (unless (eq game-object (trait-owner trait))
       (error "Trait ~s is not attached to game object ~s." trait game-object))
-    (let ((jobs (context-jobs (trait-context trait))))
-      (call-trait-hook trait :detach)
-      (push (cons game-object trait) (jobs-disable-traits jobs))
-      (setf (trait-owner trait) nil)
-      (remhash trait (game-object-traits-by-id game-object))
-      (remhash (get-trait-type trait) (game-object-traits-by-type game-object))
-      nil)))
+    (call-trait-hook trait :detach)
+    (unregister-trait trait)
+    (setf (trait-owner trait) nil)
+    (remhash trait (game-object-traits-by-id game-object))
+    (remhash (get-trait-type trait) (game-object-traits-by-type game-object))
+    nil))
 
 (u:fn-> detach-trait-type (game-object symbol) null)
 (defun detach-trait-type (game-object type)
@@ -192,7 +202,7 @@
 (u:fn-> detach-all-traits (game-object) null)
 (defun detach-all-traits (game-object)
   (declare (optimize speed))
-  (dolist (trait (game-object-trait-order game-object))
+  (u:do-hash-keys (trait (game-object-traits-by-id game-object))
     (detach-trait game-object trait)))
 
 (u:fn-> destroy-trait (trait) null)
@@ -208,6 +218,6 @@
 (u:fn-> destroy-all-traits (game-object) null)
 (defun destroy-all-traits (game-object)
   (declare (optimize speed))
-  (dolist (trait (game-object-trait-order game-object))
+  (u:do-hash-keys (trait (game-object-traits-by-id game-object))
     (destroy-trait trait))
   nil)

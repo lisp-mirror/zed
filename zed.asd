@@ -7,6 +7,7 @@
   :depends-on (#:babel
                #:cffi
                #:cl-cpus
+               #:cl-digraph
                #:cl-opengl
                #:closer-mop
                #:defpackage-plus
@@ -90,9 +91,10 @@
    (:file "geometry")
    (:file "transform-state")
    (:file "game-object")
-   (:file "jobs")
    (:file "context")
+   (:file "trait-order")
    (:file "trait")
+   (:file "trait-manager")
    (:file "collision-plan")
    (:file "collision-system")
    (:file "collision-volume")

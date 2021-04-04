@@ -87,8 +87,7 @@
                    `((gl:point-size ,point-size)))
                (u:do-hash-values (,x (material-uniforms ,material))
                  (resolve-uniform-function ,context ,game-object ,x))
-               (dolist (,x (game-object-trait-order ,game-object))
-                 (call-trait-hook ,x :render))
+               (invoke-trait-hook ,context :render :game-object ,game-object)
                (setf (material-texture-unit-state ,material) 0)
                ,@(when disable
                    `((gl:enable ,@disable)))

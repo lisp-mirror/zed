@@ -1,0 +1,20 @@
+(in-package #:zed)
+
+(glob:define-global-var =trait-order= (u:dict #'eq))
+
+(defun sort-trait-types ()
+  (let ((graph (digraph:make-digraph)))
+    (u:do-hash (type order =trait-order=)
+      (digraph:insert-vertex graph type)
+      (destructuring-bind (&key before after) order
+        (dolist (x before)
+          (unless (digraph:contains-vertex-p graph x)
+            (digraph:insert-vertex graph x))
+          (digraph:insert-edge graph x type))
+        (dolist (x after)
+          (unless (digraph:contains-vertex-p graph x)
+            (digraph:insert-vertex graph x))
+          (digraph:insert-edge graph type x))))
+    (handler-case (digraph:topological-sort graph)
+      (digraph:topological-sort-cycle (c)
+        (error "Cycle detected for order of trait ~s." (digraph:vertex-involved c))))))
