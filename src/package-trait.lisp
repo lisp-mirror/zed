@@ -58,5 +58,7 @@
    (#:z #:zed)
    (#:zsl #:zed.shader-library))
   (:use #:cl)
+  (:shadow
+   #:continue)
   (:export
    #:collider))

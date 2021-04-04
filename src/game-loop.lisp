@@ -22,7 +22,8 @@
           (dolist (trait (game-object-trait-order game-object))
             (call-trait-hook trait :physics)))
         (walk-game-object-tree (game-object scene-tree)
-          (transform-game-object game-object delta-time))))))
+          (transform-game-object game-object delta-time))
+        (compute-collisions context)))))
 
 (u:fn-> run-update-phase (context) null)
 (defun run-update-phase (context)

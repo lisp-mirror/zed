@@ -15,6 +15,7 @@
    (#:const #:zed.math.constants)
    (#:m3 #:zed.math.matrix3)
    (#:m4 #:zed.math.matrix4)
+   (#:p3 #:zed.math.point3d)
    (#:q #:zed.math.quaternion)
    (#:util.bin #:%zed.utility.binary-parser)
    (#:util.oc #:%zed.utility.ordered-class)
