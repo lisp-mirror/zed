@@ -15,4 +15,5 @@
    (:file "mesh-shader")
    (:file "mesh")
    (:file "geometry-shader")
-   (:file "geometry")))
+   (:file "geometry")
+   (:file "colliders")))

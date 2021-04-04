@@ -25,6 +25,7 @@
    (#:z.sprite #:zed.trait.sprite))
   (:use #:cl)
   (:export
+   #:colliders
    #:geometry
    #:mesh
    #:sprite))
