@@ -24,7 +24,7 @@
             (u:href (collision-system-active system) layer) (u:dict #'eq)))
     system))
 
-(u:fn-> collider-contact-p (collision-system trait trait) (or tr.collider:collider null))
+(u:fn-> collider-contact-p (collision-system trait trait) (or trait null))
 (defun collider-contact-p (system collider1 collider2)
   (declare (optimize speed))
   (let ((contacts (collision-system-contacts system)))

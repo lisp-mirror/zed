@@ -5,8 +5,7 @@
             (:include collision-volume
              (type :box)
              (mesh-name "box")
-             (update-func #'update-collision-volume-box)
-             (update-visualization-func #'update-collision-volume-box-visualization))
+             (update-func #'update-collision-volume-box))
             (:predicate nil)
             (:copier nil))
   (world-center (v3:zero) :type v3:vec)
@@ -99,14 +98,4 @@
                                                                   (m3:get-column! axis axes 1))
                                                           (v3:dot diagonal
                                                                   (m3:get-column! axis axes 2)))))
-  nil)
-
-(u:fn-> update-collision-volume-box-visualization (collision-volume-box game-object) null)
-(defun update-collision-volume-box-visualization (box owner)
-  (declare (optimize speed))
-  (translate owner (collision-volume-center box) :replace-p t)
-  (scale owner
-         (v3:- (collision-volume-box-max-extent box)
-               (collision-volume-box-min-extent box))
-         :replace-p t)
   nil)

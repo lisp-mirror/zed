@@ -54,7 +54,7 @@
    (#:tr.mesh #:zed.trait.mesh)
    (#:tr.ren #:zed.trait.render)
    (#:u #:golden-utils)
-   (#:v3 #:zed.math.vector3)
+   (#:v4 #:zed.math.vector4)
    (#:z #:zed)
    (#:zsl #:zed.shader-library))
   (:use #:cl)
@@ -62,11 +62,3 @@
    #:continue)
   (:export
    #:collider))
-
-(defpackage #:zed.trait.sphere
-  (:local-nicknames
-   (#:z #:zed)
-   (#:zsl #:zed.shader-library))
-  (:use #:cl)
-  (:export
-   #:sphere))

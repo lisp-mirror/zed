@@ -17,6 +17,7 @@
                #:jsown
                #:lparallel
                #:pngload
+               #:printv
                #:sdl2
                #:sdl2-mixer
                #:shadow
@@ -51,7 +52,6 @@
    (:file "shader-library-color")
    (:file "shader-library-sprite")
    (:file "shader-library-collider")
-   (:file "shader-library-collider-new")
    (:file "binary-parser")
    (:file "ordered-class")
    (:file "red-black-tree")
@@ -124,6 +124,5 @@
    (:file "trait-mesh")
    (:file "trait-sprite")
    (:file "trait-collider")
-   (:file "trait-sphere")
    (:file "game-loop")
    (:file "core")))

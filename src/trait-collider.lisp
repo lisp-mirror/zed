@@ -41,8 +41,8 @@
 
 (z::define-material collider ()
   (:shader zsl::collider
-   :uniforms (:hit-color (zed.math.vector4:vec 0.0 1.0 0.0 0.35)
-              :miss-color (zed.math.vector4:vec 1.0 0.0 0.0 0.35))
+   :uniforms (:hit-color (v4:vec 0.0 1.0 0.0 0.35)
+              :miss-color (v4:vec 1.0 0.0 0.0 0.35))
    :features (:enable (:line-smooth)
               :disable (:cull-face)
               :polygon-mode :line
@@ -95,57 +95,32 @@
   #++(z::on-collision-continue)
   nil)
 
-(u:fn-> make-box (z:trait) z::collision-volume-box)
-(declaim (inline make-box))
-(defun make-box (collider)
-  (declare (optimize speed))
-  (let ((box (z::make-collision-volume-box :collider collider)))
-    (u:when-let ((mesh (z:find-trait (z::trait-owner collider) 'tr.mesh:mesh)))
-      (u:mvlet ((min max (tr.mesh::get-extents mesh)))
-        (setf (z::collision-volume-center box) (v3:scale (v3:+ min max) 0.5)
-              (z::collision-volume-box-min-extent box) min
-              (z::collision-volume-box-max-extent box) max)))
-    box))
-
-(u:fn-> make-sphere (z:trait) z::collision-volume-sphere)
-(declaim (inline make-sphere))
-(defun make-sphere (collider)
-  (declare (optimize speed))
-  (let ((sphere (z::make-collision-volume-sphere :collider collider)))
-    (u:when-let ((mesh (z:find-trait (z::trait-owner collider) 'tr.mesh:mesh)))
-      (u:mvlet* ((min max (tr.mesh::get-extents mesh))
-                 (center (v3:scale (v3:+ min max) 0.5)))
-        (setf (z::collision-volume-center sphere) center
-              (z::collision-volume-sphere-radius sphere) (v3:length (v3:- max center)))))
-    sphere))
-
 (u:fn-> make-volume (z::collision-volume-type z:trait) z::collision-volume)
 (defun make-volume (type collider)
   (declare (optimize speed))
   (ecase type
-    (:box (make-box collider))
-    (:sphere (make-sphere collider))))
+    (:box (z::make-collision-volume-box :collider collider))
+    (:sphere (z::make-collision-volume-sphere :collider collider))))
 
 ;;; Hooks
 
 (u:fn-> setup (collider) null)
 (defun setup (collider)
   (declare (optimize speed))
-  (unless (layer collider)
-    (error "Collider ~s must have a layer specified." collider))
+  (let ((volume-type (volume-type collider)))
+    (unless volume-type
+      (error "Collider trait must have a volume type specified."))
+    (unless (layer collider)
+      (error "Collider ~s must have a layer specified." collider))
+    (setf (volume collider) (make-volume volume-type collider)))
   nil)
 
 (u:fn-> attach (collider) null)
 (defun attach (collider)
   (declare (optimize speed))
-  (let ((layer (layer collider))
-        (volume-type (volume-type collider)))
-    (unless volume-type
-      (error "Collider trait must have a volume type specified."))
-    (setf (volume collider) (make-volume volume-type collider))
-    (when (visible-p collider)
-      (enable-visibility collider))
-    (z::register-collider collider layer))
+  (when (visible-p collider)
+    (enable-visibility collider))
+  (z::register-collider collider (layer collider))
   nil)
 
 (u:fn-> detach (collider) null)
@@ -157,11 +132,8 @@
 (u:fn-> physics (collider) null)
 (defun physics (collider)
   (declare (optimize speed))
-  (let ((owner (z::trait-owner collider))
-        (volume (volume collider)))
-    (funcall (z::collision-volume-update-func volume) volume collider)
-    (when (visible-p collider)
-      (funcall (z::collision-volume-update-visualization-func volume) volume owner)))
+  (let ((volume (volume collider)))
+    (funcall (z::collision-volume-update-func volume) volume collider))
   nil)
 
 (u:fn-> render (collider) null)
