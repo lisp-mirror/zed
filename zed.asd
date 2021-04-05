@@ -51,6 +51,7 @@
    (:file "util-ordered-class")
    (:file "util-red-black-tree")
    (:file "util-slice-stream")
+   (:file "util-octree")
    (:file "shader-library-swizzle")
    (:file "shader-library-common")
    (:file "shader-library-color")
