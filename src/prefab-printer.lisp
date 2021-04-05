@@ -11,7 +11,13 @@
   (let ((padding (make-string (* level 2) :initial-element #\space)))
     (format t "~aGame object: ~s~%" padding (nth level path))))
 
-(defun prefab-printer/print-components (node level)
+(defun prefab-printer/print-options (node level)
+  (let ((padding (make-string (+ (* level 2) 2) :initial-element #\space)))
+    (format t "~aOptions:~%" padding)
+    (u:do-hash (k v (prefab-node-options node))
+      (format t "~a  ~s: ~s~%" padding k v))))
+
+(defun prefab-printer/print-traits (node level)
   (let ((padding (make-string (+ (* level 2) 2) :initial-element #\space)))
     (u:do-hash (k v (prefab-node-trait-args node))
       (format t "~aTrait: ~s~%" padding k)
@@ -24,7 +30,8 @@
                (let ((path (prefab-node-path node))
                      (children (prefab-printer/find-children prefab node)))
                  (prefab-printer/print-node path level)
-                 (prefab-printer/print-components node level)
+                 (prefab-printer/print-options node level)
+                 (prefab-printer/print-traits node level)
                  (format t "~%")
                  (when children
                    (map nil (lambda (x) (recurse x (1+ level))) children)))))
