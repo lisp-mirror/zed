@@ -296,9 +296,3 @@
                (color y) (color node))))
       (when (eq y-color :black)
         (delete-fixup tree x)))))
-
-(u:fn-> delete (tree t) (or node null))
-(defun delete (tree item)
-  (declare (optimize speed))
-  (u:when-let ((node (nth-value 1 (find tree item))))
-    (delete-node tree node)))

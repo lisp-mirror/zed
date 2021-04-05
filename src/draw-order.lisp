@@ -17,10 +17,12 @@
 (u:fn-> deregister-draw-order (context trait) null)
 (defun deregister-draw-order (context render-trait)
   (declare (optimize speed))
-  (let ((manager (context-draw-order context))
-        (game-object (trait-owner render-trait)))
-    (util.rb::delete (draw-order-manager-tree manager) render-trait)
-    (remhash game-object (draw-order-manager-table manager))
+  (let* ((manager (context-draw-order context))
+         (tree (draw-order-manager-tree manager))
+         (table (draw-order-manager-table manager))
+         (game-object (trait-owner render-trait)))
+    (util.rb::delete-node tree (u:href table game-object))
+    (remhash game-object table)
     nil))
 
 ;; Sort the draw call for the given game object by removing its associated node from the draw order
