@@ -24,6 +24,7 @@
   (let* ((sphere-game-object (trait-owner (collision-volume-collider sphere)))
          (sphere-center (transform-point sphere-game-object (collision-volume-center sphere)))
          (point (v3:- (get-closest-point/box-point box sphere-center) sphere-center)))
+    (declare (dynamic-extent point))
     (<= (v3:dot point point)
         (v3:length-squared (transform-vector sphere-game-object v3:+right+)))))
 

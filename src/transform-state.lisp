@@ -22,7 +22,6 @@
   (scale/interpolated (v3:zero) :type v3:vec)
   (local-matrix (m4:id) :type m4:mat)
   (world-matrix (m4:id) :type m4:mat)
-  (scaling-matrix (m4:id) :type m4:mat)
   (normal-matrix (m4:id) :type m4:mat))
 
 (u:define-printer (transform-state stream :type nil)

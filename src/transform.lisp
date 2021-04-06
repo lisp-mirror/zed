@@ -18,7 +18,8 @@
         (rotation (transform-state-rotation/interpolated state))
         (scale (transform-state-scale/interpolated state))
         (local-matrix (transform-state-local-matrix state))
-        (scaling-matrix (transform-state-scaling-matrix state)))
+        (scaling-matrix (m4:id)))
+    (declare (dynamic-extent scaling-matrix))
     (v3:lerp! translation
               (transform-state-translation/previous state)
               (transform-state-translation/current state)
@@ -103,7 +104,7 @@
 (defun translate/velocity (game-object axis rate)
   (declare (optimize speed))
   (let ((state (game-object-transform game-object)))
-    (setf (transform-state-translation/incremental state) (v3:velocity axis rate))
+    (v3:velocity! (transform-state-translation/incremental state) axis rate)
     nil))
 
 (u:fn-> rotate (game-object q:quat &key (:replace-p boolean) (:instant-p boolean)) null)
@@ -120,7 +121,7 @@
 (defun rotate/velocity (game-object axis rate)
   (declare (optimize speed))
   (let ((state (game-object-transform game-object)))
-    (setf (transform-state-rotation/incremental state) (v3:velocity axis rate))
+    (v3:velocity! (transform-state-rotation/incremental state) axis rate)
     nil))
 
 (u:fn-> scale (game-object v3:vec &key (:replace-p boolean) (:instant-p boolean)) null)
@@ -137,7 +138,7 @@
 (defun scale/velocity (game-object axis rate)
   (declare (optimize speed))
   (let ((state (game-object-transform game-object)))
-    (setf (transform-state-scale/incremental state) (v3:velocity axis rate))
+    (v3:velocity! (transform-state-scale/incremental state) axis rate)
     nil))
 
 (u:fn-> transform-point (game-object v3:vec &key (:space transform-space)) v3:vec)
