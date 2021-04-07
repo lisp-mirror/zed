@@ -141,8 +141,9 @@
     (v3:velocity! (transform-state-scale/incremental state) axis rate)
     nil))
 
-(u:fn-> transform-point (game-object v3:vec &key (:space transform-space)) v3:vec)
-(defun transform-point (game-object point &key (space :local))
+(u:fn-> transform-point! (game-object v3:vec v3:vec &key (:space transform-space)) v3:vec)
+(declaim (inline transform-point!))
+(defun transform-point! (game-object point out &key (space :local))
   (declare (optimize speed))
   (v4:with-components ((v point))
     (let ((model (m4:copy (transform-state-world-matrix (game-object-transform game-object))))
@@ -152,10 +153,20 @@
         (m4:invert! model model))
       (m4:*v4! temp model temp)
       (v4:with-components ((v temp))
-        (v3:vec vx vy vz)))))
+        (v3:with-components ((o out))
+          (setf ox vx
+                oy vy
+                oz vz)
+          out)))))
 
-(u:fn-> transform-vector (game-object v3:vec &key (:space transform-space)) v3:vec)
-(defun transform-vector (game-object vector &key (space :local))
+(u:fn-> transform-point (game-object v3:vec &key (:space transform-space)) v3:vec)
+(defun transform-point (game-object point &key (space :local))
+  (declare (optimize speed))
+  (transform-point! game-object point (v3:zero) :space space))
+
+(u:fn-> transform-vector! (game-object v3:vec v3:vec &key (:space transform-space)) v3:vec)
+(declaim (inline transform-vector!))
+(defun transform-vector! (game-object vector out &key (space :local))
   (declare (optimize speed))
   (v4:with-components ((v vector))
     (let ((model (m4:copy (transform-state-world-matrix (game-object-transform game-object))))
@@ -166,10 +177,20 @@
         (m4:invert! model model))
       (m4:*v4! temp model temp)
       (v4:with-components ((v temp))
-        (v3:vec vx vy vz)))))
+        (v3:with-components ((o out))
+          (setf ox vx
+                oy vy
+                oz vz)
+          out)))))
 
-(u:fn-> transform-direction (game-object v3:vec &key (:space transform-space)) v3:vec)
-(defun transform-direction (game-object direction &key (space :local))
+(u:fn-> transform-vector (game-object v3:vec &key (:space transform-space)) v3:vec)
+(defun transform-vector (game-object vector &key (space :local))
+  (declare (optimize speed))
+  (transform-vector! game-object vector (v3:zero) :space space))
+
+(u:fn-> transform-direction! (game-object v3:vec v3:vec &key (:space transform-space)) v3:vec)
+(declaim (inline transform-direction!))
+(defun transform-direction! (game-object direction out &key (space :local))
   (declare (optimize speed))
   (v4:with-components ((v direction))
     (let ((model (m4:copy (transform-state-world-matrix (game-object-transform game-object))))
@@ -181,4 +202,13 @@
         (m4:invert! model model))
       (m4:*v4! temp model temp)
       (v4:with-components ((v temp))
-        (v3:vec vx vy vz)))))
+        (v3:with-components ((o out))
+          (setf ox vx
+                oy vy
+                oz vz)
+          out)))))
+
+(u:fn-> transform-direction (game-object v3:vec &key (:space transform-space)) v3:vec)
+(defun transform-direction (game-object direction &key (space :local))
+  (declare (optimize speed))
+  (transform-direction! game-object direction (v3:zero) :space space))
