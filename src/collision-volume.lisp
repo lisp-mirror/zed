@@ -10,6 +10,7 @@
   (collider nil :type trait)
   (mesh-name "" :type string)
   (center (v3:zero) :type v3:vec)
+  (world-center (v3:zero) :type v3:vec)
   (update-func (constantly nil) :type function))
 
 (u:define-printer (collision-volume stream :type nil)
