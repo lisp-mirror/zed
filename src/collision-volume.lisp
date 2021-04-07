@@ -16,4 +16,7 @@
   (update-func (constantly nil) :type function))
 
 (u:define-printer (collision-volume stream :type nil)
-  (format stream "COLLISION-VOLUME: ~s" (collision-volume-type collision-volume)))
+  (let ((path (game-object-path (trait-owner (collision-volume-collider collision-volume)))))
+    (format stream "COLLISION-VOLUME: ~s (~a)"
+            (collision-volume-type collision-volume)
+            path)))
