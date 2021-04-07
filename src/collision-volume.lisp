@@ -11,6 +11,8 @@
   (mesh-name "" :type string)
   (center (v3:zero) :type v3:vec)
   (world-center (v3:zero) :type v3:vec)
+  (broad-phase-min (v3:zero) :type v3:vec)
+  (broad-phase-max (v3:zero) :type v3:vec)
   (update-func (constantly nil) :type function))
 
 (u:define-printer (collision-volume stream :type nil)
