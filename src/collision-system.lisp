@@ -42,8 +42,9 @@
 (defun collider-contact-p (system collider1 collider2)
   (declare (optimize speed))
   (let ((contacts (collision-system-contacts system)))
-    (when (u:href contacts collider1)
-      (u:href contacts collider1 collider2))))
+    (u:when-let ((contact (u:href contacts collider1)))
+      (u:href contact collider2))))
+
 
 (u:fn-> collider-contact-enter (collision-system trait trait) null)
 (defun collider-contact-enter (system collider1 collider2)
