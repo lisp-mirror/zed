@@ -2,8 +2,9 @@
 
 (glob:define-global-var =system-name= nil)
 
-(deftype fix-float () `(u:f32 ,(- (expt 2f0 60)) ,(expt 2f0 60)))
-(deftype fix-point () '(simple-array fix-float (3)))
+(deftype fix-sf60 () `(u:f32 ,(- (expt 2f0 60)) ,(expt 2f0 60)))
+(deftype fix-df60 () `(u:f64 ,(- (expt 2d0 60)) ,(expt 2d0 60)))
+(deftype fix-point () '(simple-array fix-sf60 (3)))
 
 (defmacro debug-check (&body body)
   (unless (member :zed.release *features*)
