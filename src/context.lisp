@@ -7,16 +7,18 @@
          (progn
            ;; Enable logging.
            (start-logging config)
-           (let* ((window (make-window (config-window-width config)
+           (let* ((vsync-p (config-vsync-p config))
+                  (window (make-window (config-window-width config)
                                        (config-window-height config)
                                        :title (config-window-title config)
-                                       :anti-alias-p (config-anti-alias-p config)))
+                                       :anti-alias-p (config-anti-alias-p config)
+                                       :vsync-p vsync-p))
                   (refresh-rate (get-monitor-refresh-rate (window-monitor window)))
                   (collision-plan (or (config-collision-plan config) :default))
                   (draw-order (make-draw-order-manager #'tr.ren::draw-order-tree-sort)))
              ;; Construct the context with references to the previously constructed state.
              (prog1 (%make-context :running-p t
-                                   :clock (make-clock config refresh-rate)
+                                   :clock (make-clock config refresh-rate vsync-p)
                                    :window window
                                    :input-manager (make-input-manager)
                                    :trait-manager (make-trait-manager :order (sort-trait-types))

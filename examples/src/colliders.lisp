@@ -6,7 +6,7 @@
 (defun attach (foo)
   (let ((ctx (z::trait-context foo))
         (owner (z::trait-owner foo)))
-    (dotimes (i 100)
+    (dotimes (i 1)
       (let ((gob (z::make-game-object))
             (col (z::make-trait ctx
                                 'z.collider:collider
@@ -33,7 +33,8 @@
   (z:start-game :window-width 1280
                 :window-height 720
                 :profile-p t
-                :frame-count 3000
+                :vsync-p nil
+                :frame-count 30000
                 :collision-plan 'colliders
                 :log-repl-level :error
                 :delta-time 1/10

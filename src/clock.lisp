@@ -4,6 +4,7 @@
             (:constructor %make-clock)
             (:predicate nil)
             (:copier nil))
+  (vsync-p nil :type boolean)
   (accumulator 0d0 :type u:f64)
   (delta-buffer 0d0 :type u:f64)
   (fps/current 0d0 :type u:f64)
@@ -27,9 +28,11 @@
           (clock-running-time clock)
           (clock-fps/current clock)))
 
-(defun make-clock (config refresh-rate)
+(defun make-clock (config refresh-rate vsync-p)
   (let ((delta-time (float (or (config-delta-time config) (/ refresh-rate)) 1f0)))
-    (prog1 (%make-clock :init-time (get-internal-real-time) :delta-time delta-time)
+    (prog1 (%make-clock :init-time (get-internal-real-time)
+                        :delta-time delta-time
+                        :vsync-p vsync-p)
       (v:debug :zed "Initialized game clock: delta: ~,3f ms/frame" (* delta-time 1000f0)))))
 
 (declaim (inline get-clock-time))
@@ -62,7 +65,7 @@
 (defun calculate-frame-rate (clock)
   (declare (optimize speed))
   (let* ((time (clock-frame-time clock))
-         (fps (/ 1d0 time))
+         (fps (if (zerop time) 0d0 (/ 1d0 time)))
          (alpha10 (- 1 (exp (* time #.(/ -10d0)))))
          (alpha30 (- 1 (exp (* time #.(/ -30d0)))))
          (alpha60 (- 1 (exp (* time #.(/ -60d0)))))
@@ -114,7 +117,8 @@
         (setf (clock-frame-time clock) (float (clock-delta-time clock) 1d0))
         (setf (clock-frame-time clock) (- current previous)))
     ;; Smooth delta time
-    (smooth-delta-time clock refresh-rate)
+    (when (clock-vsync-p clock)
+      (smooth-delta-time clock refresh-rate))
     ;; Advance N physics steps according to how much time is in the accumulator.
     (advance-clock-physics clock update-func)
     ;; Run the periodic updates if it is time to do so, but only during debug mode.

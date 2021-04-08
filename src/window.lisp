@@ -58,7 +58,7 @@
     (sdl2:quit*))
   nil)
 
-(defun make-window (width height &key (title "") (anti-alias-p t))
+(defun make-window (width height &key (title "") (anti-alias-p t) (vsync-p t))
   ;; First, we have to initialize SDL2's video subsystem.
   (sdl2:init* '(:video))
   ;; Before we create the window we have to prepare the OpenGL context so SDL2 knows how to prepare
@@ -68,7 +68,7 @@
   (let* ((window-handle (sdl2:create-window :w width :h height :title title :flags '(:opengl)))
          (window (%make-window :handle window-handle
                                :monitor (make-monitor window-handle)
-                               :gl-context (make-opengl-context window-handle)
+                               :gl-context (make-opengl-context window-handle vsync-p)
                                :width width
                                :height height
                                :title title)))

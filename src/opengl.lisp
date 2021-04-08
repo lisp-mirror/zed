@@ -32,14 +32,14 @@
 
 ;; Create the OpenGL context. This must be called after the SDL2 window is created to finish up
 ;; configuring the OpenGL context.
-(defun make-opengl-context (window-handle)
+(defun make-opengl-context (window-handle vsync-p)
   (let ((context (sdl2:gl-create-context window-handle)))
     (apply #'gl:enable +enabled-capabilities+)
     (apply #'gl:disable +disabled-capabilities+)
     (apply #'gl:blend-func +blend-mode+)
     (gl:depth-func +depth-mode+)
     (gl:pixel-store :unpack-alignment 1)
-    (sdl2:gl-set-swap-interval 1)
+    (sdl2:gl-set-swap-interval (if vsync-p 1 0))
     (v:debug :zed "Created OpenGL context")
     context))
 

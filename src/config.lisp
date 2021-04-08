@@ -9,6 +9,7 @@
   (window-width 1280 :type u:ub16)
   (window-height 720 :type u:ub16)
   (window-title "Zed Engine" :type string)
+  (vsync-p t :type boolean)
   (anti-alias-p t :type boolean)
   (delta-time nil :type (or real null))
   (log-repl-level :debug :type keyword)
