@@ -54,6 +54,7 @@
    (#:tr.mesh #:zed.trait.mesh)
    (#:tr.ren #:zed.trait.render)
    (#:u #:golden-utils)
+   (#:v3 #:zed.math.vector3)
    (#:v4 #:zed.math.vector4)
    (#:z #:zed)
    (#:zsl #:zed.shader-library))

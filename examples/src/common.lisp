@@ -31,8 +31,9 @@
 (z:define-prefab camera/orthographic (:template 'camera
                                       :translate (v3:vec 0.0 0.0 1.0))
   (z.camera:camera :mode :orthographic
-                   :clip-near 0.0
-                   :clip-far 16.0))
+                   :zoom 10.0
+                   :clip-near -1000.0
+                   :clip-far 1000.0))
 
 (z:define-prefab camera/isometric (:template 'camera
                                    :translate (v3:vec 0.0 0.0 1.0))

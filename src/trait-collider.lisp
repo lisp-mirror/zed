@@ -25,6 +25,10 @@
                 :type boolean
                 :initarg :pickable-p
                 :initform t)
+   (%grid-cell-size :accessor grid-cell-size
+                    :inline t
+                    :type u:ub32
+                    :initform 8)
    (%contact-count :accessor contact-count
                    :inline t
                    :type fixnum
@@ -102,6 +106,22 @@
     (:box (z::make-collision-volume-box :collider collider))
     (:sphere (z::make-collision-volume-sphere :collider collider))))
 
+(defun ensure-grid (collider)
+  (let* ((context (z:trait-context collider))
+         (system (z::context-collision-system context))
+         (grids (z::collision-system-grids system))
+         (cell-sizes (z::collision-system-cell-sizes system))
+         (volume (volume collider)))
+    (v3:with-components ((min- (z::collision-volume-broad-phase-min volume))
+                         (max- (z::collision-volume-broad-phase-max volume)))
+      (let* ((volume-size (max (- max-x min-x) (- max-y min-y) (- max-z min-z)))
+             (cell-size (ash 1 (max 3 (integer-length (ceiling volume-size))))))
+        (unless (u:href grids cell-size)
+          (setf (u:href grids cell-size) (z::make-hash-grid :cell-size cell-size)
+                (z::collision-system-cell-sizes system)
+                (sort (copy-list (list* cell-size cell-sizes)) #'<)))
+        (setf (grid-cell-size collider) cell-size)))))
+
 ;;; Hooks
 
 (u:fn-> setup (collider) null)
@@ -118,22 +138,28 @@
 (u:fn-> attach (collider) null)
 (defun attach (collider)
   (declare (optimize speed))
-  (when (visible-p collider)
-    (enable-visibility collider))
-  (z::register-collider collider (layer collider))
-  nil)
+  (let ((volume (volume collider)))
+    (when (visible-p collider)
+      (enable-visibility collider))
+    (funcall (z::collision-volume-update-func volume) volume collider)
+    (ensure-grid collider)
+    nil))
 
 (u:fn-> detach (collider) null)
 (defun detach (collider)
-  (declare (optimize speed))
-  (z::deregister-collider collider (layer collider))
+  (declare (optimize speed)
+           (ignore collider))
   nil)
 
 (u:fn-> physics (collider) null)
 (defun physics (collider)
   (declare (optimize speed))
-  (let ((volume (volume collider)))
-    (funcall (z::collision-volume-update-func volume) volume collider))
+  (let ((volume (volume collider))
+        (system (z::context-collision-system (z:trait-context collider))))
+    (funcall (z::collision-volume-update-func volume) volume collider)
+    (z::hash-grid-insert (u:href (z::collision-system-grids system)
+                                 (grid-cell-size collider))
+                         volume))
   nil)
 
 (u:fn-> render (collider) null)

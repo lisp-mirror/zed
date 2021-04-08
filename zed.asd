@@ -1,3 +1,6 @@
+(push :cl-opengl-no-masked-traps *features*)
+(push :cl-opengl-no-check-error *features*)
+
 (asdf:defsystem #:zed
   :description "Experimental game engine"
   :author ("Michael Fiano <mail@mfiano.net>")
@@ -101,6 +104,7 @@
    (:file "collision-volume")
    (:file "collision-volume-box")
    (:file "collision-volume-sphere")
+   (:file "collision-hash-grid")
    (:file "collision-tests")
    (:file "collision-system")
    (:file "draw-order")
