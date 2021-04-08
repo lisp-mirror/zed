@@ -27,7 +27,6 @@
                                    :collision-system (make-collision-system collision-plan))
                ;; Setup live coding support. This instructs SLIME or Sly's REPL to run inside our
                ;; game loop.
-               (setup-repl)
                ;; Load the pack file (if running in release mode).
                (read-pack)
                ;; Start the audio system.

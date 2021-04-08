@@ -101,10 +101,9 @@
     (setf (clock-alpha clock) (float (/ (clock-accumulator clock) delta-time) 1f0))
     nil))
 
-(u:fn-> tick-clock (clock u:ub8 function function) (values))
-(defun tick-clock (clock refresh-rate update-func periodic-func)
-  (declare (optimize speed)
-           (ignorable periodic-func))
+(u:fn-> tick-clock (clock u:ub8 function) (values))
+(defun tick-clock (clock refresh-rate func)
+  (declare (optimize speed))
   (let* ((pause (clock-pause-time clock))
          (previous (+ (clock-running-time clock) pause))
          (current (- (get-clock-time clock) pause)))
@@ -120,11 +119,11 @@
     (when (clock-vsync-p clock)
       (smooth-delta-time clock refresh-rate))
     ;; Advance N physics steps according to how much time is in the accumulator.
-    (advance-clock-physics clock update-func)
+    (advance-clock-physics clock func)
     ;; Run the periodic updates if it is time to do so, but only during debug mode.
     #-zed.release
     (when (>= (- current (clock-period-elapsed clock)) (clock-period-interval clock))
-      (funcall periodic-func)
+      (process-thread-pool-queue #'recompile)
       (setf (clock-period-elapsed clock) current))
     ;; Calculate the frame rate on every frame except the first.
     (when (plusp (clock-frame-count clock))

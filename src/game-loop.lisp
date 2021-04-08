@@ -1,14 +1,5 @@
 (in-package #:zed)
 
-;; Create a function that is called periodically to perform necessary book-keeping that does not
-;; need to run every frame.
-(u:fn-> make-periodic-phase-function (context) function)
-(defun make-periodic-phase-function (context)
-  (lambda ()
-    (declare (optimize speed))
-    (update-repl (context-clock context))
-    (process-thread-pool-queue #'recompile)))
-
 ;; Create a function that is called every clock tick to update the transform state of each game
 ;; object.
 (u:fn-> make-physics-phase-function (context) function)
@@ -46,8 +37,7 @@
          (input-manager (context-input-manager context))
          (viewport-manager (context-viewports context))
          (refresh-rate (get-monitor-refresh-rate (window-monitor window)))
-         (physics-phase-func (make-physics-phase-function context))
-         (periodic-phase-func (make-periodic-phase-function context)))
+         (physics-phase-func (make-physics-phase-function context)))
     ;; Emulate this function returning by sending the context value to the REPL. This only works on
     ;; Sly, and only if it is configured to allow sending code to the REPL. It is a no-op on other
     ;; environments. See: https://joaotavora.github.io/sly/#Controlling-SLY-from-outside-Emacs
@@ -64,7 +54,7 @@
         (with-continuable (clock)
           (handle-input-events input-manager window viewport-manager)
           ;; Perform one clock tick.
-          (tick-clock clock refresh-rate physics-phase-func periodic-phase-func)
+          (tick-clock clock refresh-rate physics-phase-func)
           ;; Perform update logic that needs to occur each frame.
           (run-update-phase context)
           ;; Draw all game objects with a render trait attached.

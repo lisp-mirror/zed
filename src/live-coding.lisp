@@ -21,26 +21,6 @@
 
 (flet ((generate-live-support-functions ()
          (let ((repl-package (find-if #'find-package '(:slynk :swank))))
-           (compile 'setup-repl
-                    (if (eq repl-package :slynk)
-                        `(lambda ()
-                           (,(find-symbol "SEND-PROMPT" :slynk-mrepl)))
-                        (constantly nil)))
-           (compile 'update-repl
-                    (case repl-package
-                      (:slynk
-                       `(lambda (clock)
-                          (let ((before-time (get-clock-time clock)))
-                            (,(find-symbol "PROCESS-REQUESTS" :slynk) t)
-                            (adjust-clock-pause-time clock before-time))))
-                      (:swank
-                       `(lambda (clock)
-                          (u:when-let ((repl (or ,(find-symbol "*EMACS-CONNECTION*" :swank)
-                                                 (,(find-symbol "DEFAULT-CONNECTION" :swank))))
-                                       (before-time (get-clock-time clock)))
-                            (,(find-symbol "HANDLE-REQUESTS" :swank) repl t)
-                            (adjust-clock-pause-time clock before-time))))
-                      (t (constantly nil))))
            (compile 'send-to-repl
                     (if (eq repl-package :slynk)
                         `(lambda (values &key (comment "Sent from Zed"))
