@@ -109,10 +109,8 @@
             (when (>= (length bucket) 2)
               (u:map-combinations
                (lambda (x)
-                 (let* ((volume1 (svref x 0))
-                        (volume2 (svref x 1))
-                        (collider1 (collision-volume-collider volume1))
-                        (collider2 (collision-volume-collider volume2)))
+                 (let ((collider1 (collision-volume-collider (svref x 0)))
+                       (collider2 (collision-volume-collider (svref x 1))))
                    (when (u:href layers (tr.col::layer collider1) (tr.col::layer collider2))
                      (compute-collider-contact system collider1 collider2))))
                bucket
