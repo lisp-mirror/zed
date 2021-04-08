@@ -75,6 +75,6 @@
           (count-clock-frame clock)
           ;; In debug mode only, quit the game after the user-supplied frame count (useful for
           ;; profiling).
-          #-release
+          #-zed.release
           (when (and frame-count (>= (clock-frame-count clock) frame-count))
             (shutdown-context context)))))))
