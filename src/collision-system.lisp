@@ -4,8 +4,7 @@
             (:constructor %make-collision-system)
             (:predicate nil)
             (:copier nil))
-  (plan nil :type collision-plan)
-  ;; hash grid objects, keyed by cell-size scalar
+  (layers (u:dict #'eq) :type hash-table)
   (cell-sizes nil :type list)
   (grids (u:dict #'eql) :type hash-table)
   (volume-buffer (make-array 8 :fill-pointer 0 :adjustable t) :type (vector collision-volume))
@@ -18,8 +17,8 @@
 (u:fn-> make-collision-system (symbol) collision-system)
 (defun make-collision-system (plan-name)
   (declare (optimize speed))
-  (let ((system (%make-collision-system :plan (find-collision-plan plan-name))))
-    system))
+  (let ((plan (find-collision-plan plan-name)))
+    (%make-collision-system :layers (collision-plan-table plan))))
 
 (u:fn-> collider-contact-p (collision-system trait trait) (or trait null))
 (defun collider-contact-p (system collider1 collider2)
@@ -27,7 +26,6 @@
   (let ((contacts (collision-system-contacts system)))
     (u:when-let ((contact (u:href contacts collider1)))
       (u:href contact collider2))))
-
 
 (u:fn-> collider-contact-enter (collision-system trait trait) null)
 (defun collider-contact-enter (system collider1 collider2)

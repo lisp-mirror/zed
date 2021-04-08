@@ -23,9 +23,11 @@
     (setf (collision-plan-layers data) (remove-duplicates (u:flatten mappings)))
     (clrhash table)
     (dolist (x mappings)
-      (destructuring-bind (k v) x
-        (when v
-          (setf (u:href table k) v))))))
+      (destructuring-bind (source targets) x
+        (dolist (target targets)
+          (unless (u:href table source)
+            (setf (u:href table source) (u:dict #'eq)))
+          (setf (u:href table source target) t))))))
 
 (defun make-collision-plan (name mappings)
   (let ((plan (%make-collision-plan :name name)))
