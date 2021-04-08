@@ -8,6 +8,7 @@
   :source-control (:git "https://git.mfiano.net/mfiano/zed.git")
   :encoding :utf-8
   :depends-on (#:babel
+               #:bordeaux-threads
                #:cffi
                #:cl-cpus
                #:cl-digraph

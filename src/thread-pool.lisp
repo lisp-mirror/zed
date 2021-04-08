@@ -21,7 +21,8 @@
 (defmacro with-thread-pool (() &body body)
   `(progn
      (setf =thread-pool= (make-thread-pool))
-     (let ((lp:*kernel* (lp:make-kernel (thread-pool-worker-count =thread-pool=) :name "Zed")))
+     (let ((lp:*kernel* (lp:make-kernel (thread-pool-worker-count =thread-pool=)
+                                        :name "Zed worker")))
        (unwind-protect (progn ,@body)
          (setf =thread-pool= nil)
          (lp:end-kernel :wait t)))))

@@ -3,14 +3,12 @@
 ;; The entry point of the engine. This constructs a context using the optional user-supplied
 ;; arguments, and then enters the main game loop.
 (defun start-game (&rest options)
-  (bt:make-thread
-   (lambda ()
-     (let ((config (apply #'make-config options)))
-       (v:info :zed "Started ~a" (config-window-title config))
-       (with-context context (config)
-         (start-game-loop context
-                          :profile-p (config-profile-p config)
-                          :frame-count (config-frame-count config))))))
+  (let ((config (apply #'make-config options)))
+    (v:info :zed "Started ~a" (config-window-title config))
+    (with-context context (config)
+      (start-game-loop context
+                       :profile-p (config-profile-p config)
+                       :frame-count (config-frame-count config))))
   (values))
 
 ;; Stop the game associated with the given context.

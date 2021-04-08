@@ -65,15 +65,18 @@
 (defmacro with-context (context (config) &body body)
   `(if =context=
        (warn "There is a context already running.")
-       (let* ((,context (make-context ,config)))
-         (setf =context= ,context)
-         (with-thread-pool ()
-           (unwind-protect
-                (progn
-                  (with-scope (:prelude)
-                    (v:debug :zed "Executing prelude...")
-                    (funcall (config-prelude ,config) ,context)
-                    (v:debug :zed "Finished executing prelude"))
-                  ,@body)
-             (setf =context= nil)
-             (destroy-context ,context))))))
+       (bt:make-thread
+        (lambda ()
+          (with-thread-pool ()
+            (let ((,context (make-context ,config)))
+              (setf =context= ,context)
+              (unwind-protect
+                   (progn
+                     (with-scope (:prelude)
+                       (v:debug :zed "Executing prelude...")
+                       (funcall (config-prelude ,config) ,context)
+                       (v:debug :zed "Finished executing prelude"))
+                     ,@body)
+                (setf =context= nil)
+                (destroy-context ,context)))))
+        :name "Zed")))

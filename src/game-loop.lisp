@@ -38,10 +38,6 @@
          (viewport-manager (context-viewports context))
          (refresh-rate (get-monitor-refresh-rate (window-monitor window)))
          (physics-phase-func (make-physics-phase-function context)))
-    ;; Emulate this function returning by sending the context value to the REPL. This only works on
-    ;; Sly, and only if it is configured to allow sending code to the REPL. It is a no-op on other
-    ;; environments. See: https://joaotavora.github.io/sly/#Controlling-SLY-from-outside-Emacs
-    (send-to-repl (list context) :comment "")
     ;; Request the Lisp implementation to perform a full garbage collection immediately before we
     ;; start the main game loop, to mitigate any large amounts of data from initialization or the
     ;; last run from being cleaned up at runtime causing frame drops.
