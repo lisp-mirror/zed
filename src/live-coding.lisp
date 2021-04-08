@@ -37,7 +37,7 @@
                        `(lambda (clock)
                           (u:when-let ((repl (or ,(find-symbol "*EMACS-CONNECTION*" :swank)
                                                  (,(find-symbol "DEFAULT-CONNECTION" :swank))))
-                                       (before-time (get-time)))
+                                       (before-time (get-clock-time clock)))
                             (,(find-symbol "HANDLE-REQUESTS" :swank) repl t)
                             (adjust-clock-pause-time clock before-time))))
                       (t (constantly nil))))
