@@ -100,7 +100,8 @@
 (defun compute-collisions (context)
   (declare (optimize speed))
   (let* ((system (context-collision-system context))
-         (grids (collision-system-grids system)))
+         (grids (collision-system-grids system))
+         (layers (collision-system-layers system)))
     (dolist (cell-size (collision-system-cell-sizes system))
       (let ((grid (u:href grids cell-size)))
         (u:do-hash-keys (hash (hash-grid-buckets grid))
@@ -108,9 +109,12 @@
             (when (>= (length bucket) 2)
               (u:map-combinations
                (lambda (x)
-                 (let ((a (collision-volume-collider (svref x 0)))
-                       (b (collision-volume-collider (svref x 1))))
-                   (compute-collider-contact system a b)))
+                 (let* ((volume1 (svref x 0))
+                        (volume2 (svref x 1))
+                        (collider1 (collision-volume-collider volume1))
+                        (collider2 (collision-volume-collider volume2)))
+                   (when (u:href layers (tr.col::layer collider1) (tr.col::layer collider2))
+                     (compute-collider-contact system collider1 collider2))))
                bucket
                :copy nil
                :length 2))))
