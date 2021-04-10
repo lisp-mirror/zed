@@ -1,18 +1,23 @@
 (in-package #:zed)
 
 (defstruct (hash-grid
-            (:constructor make-hash-grid
-                (&key cell-size (bucket-size 4096)
-                 &aux (buckets (make-array bucket-size :initial-element nil))))
+            (:constructor %make-hash-grid)
             (:predicate nil)
             (:copier nil))
   (cell-size 32 :type u:positive-fixnum)
-  (bucket-size 2048 :type u:ub32)
+  (bucket-size 1024 :type u:ub32)
   (buckets nil :type (simple-array t (*))))
 
 (u:define-constant +hash-grid-x+ #x8da6b343)
 (u:define-constant +hash-grid-y+ #xd8163841)
 (u:define-constant +hash-grid-z+ #xcb1ab31f)
+
+(u:fn-> make-hash-grid (&key (:cell-size u:positive-fixnum) (:bucket-size u:ub32)) hash-grid)
+(defun make-hash-grid (&key (cell-size 32) (bucket-size 1024))
+  (declare (optimize speed))
+  (%make-hash-grid :cell-size cell-size
+                   :bucket-size bucket-size
+                   :buckets (make-array bucket-size :initial-element nil)))
 
 (u:fn-> hash-grid-coordinates (hash-grid u:b32 u:b32 u:b32) u:array-index)
 (defun hash-grid-coordinates (grid x y z)
