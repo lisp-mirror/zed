@@ -6,6 +6,7 @@
             (:copier nil))
   (name nil :type symbol)
   (layers nil :type list)
+  (bucket-size 1024 :type u:positive-fixnum)
   (table (u:dict #'eq) :type hash-table))
 
 (u:define-printer (collision-plan stream :type nil)
@@ -17,10 +18,11 @@
   (or (u:href =collision-plans= name)
       (error "Collision plan ~s is not defined." name)))
 
-(defun update-collision-plan (name mappings)
+(defun update-collision-plan (name bucket-size mappings)
   (let* ((data (u:href =collision-plans= name))
          (table (collision-plan-table data)))
-    (setf (collision-plan-layers data) (remove-duplicates (u:flatten mappings)))
+    (setf (collision-plan-bucket-size data) bucket-size
+          (collision-plan-layers data) (remove-duplicates (u:flatten mappings)))
     (clrhash table)
     (dolist (x mappings)
       (destructuring-bind (source targets) x
@@ -29,15 +31,15 @@
             (setf (u:href table source) (u:dict #'eq)))
           (setf (u:href table source target) t))))))
 
-(defun make-collision-plan (name mappings)
+(defun make-collision-plan (name bucket-size mappings)
   (let ((plan (%make-collision-plan :name name)))
     (setf (u:href =collision-plans= name) plan)
-    (update-collision-plan name mappings)
+    (update-collision-plan name bucket-size mappings)
     plan))
 
-(defmacro define-collision-plan (name () &body body)
+(defmacro define-collision-plan (name (&key (bucket-size 1024)) &body body)
   `(if (u:href =collision-plans= ',name)
-       (update-collision-plan ',name ',body)
-       (make-collision-plan ',name ',body)))
+       (update-collision-plan ',name ,bucket-size ',body)
+       (make-collision-plan ',name ,bucket-size ',body)))
 
 (define-collision-plan :default ())
