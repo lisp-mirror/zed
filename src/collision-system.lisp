@@ -98,10 +98,12 @@
     (setf (fill-pointer buffer) 0)
     (u:do-hash (cell-size grid grids)
       (when (>= (the u:ub32 cell-size) start-size)
-        (dolist (volume (aref (hash-grid-buckets grid) hash))
-          (unless (u:href visited volume)
-            (vector-push-extend volume buffer)
-            (setf (u:href visited volume) t)))))
+        (map nil
+             (lambda (x)
+               (unless (u:href visited x)
+                 (vector-push-extend x buffer)
+                 (setf (u:href visited x) t)))
+             (aref (hash-grid-buckets grid) hash))))
     buffer))
 
 (u:fn-> compute-collisions (context) null)
@@ -129,4 +131,4 @@
                          bucket
                          :copy nil
                          :length 2))))
-        (fill buckets nil)))))
+        (map nil (lambda (x) (setf (fill-pointer x) 0)) buckets)))))

@@ -15,9 +15,12 @@
 (u:fn-> make-hash-grid (&key (:cell-size u:positive-fixnum) (:bucket-size u:ub32)) hash-grid)
 (defun make-hash-grid (&key (cell-size 32) (bucket-size 1024))
   (declare (optimize speed))
-  (%make-hash-grid :cell-size cell-size
-                   :bucket-size bucket-size
-                   :buckets (make-array bucket-size :initial-element nil)))
+  (let ((buckets (make-array bucket-size)))
+    (dotimes (i bucket-size)
+      (setf (aref buckets i) (make-array 8 :fill-pointer 0 :adjustable t)))
+    (%make-hash-grid :cell-size cell-size
+                     :bucket-size bucket-size
+                     :buckets buckets)))
 
 (u:fn-> hash-grid-coordinates (hash-grid u:b32 u:b32 u:b32) u:array-index)
 (declaim (inline hash-grid-coordinates))
@@ -48,4 +51,4 @@
           :do (loop :for y :from (aref min 1) :to (aref max 1)
                     :do (loop :for x :from (aref min 0) :to (aref max 0)
                               :for hash = (hash-grid-coordinates grid x y z)
-                              :do (push volume (aref buckets hash)))))))
+                              :do (vector-push-extend volume (aref buckets hash)))))))
