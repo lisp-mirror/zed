@@ -5,6 +5,7 @@
             (:predicate nil)
             (:copier nil))
   (layers (u:dict #'eq) :type hash-table)
+  (bucket-size 1024 :type u:positive-fixnum)
   (cell-sizes nil :type list)
   (grids (u:dict #'eql) :type hash-table)
   (volume-buffer (make-array 8 :fill-pointer 0 :adjustable t) :type (vector collision-volume))
@@ -18,7 +19,8 @@
 (defun make-collision-system (plan-name)
   (declare (optimize speed))
   (let ((plan (find-collision-plan plan-name)))
-    (%make-collision-system :layers (collision-plan-table plan))))
+    (%make-collision-system :bucket-size (collision-plan-bucket-size plan)
+                            :layers (collision-plan-table plan))))
 
 (u:fn-> collider-contact-p (collision-system trait trait) (or trait null))
 (defun collider-contact-p (system collider1 collider2)
