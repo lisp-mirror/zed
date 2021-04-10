@@ -53,7 +53,8 @@
   (let ((draw-order (z::context-draw-order context)))
     (gl:clear-color 0 0 0 1)
     (gl:clear :color-buffer :depth-buffer)
-    (z::map-draw-order draw-order #'render-game-object)))
+    (z::with-time-buffer (context :render-phase)
+      (z::map-draw-order draw-order #'render-game-object))))
 
 ;;; Hooks
 

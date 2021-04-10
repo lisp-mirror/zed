@@ -53,6 +53,8 @@
   (stop-audio)
   ;; Stop logging.
   (stop-logging)
+  ;; Purge debug time buffers
+  (clrhash =time-buffers=)
   ;; Force the Lisp implementation to perform a full garbage collection.
   (tg:gc :full t)
   (v:info :zed "Context destroyed"))

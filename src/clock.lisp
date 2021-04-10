@@ -40,7 +40,7 @@
   (period-elapsed 0 :type u:non-negative-fixnum)
   ;; The monitor refresh rate stored in time units. units-per-second / refresh-rate gives the number
   ;; of cycles per second.
-  (refresh-rate 0 :type (u:non-negative-fixnum))
+  (refresh-time-units 0 :type (u:non-negative-fixnum))
   ;; The current frame rate in frames per second.
   (fps/current 0.0 :type u:f32)
   ;; The overall average frame rate.
@@ -60,10 +60,10 @@
 (defun make-clock (config refresh-rate vsync-p)
   (let* ((units-per-second (sdl2:get-performance-frequency))
          (delta-time (round (* (or (config-delta-time config) (/ refresh-rate)) units-per-second)))
-         (refresh-rate (round units-per-second refresh-rate)))
+         (refresh-time-units (round units-per-second refresh-rate)))
     (prog1 (%make-clock :init-time (sdl2:get-performance-counter)
                         :units-per-second units-per-second
-                        :refresh-rate refresh-rate
+                        :refresh-time-units refresh-time-units
                         :delta-time delta-time
                         :vsync-p vsync-p)
       (v:debug :zed "Initialized game clock: delta: ~,3f ms/frame"
@@ -89,10 +89,10 @@
 ;; Perform delta-time smoothing, as per https://frankforce.com/frame-rate-delta-buffering/
 (u:fn-> smooth-delta-time (clock) null)
 (defun smooth-delta-time (clock)
-  (let* ((refresh-rate (clock-refresh-rate clock))
+  (let* ((refresh-time-units (clock-refresh-time-units clock))
          (frame-time (+ (clock-frame-time clock) (clock-smoothing-buffer clock)))
-         (cycles (max 1 (truncate (1+ (* frame-time (/ refresh-rate)))))))
-    (setf (clock-frame-time clock) (* cycles refresh-rate)
+         (cycles (max 1 (truncate (1+ (* frame-time (/ refresh-time-units)))))))
+    (setf (clock-frame-time clock) (* cycles refresh-time-units)
           (clock-smoothing-buffer clock) (- frame-time (clock-frame-time clock)))
     nil))
 

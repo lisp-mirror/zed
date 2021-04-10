@@ -74,6 +74,7 @@
    (:file "gltf")
    (:file "whitelist")
    (:file "clock")
+   (:file "time-buffer")
    (:file "live-coding")
    (:file "opengl")
    (:file "monitor")
