@@ -118,8 +118,7 @@
              (cell-size (ash 1 (max 3 (integer-length (ceiling volume-size))))))
         (unless (u:href grids cell-size)
           (setf (u:href grids cell-size) (z::make-hash-grid :cell-size cell-size)
-                (z::collision-system-cell-sizes system)
-                (sort (copy-list (list* cell-size cell-sizes)) #'<)))
+                (z::collision-system-cell-sizes system) (sort (list* cell-size cell-sizes) #'<)))
         (setf (grid-cell-size collider) cell-size)))))
 
 ;;; Hooks
