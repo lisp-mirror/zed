@@ -228,7 +228,7 @@
       (when (eq (game-object-pause-mode game-object) :inherit)
         (setf (game-object-pause-mode game-object) (game-object-pause-mode new-parent)))
       ;; Resolve the new world matrix for the moved game object.
-      (resolve-world-matrix game-object (clock-alpha clock))
+      (resolve-world-matrix game-object (clock-interpolation-factor clock))
       ;; Return the updated game object.
       game-object)))
 

@@ -14,7 +14,7 @@
                            (unwind-protect (invoke-debugger condition)
                              (v:debug :zed
                                       "Spent ~3$ seconds in the debugger"
-                                      (adjust-clock-pause-time ,clock ,entry-time))
+                                      (adjust-clock-debug-time ,clock ,entry-time))
                              nil))))))
          (restart-case (progn ,@body)
            (abort () :report "Zed: Skip processing current frame"))))))

@@ -4,8 +4,10 @@
 ;; object.
 (u:fn-> make-physics-phase-function (context) function)
 (defun make-physics-phase-function (context)
-  (let ((scene-tree (context-scene-tree context))
-        (delta-time (clock-delta-time (context-clock context))))
+  (declare (optimize speed))
+  (let* ((scene-tree (context-scene-tree context))
+         (clock (context-clock context))
+         (delta-time (/ (float (clock-delta-time clock) 1f0) (clock-units-per-second clock))))
     (lambda ()
       (declare (optimize speed))
       (with-scope (:physics-phase)
@@ -23,7 +25,7 @@
       (activate-traits context)
       (deactivate-traits context)
       (walk-game-object-tree (game-object scene-tree)
-        (resolve-world-matrix game-object (clock-alpha clock)))
+        (resolve-world-matrix game-object (clock-interpolation-factor clock)))
       (invoke-trait-hook context :update)
       nil)))
 
@@ -36,7 +38,6 @@
          (window (context-window context))
          (input-manager (context-input-manager context))
          (viewport-manager (context-viewports context))
-         (refresh-rate (get-monitor-refresh-rate (window-monitor window)))
          (physics-phase-func (make-physics-phase-function context)))
     ;; Request the Lisp implementation to perform a full garbage collection immediately before we
     ;; start the main game loop, to mitigate any large amounts of data from initialization or the
@@ -50,7 +51,7 @@
         (with-continuable (clock)
           (handle-input-events input-manager window viewport-manager)
           ;; Perform one clock tick.
-          (tick-clock clock refresh-rate physics-phase-func)
+          (tick-clock clock physics-phase-func)
           ;; Perform update logic that needs to occur each frame.
           (run-update-phase context)
           ;; Draw all game objects with a render trait attached.

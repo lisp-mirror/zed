@@ -78,7 +78,7 @@
   (unless (pause-p sprite)
     (let* ((duration (duration sprite))
            (clock (z::context-clock (z:trait-context sprite))))
-      (incf (elapsed sprite) (float (z::clock-frame-time clock) 1f0))
+      (incf (elapsed sprite) (z::get-frame-time clock))
       (if (>= (elapsed sprite) duration)
           (setf (elapsed sprite) 0.0
                 (pause-p sprite) (unless (repeat-p sprite) t))
