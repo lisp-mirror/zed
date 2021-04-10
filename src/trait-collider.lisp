@@ -128,8 +128,6 @@
 (defun setup (collider)
   (declare (optimize speed))
   (let ((volume-type (volume-type collider)))
-    (unless volume-type
-      (error "Collider trait must have a volume type specified."))
     (unless (layer collider)
       (error "Collider ~s must have a layer specified." collider))
     (setf (volume collider) (make-volume volume-type collider)))
