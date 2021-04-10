@@ -90,7 +90,7 @@
     (setf (fill-pointer buffer) 0)
     (u:do-hash (cell-size grid grids)
       (when (>= (the u:ub32 cell-size) start-size)
-        (dolist (volume (u:href (hash-grid-buckets grid) hash))
+        (dolist (volume (aref (hash-grid-buckets grid) hash))
           (unless (u:href visited volume)
             (vector-push-extend volume buffer)
             (setf (u:href visited volume) t)))))
@@ -103,17 +103,22 @@
          (grids (collision-system-grids system))
          (layers (collision-system-layers system)))
     (dolist (cell-size (collision-system-cell-sizes system))
-      (let ((grid (u:href grids cell-size)))
-        (u:do-hash-keys (hash (hash-grid-buckets grid))
-          (let ((bucket (merge-collision-grid-bucket system cell-size hash)))
-            (when (>= (length bucket) 2)
-              (u:map-combinations
-               (lambda (x)
-                 (let ((collider1 (collision-volume-collider (svref x 0)))
-                       (collider2 (collision-volume-collider (svref x 1))))
-                   (when (u:href layers (tr.col::layer collider1) (tr.col::layer collider2))
-                     (compute-collider-contact system collider1 collider2))))
-               bucket
-               :copy nil
-               :length 2))))
-        (clrhash (hash-grid-buckets grid))))))
+      (let* ((grid (u:href grids cell-size))
+             (buckets (hash-grid-buckets grid)))
+        (loop :for hash :of-type fixnum :from 0
+              :for local-bucket :across buckets
+              :when local-bucket
+                :do (let ((bucket (merge-collision-grid-bucket system cell-size hash)))
+                      (when (>= (length bucket) 2)
+                        (u:map-combinations
+                         (lambda (x)
+                           (let ((collider1 (collision-volume-collider (svref x 0)))
+                                 (collider2 (collision-volume-collider (svref x 1))))
+                             (when (u:href layers
+                                           (tr.col::layer collider1)
+                                           (tr.col::layer collider2))
+                               (compute-collider-contact system collider1 collider2))))
+                         bucket
+                         :copy nil
+                         :length 2))))
+        (fill buckets nil)))))
