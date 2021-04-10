@@ -22,6 +22,12 @@
     (%make-collision-system :bucket-size (collision-plan-bucket-size plan)
                             :layers (collision-plan-table plan))))
 
+(u:fn-> register-collider (collision-system u:positive-fixnum collision-volume) null)
+(defun register-collider (system cell-size volume)
+  (declare (optimize speed))
+  (hash-grid-insert (u:href (collision-system-grids system) cell-size) volume)
+  nil)
+
 (u:fn-> collider-contact-p (collision-system trait trait) (or trait null))
 (defun collider-contact-p (system collider1 collider2)
   (declare (optimize speed))

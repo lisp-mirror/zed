@@ -156,9 +156,7 @@
   (let ((volume (volume collider))
         (system (z::context-collision-system (z:trait-context collider))))
     (funcall (z::collision-volume-update-func volume) volume collider)
-    (z::hash-grid-insert (u:href (z::collision-system-grids system)
-                                 (grid-cell-size collider))
-                         volume))
+    (z::register-collider system (grid-cell-size collider) volume))
   nil)
 
 (u:fn-> render (collider) null)

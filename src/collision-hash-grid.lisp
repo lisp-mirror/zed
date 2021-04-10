@@ -6,7 +6,7 @@
                  &aux (buckets (make-array bucket-size :initial-element nil))))
             (:predicate nil)
             (:copier nil))
-  (cell-size 32 :type (and u:ub32 (integer 1)))
+  (cell-size 32 :type u:positive-fixnum)
   (bucket-size 2048 :type u:ub32)
   (buckets nil :type (simple-array t (*))))
 
