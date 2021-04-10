@@ -20,6 +20,7 @@
                    :buckets (make-array bucket-size :initial-element nil)))
 
 (u:fn-> hash-grid-coordinates (hash-grid u:b32 u:b32 u:b32) u:array-index)
+(declaim (inline hash-grid-coordinates))
 (defun hash-grid-coordinates (grid x y z)
   (declare (optimize speed))
   (mod (+ (logand (* +hash-grid-x+ x) #.(1- (expt 2 32)))
