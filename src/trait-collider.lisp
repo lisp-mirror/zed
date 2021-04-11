@@ -100,5 +100,6 @@
   (when (visible-p collider)
     (let* ((volume (volume collider))
            (render-trait (z:find-trait (z::trait-owner collider) 'tr.ren:render))
-           (material (tr.ren::material render-trait)))
-      (z::set-uniform material :contact (z::collision-volume-hit-p volume)))))
+           (material (tr.ren::material render-trait))
+           (hit-p (plusp (hash-table-count (z::collision-volume-contacts volume)))))
+      (z::set-uniform material :contact hit-p))))
