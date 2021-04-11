@@ -162,10 +162,9 @@
      (lambda (x)
        (let ((volume1 (svref x 0))
              (volume2 (svref x 1)))
-         (when (u:href layers
-                       (collision-volume-layer volume1)
-                       (collision-volume-layer volume2))
-           (compute-volume-contact volume1 volume2))))
+         (u:when-let ((layer (u:href layers (collision-volume-layer volume1))))
+           (when (u:href layer (collision-volume-layer volume2))
+             (compute-volume-contact volume1 volume2)))))
      bucket
      :length 2
      :copy nil))
