@@ -52,14 +52,16 @@
          (let* ((volume-size (max (- max-x min-x) (- max-y min-y) (- max-z min-z)))
                 (cell-size (ash 1 (max 3 (integer-length (ceiling volume-size))))))
            (register-collision-grid system cell-size)
-           cell-size)))
+           (setf (collision-volume-grid-cell-size volume) cell-size))))
       (t
-       (car (collision-system-cell-sizes system))))))
+       (let ((cell-size (car (collision-system-cell-sizes system))))
+         (setf (collision-volume-grid-cell-size volume) cell-size))))))
 
-(u:fn-> register-collider (collision-system u:positive-fixnum collision-volume) null)
-(defun register-collider (system cell-size volume)
+(u:fn-> register-collider (collision-system collision-volume) null)
+(defun register-collider (system volume)
   (declare (optimize speed))
-  (hash-grid-insert (u:href (collision-system-grids system) cell-size) volume)
+  (let ((cell-size (collision-volume-grid-cell-size volume)))
+    (hash-grid-insert (u:href (collision-system-grids system) cell-size) volume))
   nil)
 
 (u:fn-> collider-contact-p (collision-system trait trait) (or trait null))

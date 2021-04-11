@@ -25,10 +25,6 @@
                 :type boolean
                 :initarg :pickable-p
                 :initform t)
-   (%grid-cell-size :accessor grid-cell-size
-                    :inline t
-                    :type u:ub32
-                    :initform 8)
    (%contact-count :accessor contact-count
                    :inline t
                    :type fixnum
@@ -39,7 +35,6 @@
            :initform nil))
   (:setup setup)
   (:attach attach)
-  (:detach detach)
   (:physics physics)
   (:render render))
 
@@ -124,13 +119,7 @@
   (let ((volume (volume collider)))
     (when (visible-p collider)
       (enable-visibility collider))
-    (setf (grid-cell-size collider) (z::ensure-collision-grid collider volume)))
-  nil)
-
-(u:fn-> detach (collider) null)
-(defun detach (collider)
-  (declare (optimize speed)
-           (ignore collider))
+    (z::ensure-collision-grid collider volume))
   nil)
 
 (u:fn-> physics (collider) null)
@@ -139,7 +128,7 @@
   (let ((volume (volume collider))
         (system (z::context-collision-system (z:trait-context collider))))
     (funcall (z::collision-volume-update-func volume) volume collider)
-    (z::register-collider system (grid-cell-size collider) volume))
+    (z::register-collider system volume))
   nil)
 
 (u:fn-> render (collider) null)
