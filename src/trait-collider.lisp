@@ -7,7 +7,7 @@
                  :initarg :volume
                  :initform :box)
    (%volume :accessor volume
-            :inline nil
+            :inline t
             :type (or z::collision-volume null)
             :initform nil)
    (%visible-p :reader visible-p
@@ -24,15 +24,7 @@
                 :inline t
                 :type boolean
                 :initarg :pickable-p
-                :initform t)
-   (%contact-count :accessor contact-count
-                   :inline t
-                   :type fixnum
-                   :initform 0)
-   (%hit-p :accessor hit-p
-           :inline t
-           :type boolean
-           :initform nil))
+                :initform t))
   (:setup setup)
   (:attach attach)
   (:physics physics)
@@ -65,35 +57,6 @@
       (z:attach-trait owner render)
       nil)))
 
-(u:fn-> enter (collider collider) null)
-(defun enter (collider1 collider2)
-  (declare (optimize speed))
-  (incf (contact-count collider1))
-  (when (plusp (contact-count collider1))
-    (setf (hit-p collider1) t))
-  (when (plusp (contact-count collider2))
-    (setf (hit-p collider2) t))
-  #++(z::on-collision-enter)
-  nil)
-
-(u:fn-> exit (collider collider) null)
-(defun exit (collider1 collider2)
-  (declare (optimize speed))
-  (decf (contact-count collider1))
-  (when (zerop (contact-count collider1))
-    (setf (hit-p collider1) nil))
-  (when (zerop (contact-count collider2))
-    (setf (hit-p collider2) nil))
-  #++(z::on-collision-exit)
-  nil)
-
-(u:fn-> continue (collider collider) null)
-(defun continue (collider1 collider2)
-  (declare (optimize speed)
-           (ignore collider1 collider2))
-  #++(z::on-collision-continue)
-  nil)
-
 (u:fn-> make-volume (z::collision-volume-type z:trait) z::collision-volume)
 (defun make-volume (type collider)
   (declare (optimize speed))
@@ -116,25 +79,26 @@
 (u:fn-> attach (collider) null)
 (defun attach (collider)
   (declare (optimize speed))
-  (let ((volume (volume collider)))
+  (let ((context (z:trait-context collider))
+        (volume (volume collider)))
     (when (visible-p collider)
       (enable-visibility collider))
-    (z::ensure-collision-grid collider volume))
+    (z::ensure-collision-grid context volume))
   nil)
 
 (u:fn-> physics (collider) null)
 (defun physics (collider)
   (declare (optimize speed))
-  (let ((volume (volume collider))
-        (system (z::context-collision-system (z:trait-context collider))))
-    (funcall (z::collision-volume-update-func volume) volume collider)
-    (z::register-collider system volume))
+  (let ((system (z::context-collision-system (z:trait-context collider)))
+        (volume (volume collider)))
+    (z::register-collision-volume system volume))
   nil)
 
 (u:fn-> render (collider) null)
 (defun render (collider)
   (declare (optimize speed))
   (when (visible-p collider)
-    (let* ((render-trait (z:find-trait (z::trait-owner collider) 'tr.ren:render))
+    (let* ((volume (volume collider))
+           (render-trait (z:find-trait (z::trait-owner collider) 'tr.ren:render))
            (material (tr.ren::material render-trait)))
-      (z::set-uniform material :contact (hit-p collider)))))
+      (z::set-uniform material :contact (z::collision-volume-hit-p volume)))))

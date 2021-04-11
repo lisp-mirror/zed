@@ -20,10 +20,11 @@
     (v3:+! (collision-volume-broad-phase-max sphere) world-center radius)
     nil))
 
-(u:fn-> update-collision-volume-sphere (collision-volume-sphere trait) null)
-(defun update-collision-volume-sphere (sphere collider)
+(u:fn-> update-collision-volume-sphere (collision-volume-sphere) null)
+(defun update-collision-volume-sphere (sphere)
   (declare (optimize speed))
-  (let ((owner (trait-owner collider)))
+  (let* ((collider (collision-volume-collider sphere))
+         (owner (trait-owner collider)))
     (v3:with-components ((s (get-scale owner :space :world)))
       (transform-point! owner
                         (collision-volume-center sphere)
