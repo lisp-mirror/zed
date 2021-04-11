@@ -106,22 +106,6 @@
     (:box (z::make-collision-volume-box :collider collider))
     (:sphere (z::make-collision-volume-sphere :collider collider))))
 
-(defun ensure-grid (collider)
-  (let* ((context (z:trait-context collider))
-         (system (z::context-collision-system context))
-         (volume (volume collider)))
-    (cond
-      ((z::collision-system-multi-level-p system)
-       (funcall (z::collision-volume-update-func volume) volume collider)
-       (v3:with-components ((min- (z::collision-volume-broad-phase-min volume))
-                            (max- (z::collision-volume-broad-phase-max volume)))
-         (let* ((volume-size (max (- max-x min-x) (- max-y min-y) (- max-z min-z)))
-                (cell-size (ash 1 (max 3 (integer-length (ceiling volume-size))))))
-           (z::register-collision-grid system cell-size)
-           cell-size)))
-      (t
-       (car (z::collision-system-cell-sizes system))))))
-
 ;;; Hooks
 
 (u:fn-> setup (collider) null)
@@ -136,9 +120,10 @@
 (u:fn-> attach (collider) null)
 (defun attach (collider)
   (declare (optimize speed))
-  (when (visible-p collider)
-    (enable-visibility collider))
-  (setf (grid-cell-size collider) (ensure-grid collider))
+  (let ((volume (volume collider)))
+    (when (visible-p collider)
+      (enable-visibility collider))
+    (setf (grid-cell-size collider) (z::ensure-collision-grid collider volume)))
   nil)
 
 (u:fn-> detach (collider) null)

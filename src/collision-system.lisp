@@ -41,6 +41,21 @@
             (collision-system-cell-sizes system) (sort (list* cell-size cell-sizes) #'<))))
   nil)
 
+(defun ensure-collision-grid (collider volume)
+  (let* ((context (trait-context collider))
+         (system (context-collision-system context)))
+    (cond
+      ((collision-system-multi-level-p system)
+       (funcall (collision-volume-update-func volume) volume collider)
+       (v3:with-components ((min- (collision-volume-broad-phase-min volume))
+                            (max- (collision-volume-broad-phase-max volume)))
+         (let* ((volume-size (max (- max-x min-x) (- max-y min-y) (- max-z min-z)))
+                (cell-size (ash 1 (max 3 (integer-length (ceiling volume-size))))))
+           (register-collision-grid system cell-size)
+           cell-size)))
+      (t
+       (car (collision-system-cell-sizes system))))))
+
 (u:fn-> register-collider (collision-system u:positive-fixnum collision-volume) null)
 (defun register-collider (system cell-size volume)
   (declare (optimize speed))
