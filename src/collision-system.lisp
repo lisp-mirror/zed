@@ -147,10 +147,14 @@
   (when (>= (length bucket) 2)
     (u:map-combinations
      (lambda (x)
-       (let ((collider1 (collision-volume-collider (svref x 0)))
-             (collider2 (collision-volume-collider (svref x 1))))
-         (when (u:href layers (tr.col::layer collider1) (tr.col::layer collider2))
-           (compute-collider-contact system collider1 collider2))))
+       (let ((volume1 (svref x 0))
+             (volume2 (svref x 1)))
+         (when (u:href layers
+                       (collision-volume-layer volume1)
+                       (collision-volume-layer volume2))
+           (compute-collider-contact system
+                                     (collision-volume-collider volume1)
+                                     (collision-volume-collider volume2)))))
      bucket
      :copy nil
      :length 2))

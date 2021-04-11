@@ -102,9 +102,10 @@
 (u:fn-> make-volume (z::collision-volume-type z:trait) z::collision-volume)
 (defun make-volume (type collider)
   (declare (optimize speed))
-  (ecase type
-    (:box (z::make-collision-volume-box :collider collider))
-    (:sphere (z::make-collision-volume-sphere :collider collider))))
+  (let ((layer (layer collider)))
+    (ecase type
+      (:box (z::make-collision-volume-box :collider collider :layer layer))
+      (:sphere (z::make-collision-volume-sphere :collider collider :layer layer)))))
 
 ;;; Hooks
 

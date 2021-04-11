@@ -8,6 +8,7 @@
             (:copier nil))
   (type :box :type collision-volume-type)
   (collider nil :type trait)
+  (layer nil :type symbol)
   (mesh-name "" :type string)
   (center (v3:zero) :type v3:vec)
   (world-center (v3:zero) :type v3:vec)
