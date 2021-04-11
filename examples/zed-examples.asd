@@ -10,10 +10,11 @@
   :serial t
   :components
   ((:file "package")
+   (:module "shaders"
+    :components
+    ((:file "mesh")
+     (:file "geometry")))
    (:file "common")
    (:file "sprite")
-   (:file "mesh-shader")
    (:file "mesh")
-   (:file "geometry-shader")
-   (:file "geometry")
-   (:file "colliders")))
+   (:file "geometry")))
