@@ -64,6 +64,63 @@
     (hash-grid-insert (u:href (collision-system-grids system) cell-size) volume))
   nil)
 
+(defgeneric on-collision-enter (layer1 source1 layer2 source2)
+  (:method (layer1 source1 layer2 source2)))
+
+(defgeneric on-collision-continue (layer1 source1 layer2 source2)
+  (:method (layer1 source1 layer2 source2)))
+
+(defgeneric on-collision-exit (layer1 source1 layer2 source2)
+  (:method (layer1 source1 layer2 source2)))
+
+(defgeneric on-game-object-picked (layer source)
+  (:method (layer source)))
+
+(defmacro define-collision-hook (hook layer-spec &body body)
+  (u:with-gensyms (layer1-symbol layer2-symbol)
+    (case hook
+      ((:enter :continue :exit)
+       (destructuring-bind ((source1 layer1) (source2 layer2)) layer-spec
+         `(defmethod ,(u:format-symbol :zed "ON-COLLISION-~a" hook)
+              ((,layer1-symbol (eql ',layer1)) ,source1
+               (,layer2-symbol (eql ',layer2)) ,source2)
+            ,@body)))
+      (t
+       `(error "Invalid collision hook type: ~s." ',hook)))))
+
+(u:fn-> %on-collision-enter (collision-volume collision-volume) null)
+(declaim (inline %on-collision-enter))
+(defun %on-collision-enter (volume1 volume2)
+  (declare (optimize speed))
+  (let ((layer1 (collision-volume-layer volume1))
+        (layer2 (collision-volume-layer volume2))
+        (source1 (collision-volume-source volume1))
+        (source2 (collision-volume-source volume2)))
+    (on-collision-enter layer1 source1 layer2 source2))
+  nil)
+
+(u:fn-> %on-collision-continue (collision-volume collision-volume) null)
+(declaim (inline %on-collision-continue))
+(defun %on-collision-continue (volume1 volume2)
+  (declare (optimize speed))
+  (let ((layer1 (collision-volume-layer volume1))
+        (layer2 (collision-volume-layer volume2))
+        (source1 (collision-volume-source volume1))
+        (source2 (collision-volume-source volume2)))
+    (on-collision-continue layer1 source1 layer2 source2))
+  nil)
+
+(u:fn-> %on-collision-exit (collision-volume collision-volume) null)
+(declaim (inline %on-collision-exit))
+(defun %on-collision-exit (volume1 volume2)
+  (declare (optimize speed))
+  (let ((layer1 (collision-volume-layer volume1))
+        (layer2 (collision-volume-layer volume2))
+        (source1 (collision-volume-source volume1))
+        (source2 (collision-volume-source volume2)))
+    (on-collision-exit layer1 source1 layer2 source2))
+  nil)
+
 (u:fn-> compute-volume-contact (collision-volume collision-volume) null)
 (defun compute-volume-contact (volume1 volume2)
   (declare (optimize speed))
@@ -73,21 +130,15 @@
          (contact-p (u:href contacts1 volume2)))
     (cond
       ((and collide-p contact-p)
-       ;; TODO: COllision hooks
-       #++(on-collision-continue volume1 volume2)
-       #++(on-collision-continue volume2 volume1))
+       (%on-collision-continue volume1 volume2))
       ((and collide-p (not contact-p))
        (setf (u:href contacts1 volume2) t
              (u:href contacts2 volume1) t)
-       ;; TODO: Collision hooks
-       #++(on-collision-enter volume1 volume2)
-       #++(on-collision-enter volume2 volume1))
+       (%on-collision-enter volume1 volume2))
       ((and (not collide-p) contact-p)
        (remhash volume2 contacts1)
        (remhash volume1 contacts2)
-       ;; TODO: Collision hooks
-       #++(on-collision-exit volume1 volume2)
-       #++(on-collision-exit volume2 volume1)))
+       (%on-collision-exit volume1 volume2)))
     nil))
 
 (u:fn-> merge-collision-grid-bucket (collision-system u:ub32 u:ub32) (vector collision-volume))

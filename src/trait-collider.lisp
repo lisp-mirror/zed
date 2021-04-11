@@ -20,6 +20,11 @@
            :type symbol
            :initarg :layer
            :initform nil)
+   (%source :reader source
+            :inline t
+            :type (or z:game-object null)
+            :initarg :source
+            :initform nil)
    (%pickable-p :reader pickable-p
                 :inline t
                 :type boolean
@@ -57,30 +62,30 @@
       (z:attach-trait owner render)
       nil)))
 
-(u:fn-> make-volume (z::collision-volume-type collider) z::collision-volume)
-(defun make-volume (type collider)
+(u:fn-> make-volume (z::collision-volume-type collider z:game-object) z::collision-volume)
+(defun make-volume (type collider source)
   (declare (optimize speed))
   (let ((layer (layer collider)))
     (ecase type
-      (:box (z::make-collision-volume-box :collider collider :layer layer))
-      (:sphere (z::make-collision-volume-sphere :collider collider :layer layer)))))
+      (:box (z::make-collision-volume-box :collider collider :layer layer :source source))
+      (:sphere (z::make-collision-volume-sphere :collider collider :layer layer :source source)))))
 
 ;;; Hooks
 
 (u:fn-> setup (collider) null)
 (defun setup (collider)
   (declare (optimize speed))
-  (let ((volume-type (volume-type collider)))
-    (unless (layer collider)
-      (error "Collider ~s must have a layer specified." collider))
-    (setf (volume collider) (make-volume volume-type collider))
-    nil))
+  (unless (layer collider)
+    (error "Collider ~s must have a layer specified." collider))
+  nil)
 
 (u:fn-> attach (collider) null)
 (defun attach (collider)
   (declare (optimize speed))
-  (let ((context (z:trait-context collider))
-        (volume (volume collider)))
+  (let* ((context (z:trait-context collider))
+         (source (or (source collider) (z::trait-owner collider)))
+         (volume (make-volume (volume-type collider) collider source)))
+    (setf (volume collider) volume)
     (when (visible-p collider)
       (enable-visibility collider))
     (z::ensure-collision-grid context volume)

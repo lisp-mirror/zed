@@ -38,6 +38,7 @@
    #:game-object-enabled-p
    #:game-object-paused-p
    #:make-game-object
+   #:on-game-object-picked
    #:pause-game-object
    #:reparent-game-object
    #:spawn-game-object
@@ -73,6 +74,7 @@
    #:relative-mouse-mode-p)
   ;; DSLs
   (:export
+   #:define-collision-hook
    #:define-collision-plan
    #:define-framebuffer
    #:define-geometry
