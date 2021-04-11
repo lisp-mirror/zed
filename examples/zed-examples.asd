@@ -17,4 +17,5 @@
    (:file "common")
    (:file "sprite")
    (:file "mesh")
-   (:file "geometry")))
+   (:file "geometry")
+   (:file "colliders1")))
