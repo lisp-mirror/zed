@@ -9,8 +9,7 @@
   (bucket-size 1024 :type u:positive-fixnum)
   (cell-sizes nil :type list)
   (grids (u:dict #'eql) :type hash-table)
-  (volume-buffer (make-array 8 :fill-pointer 0 :adjustable t) :type (vector collision-volume))
-  (visited-volumes (u:dict #'eq) :type hash-table))
+  (volume-buffer (make-array 8 :fill-pointer 0 :adjustable t) :type (vector collision-volume)))
 
 (u:define-printer (collision-system stream :type nil)
   (format stream "COLLISION-SYSTEM"))
@@ -65,64 +64,44 @@
     (hash-grid-insert (u:href (collision-system-grids system) cell-size) volume))
   nil)
 
-(u:fn-> volume-contact-enter (collision-volume collision-volume) null)
-(defun volume-contact-enter (volume1 volume2)
-  (declare (optimize speed))
-  (setf (u:href (collision-volume-contacts volume1) volume2) t
-        (u:href (collision-volume-contacts volume2) volume1) t)
-  ;; TODO: Collision hooks
-  #++(on-collision-enter volume1 volume2)
-  #++(on-collision-enter volume2 volume1)
-  nil)
-
-(u:fn-> volume-contact-exit (collision-volume collision-volume) null)
-(defun volume-contact-exit (volume1 volume2)
-  (declare (optimize speed))
-  (remhash volume2 (collision-volume-contacts volume1))
-  (remhash volume1 (collision-volume-contacts volume2))
-  ;; TODO: Collision hooks
-  #++(on-collision-exit volume1 volume2)
-  #++(on-collision-exit volume2 volume1)
-  nil)
-
-(u:fn-> volume-contact-continue (collision-volume collision-volume) null)
-(defun volume-contact-continue (volume1 volume2)
-  (declare (optimize speed))
-  ;; TODO: Collision hookes
-  (declare (ignore volume1 volume2))
-  #++(on-collision-continue volume1 volume2)
-  #++(on-collision-continue volume2 volume1)
-  nil)
-
 (u:fn-> compute-volume-contact (collision-volume collision-volume) null)
 (defun compute-volume-contact (volume1 volume2)
   (declare (optimize speed))
-  (let ((collide-p (collide-p volume1 volume2))
-        (contact-p (u:href (collision-volume-contacts volume1) volume2)))
+  (let* ((collide-p (collide-p volume1 volume2))
+         (contacts1 (collision-volume-contacts volume1))
+         (contacts2 (collision-volume-contacts volume2))
+         (contact-p (u:href contacts1 volume2)))
     (cond
       ((and collide-p contact-p)
-       (volume-contact-continue volume1 volume2))
+       ;; TODO: COllision hooks
+       #++(on-collision-continue volume1 volume2)
+       #++(on-collision-continue volume2 volume1))
       ((and collide-p (not contact-p))
-       (volume-contact-enter volume1 volume2))
+       (setf (u:href contacts1 volume2) t
+             (u:href contacts2 volume1) t)
+       ;; TODO: Collision hooks
+       #++(on-collision-enter volume1 volume2)
+       #++(on-collision-enter volume2 volume1))
       ((and (not collide-p) contact-p)
-       (volume-contact-exit volume1 volume2)))))
+       (remhash volume2 contacts1)
+       (remhash volume1 contacts2)
+       ;; TODO: Collision hooks
+       #++(on-collision-exit volume1 volume2)
+       #++(on-collision-exit volume2 volume1)))
+    nil))
 
 (u:fn-> merge-collision-grid-bucket (collision-system u:ub32 u:ub32) (vector collision-volume))
 (declaim (inline merge-collision-grid-bucket))
 (defun merge-collision-grid-bucket (system start-size hash)
   (declare (optimize speed))
   (let ((grids (collision-system-grids system))
-        (visited (collision-system-visited-volumes system))
         (buffer (collision-system-volume-buffer system)))
-    (clrhash visited)
     (setf (fill-pointer buffer) 0)
     (u:do-hash (cell-size grid grids)
       (when (>= (the u:ub32 cell-size) start-size)
         (map nil
              (lambda (x)
-               (unless (u:href visited x)
-                 (vector-push-extend x buffer)
-                 (setf (u:href visited x) t)))
+               (vector-push-extend x buffer))
              (aref (hash-grid-buckets grid) hash))))
     buffer))
 
