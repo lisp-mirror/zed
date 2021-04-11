@@ -109,19 +109,18 @@
 (defun ensure-grid (collider)
   (let* ((context (z:trait-context collider))
          (system (z::context-collision-system context))
-         (grids (z::collision-system-grids system))
-         (bucket-size (z::collision-system-bucket-size system))
-         (cell-sizes (z::collision-system-cell-sizes system))
          (volume (volume collider)))
-    (v3:with-components ((min- (z::collision-volume-broad-phase-min volume))
-                         (max- (z::collision-volume-broad-phase-max volume)))
-      (let* ((volume-size (max (- max-x min-x) (- max-y min-y) (- max-z min-z)))
-             (cell-size (ash 1 (max 3 (integer-length (ceiling volume-size)))))
-             (grid (z::make-hash-grid :bucket-size bucket-size :cell-size cell-size)))
-        (unless (u:href grids cell-size)
-          (setf (u:href grids cell-size) grid
-                (z::collision-system-cell-sizes system) (sort (list* cell-size cell-sizes) #'<)))
-        (setf (grid-cell-size collider) cell-size)))))
+    (cond
+      ((z::collision-system-multi-level-p system)
+       (funcall (z::collision-volume-update-func volume) volume collider)
+       (v3:with-components ((min- (z::collision-volume-broad-phase-min volume))
+                            (max- (z::collision-volume-broad-phase-max volume)))
+         (let* ((volume-size (max (- max-x min-x) (- max-y min-y) (- max-z min-z)))
+                (cell-size (ash 1 (max 3 (integer-length (ceiling volume-size))))))
+           (z::register-collision-grid system cell-size)
+           cell-size)))
+      (t
+       (car (z::collision-system-cell-sizes system))))))
 
 ;;; Hooks
 
@@ -137,12 +136,10 @@
 (u:fn-> attach (collider) null)
 (defun attach (collider)
   (declare (optimize speed))
-  (let ((volume (volume collider)))
-    (when (visible-p collider)
-      (enable-visibility collider))
-    (funcall (z::collision-volume-update-func volume) volume collider)
-    (ensure-grid collider)
-    nil))
+  (when (visible-p collider)
+    (enable-visibility collider))
+  (setf (grid-cell-size collider) (ensure-grid collider))
+  nil)
 
 (u:fn-> detach (collider) null)
 (defun detach (collider)

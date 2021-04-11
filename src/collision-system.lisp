@@ -5,6 +5,7 @@
             (:predicate nil)
             (:copier nil))
   (layers (u:dict #'eq) :type hash-table)
+  (multi-level-p t :type boolean)
   (bucket-size 1024 :type u:positive-fixnum)
   (cell-sizes nil :type list)
   (grids (u:dict #'eql) :type hash-table)
@@ -18,9 +19,27 @@
 (u:fn-> make-collision-system (symbol) collision-system)
 (defun make-collision-system (plan-name)
   (declare (optimize speed))
-  (let ((plan (find-collision-plan plan-name)))
-    (%make-collision-system :bucket-size (collision-plan-bucket-size plan)
-                            :layers (collision-plan-table plan))))
+  (let* ((plan (find-collision-plan plan-name))
+         (multi-level-p (collision-plan-multi-level-p plan))
+         (cell-size (collision-plan-cell-size plan))
+         (system (%make-collision-system :multi-level-p multi-level-p
+                                         :bucket-size (collision-plan-bucket-size plan)
+                                         :layers (collision-plan-table plan))))
+    (unless multi-level-p
+      (register-collision-grid system cell-size))
+    system))
+
+(u:fn-> register-collision-grid (collision-system u:positive-fixnum) null)
+(defun register-collision-grid (system cell-size)
+  (declare (optimize speed))
+  (let* ((grids (collision-system-grids system))
+         (bucket-size (collision-system-bucket-size system))
+         (cell-sizes (collision-system-cell-sizes system))
+         (grid (make-hash-grid :bucket-size bucket-size :cell-size cell-size)))
+    (unless (u:href grids cell-size)
+      (setf (u:href grids cell-size) grid
+            (collision-system-cell-sizes system) (sort (list* cell-size cell-sizes) #'<))))
+  nil)
 
 (u:fn-> register-collider (collision-system u:positive-fixnum collision-volume) null)
 (defun register-collider (system cell-size volume)
@@ -106,12 +125,28 @@
              (aref (hash-grid-buckets grid) hash))))
     buffer))
 
-(u:fn-> compute-collisions (context) null)
-(defun compute-collisions (context)
+(u:fn-> %compute-collisions (collision-system hash-table vector) null)
+(declaim (inline %compute-collisions))
+(defun %compute-collisions (system layers bucket)
   (declare (optimize speed))
-  (let* ((system (context-collision-system context))
-         (grids (collision-system-grids system))
-         (layers (collision-system-layers system)))
+  (when (>= (length bucket) 2)
+    (u:map-combinations
+     (lambda (x)
+       (let ((collider1 (collision-volume-collider (svref x 0)))
+             (collider2 (collision-volume-collider (svref x 1))))
+         (when (u:href layers (tr.col::layer collider1) (tr.col::layer collider2))
+           (compute-collider-contact system collider1 collider2))))
+     bucket
+     :copy nil
+     :length 2))
+  nil)
+
+(u:fn-> compute-collisions/multi-level (collision-system) null)
+(declaim (inline compute-collisions/multi-level))
+(defun compute-collisions/multi-level (system)
+  (declare (optimize speed))
+  (let ((grids (collision-system-grids system))
+        (layers (collision-system-layers system)))
     (dolist (cell-size (collision-system-cell-sizes system))
       (let* ((grid (u:href grids cell-size))
              (buckets (hash-grid-buckets grid)))
@@ -119,16 +154,27 @@
               :for local-bucket :across buckets
               :when local-bucket
                 :do (let ((bucket (merge-collision-grid-bucket system cell-size hash)))
-                      (when (>= (length bucket) 2)
-                        (u:map-combinations
-                         (lambda (x)
-                           (let ((collider1 (collision-volume-collider (svref x 0)))
-                                 (collider2 (collision-volume-collider (svref x 1))))
-                             (when (u:href layers
-                                           (tr.col::layer collider1)
-                                           (tr.col::layer collider2))
-                               (compute-collider-contact system collider1 collider2))))
-                         bucket
-                         :copy nil
-                         :length 2))))
+                      (%compute-collisions system layers bucket)))
         (map nil (lambda (x) (setf (fill-pointer x) 0)) buckets)))))
+
+(u:fn-> compute-collisions/flat (collision-system) null)
+(declaim (inline compute-collisions/flat))
+(defun compute-collisions/flat (system)
+  (declare (optimize speed))
+  (let* ((layers (collision-system-layers system))
+         (grids (collision-system-grids system))
+         (grid (u:href grids (car (collision-system-cell-sizes system))))
+         (buckets (hash-grid-buckets grid)))
+    (loop :for hash :of-type fixnum :from 0
+          :for bucket :of-type vector :across buckets
+          :when bucket
+            :do (%compute-collisions system layers bucket))
+    (map nil (lambda (x) (setf (fill-pointer x) 0)) buckets)))
+
+(u:fn-> compute-collisions (context) null)
+(defun compute-collisions (context)
+  (declare (optimize speed))
+  (let ((system (context-collision-system context)))
+    (if (collision-system-multi-level-p system)
+        (compute-collisions/multi-level system)
+        (compute-collisions/flat system))))
