@@ -33,7 +33,10 @@
         (dolist (target targets)
           (unless (u:href table source)
             (setf (u:href table source) (u:dict #'eq)))
-          (setf (u:href table source target) t))))))
+          (unless (u:href table target)
+            (setf (u:href table target) (u:dict #'eq)))
+          (setf (u:href table source target) t
+                (u:href table target source) t))))))
 
 (defun make-collision-plan (name multi-level-p cell-size bucket-size mappings)
   (let ((plan (%make-collision-plan :name name)))
