@@ -84,7 +84,8 @@
          `(defmethod ,(u:format-symbol :zed "ON-COLLISION-~a" hook)
               ((,layer1-symbol (eql ',layer1)) ,source1
                (,layer2-symbol (eql ',layer2)) ,source2)
-            ,@body)))
+            (with-scope (:collision-hook)
+              ,@body))))
       (t
        `(error "Invalid collision hook type: ~s." ',hook)))))
 

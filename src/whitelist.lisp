@@ -57,4 +57,5 @@
   :trait-physics-hook
   :trait-update-hook
   :trait-render-hook
+  :collision-hook
   :pause-game)

@@ -252,7 +252,7 @@
   (declare (optimize speed))
   (with-allowed-scopes destroy-game-object
       (:prefab-recompile :trait-setup-hook :trait-destroy-hook :trait-attach-hook
-       :trait-detach-hook :trait-physics-hook :trait-update-hook)
+       :trait-detach-hook :trait-physics-hook :trait-update-hook :collision-hook)
     (flet ((deregister-prefab (context game-object)
              (u:when-let ((prefab-name (game-object-prefab-name game-object))
                           (table (context-prefabs context)))

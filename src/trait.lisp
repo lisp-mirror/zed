@@ -130,7 +130,8 @@
   (declare (optimize speed))
   (with-allowed-scopes make-trait
       (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
-       :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook)
+       :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook
+       :collision-hook)
     (if (subtypep type 'trait)
         (let ((trait (apply #'make-instance type 'context context args)))
           (call-trait-hook trait :setup)
@@ -147,7 +148,8 @@
             (error "Trait type ~s is not defined." type))
           `(with-allowed-scopes make-trait
                (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
-                :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook)
+                :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook
+                :collision-hook)
              (let ((,trait (make-instance ',type 'context ,context ,@args)))
                (funcall (fdefinition (trait-setup-hook ,trait)) ,trait)
                ,trait)))
@@ -163,7 +165,8 @@
   (declare (optimize speed))
   (with-allowed-scopes attach-trait
       (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
-       :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook)
+       :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook
+       :collision-hook)
     (when (trait-owner trait)
       (error "Trait ~s is already attached to a game object." trait))
     (let* ((by-id (game-object-traits-by-id game-object))
@@ -183,7 +186,7 @@
   (declare (optimize speed))
   (with-allowed-scopes detach-trait
       (:prefab-recompile :trait-setup-hook :trait-destroy-hook :trait-attach-hook
-       :trait-detach-hook :trait-physics-hook :trait-update-hook)
+       :trait-detach-hook :trait-physics-hook :trait-update-hook :collision-hook)
     (unless (eq game-object (trait-owner trait))
       (error "Trait ~s is not attached to game object ~s." trait game-object))
     (call-trait-hook trait :detach)
@@ -210,7 +213,7 @@
   (declare (optimize speed))
   (with-allowed-scopes destroy-trait
       (:prefab-recompile :trait-setup-hook :trait-destroy-hook :trait-attach-hook
-       :trait-detach-hook :trait-physics-hook :trait-update-hook)
+       :trait-detach-hook :trait-physics-hook :trait-update-hook :collision-hook)
     (call-trait-hook trait :destroy)
     (detach-trait (trait-owner trait) trait))
   nil)
