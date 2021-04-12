@@ -140,19 +140,6 @@
        (%on-collision-exit volume1 volume2)))
     nil))
 
-(u:fn-> merge-collision-grid-bucket
-        (hash-table (vector collision-volume) u:ub32 u:ub32)
-        (vector collision-volume))
-(declaim (inline merge-collision-grid-bucket))
-(defun merge-collision-grid-bucket (grids buffer start-size hash)
-  (declare (optimize speed))
-  (setf (fill-pointer buffer) 0)
-  (u:do-hash (cell-size grid grids)
-    (when (>= (the u:ub32 cell-size) start-size)
-      (let ((volumes (aref (hash-grid-buckets grid) hash)))
-        (map nil (lambda (x) (vector-push-extend x buffer)) volumes))))
-  buffer)
-
 (u:fn-> %compute-collisions (hash-table vector) null)
 (declaim (inline %compute-collisions))
 (defun %compute-collisions (layers bucket)
@@ -167,8 +154,21 @@
              (compute-volume-contact volume1 volume2)))))
      bucket
      :length 2
-     :copy nil))
-  nil)
+     :copy nil)
+    nil))
+
+(u:fn-> merge-collision-grid-bucket
+        (hash-table (vector collision-volume) u:ub32 u:ub32)
+        (vector collision-volume))
+(declaim (inline merge-collision-grid-bucket))
+(defun merge-collision-grid-bucket (grids buffer start-size hash)
+  (declare (optimize speed))
+  (setf (fill-pointer buffer) 0)
+  (u:do-hash (cell-size grid grids)
+    (when (>= (the u:ub32 cell-size) start-size)
+      (let ((volumes (aref (hash-grid-buckets grid) hash)))
+        (map nil (lambda (x) (vector-push-extend x buffer)) volumes))))
+  buffer)
 
 (u:fn-> compute-collisions/multi-level (collision-system) null)
 (declaim (inline compute-collisions/multi-level))
@@ -178,11 +178,9 @@
         (buffer (collision-system-volume-buffer system))
         (layers (collision-system-layers system)))
     (dolist (cell-size (collision-system-cell-sizes system))
-      (let* ((grid (u:href grids cell-size))
-             (buckets (hash-grid-buckets grid)))
+      (let ((buckets (hash-grid-buckets (u:href grids cell-size))))
         (dotimes (hash (length buckets))
-          (u:when-let* ((local-bucket (aref buckets hash))
-                        (bucket (merge-collision-grid-bucket grids buffer cell-size hash)))
+          (let ((bucket (merge-collision-grid-bucket grids buffer cell-size hash)))
             (%compute-collisions layers bucket)))
         (map nil (lambda (x) (setf (fill-pointer x) 0)) buckets)))))
 
@@ -195,8 +193,7 @@
          (grid (u:href grids (car (collision-system-cell-sizes system))))
          (buckets (hash-grid-buckets grid)))
     (dotimes (hash (length buckets))
-      (u:when-let ((bucket (aref buckets hash)))
-        (%compute-collisions layers bucket)))
+      (%compute-collisions layers (aref buckets hash)))
     (map nil (lambda (x) (setf (fill-pointer x) 0)) buckets)))
 
 (u:fn-> compute-collisions (context) null)
