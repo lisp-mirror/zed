@@ -26,6 +26,7 @@
   (:use #:cl)
   (:export
    #:colliders1
+   #:colliders2
    #:geometry
    #:mesh
    #:sprite))

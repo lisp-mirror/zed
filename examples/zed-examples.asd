@@ -18,4 +18,5 @@
    (:file "sprite")
    (:file "mesh")
    (:file "geometry")
-   (:file "colliders1")))
+   (:file "colliders1")
+   (:file "colliders2")))
