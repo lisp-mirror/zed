@@ -56,4 +56,5 @@
   :trait-detach-hook
   :trait-physics-hook
   :trait-update-hook
-  :trait-render-hook)
+  :trait-render-hook
+  :pause-game)

@@ -120,8 +120,8 @@
 (defun %walk-game-object-tree (game-object func disabled-p paused-p)
   (declare (optimize speed))
   (with-allowed-scopes walk-tree
-      (:prelude :prefab-instantiate :physics-phase :update-phase
-       :trait-setup-hook :trait-destroy-hook :trait-attach-hook :trait-detach-hook)
+      (:pause-game :prelude :prefab-instantiate :physics-phase
+       :update-phase :trait-setup-hook :trait-destroy-hook :trait-attach-hook :trait-detach-hook)
     (labels ((recurse (game-object)
                (when (and (or disabled-p (game-object-%enabled-p game-object))
                           (or paused-p (not (game-object-%paused-p game-object))))
