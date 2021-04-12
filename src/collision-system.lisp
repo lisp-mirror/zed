@@ -98,14 +98,14 @@
     (let* ((contacts1 (collision-volume-contacts volume1))
            (contact-p (u:href contacts1 volume2)))
       (cond
-        ((and collide-p contact-p)
-         (%on-collision-continue volume1 volume2))
         ((and collide-p (not contact-p))
          (setf (u:href contacts1 volume2) t
                (u:href (collision-volume-contacts volume2) volume1) t
                (u:href (collision-system-contact-table system) volume1) volume2
                (u:href (collision-system-contact-table system) volume2) volume1)
-         (%on-collision-enter volume1 volume2)))
+         (%on-collision-enter volume1 volume2))
+        ((and collide-p contact-p)
+         (%on-collision-continue volume1 volume2)))
       nil)))
 
 (u:fn-> compute-volume-separations (collision-system) null)
