@@ -15,6 +15,10 @@
            :type u:b16
            :initarg :layer
            :initform 0)
+   (%culled-p :accessor culled-p
+              :inline t
+              :type boolean
+              :initform nil)
    (%viewport-name :reader viewport-name
                    :inline t
                    :type symbol
@@ -54,7 +58,10 @@
     (gl:clear-color 0 0 0 1)
     (gl:clear :color-buffer :depth-buffer)
     (z::with-time-buffer (context :render-phase)
-      (z::map-draw-order draw-order #'render-game-object))))
+      (z::map-draw-order draw-order
+                         (lambda (x)
+                           (unless (culled-p x)
+                             (render-game-object x)))))))
 
 ;;; Hooks
 

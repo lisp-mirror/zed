@@ -153,7 +153,6 @@
     (update-broad-phase-box box))
   nil)
 
-;; FIXME: Working frustum-aabb test, integrate properly
 (u:fn-> frustum-aabb (frustum:frustum v3:vec v3:vec) boolean)
 (defun frustum-aabb (frustum min max)
   (declare (optimize speed))
@@ -185,5 +184,5 @@
               (let ((plane-normal (v3:vec px py pz)))
                 (declare (dynamic-extent plane-normal))
                 (when (minusp (+ (v3:dot plane-normal v) pw))
-                  (return-from frustum-aabb nil)))))))
-      t)))
+                  (return-from frustum-aabb t)))))))
+      nil)))

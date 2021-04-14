@@ -1,6 +1,6 @@
 (in-package #:zed.trait.collider)
 
-(z::define-internal-trait collider ()
+(z::define-internal-trait collider (:order (:before tr.ren:render))
   ((%volume-type :reader volume-type
                  :inline t
                  :type (or keyword null)
@@ -70,6 +70,22 @@
       (:box (z::make-collision-volume-box :collider collider :layer layer :source source))
       (:sphere (z::make-collision-volume-sphere :collider collider :layer layer :source source)))))
 
+(u:fn-> frustum-cull-collider (collider) null)
+(defun frustum-cull-collider (collider)
+  (declare (optimize speed))
+  (u:when-let* ((context (z:trait-context collider))
+                (camera (z::context-active-camera context))
+                (volume (volume collider))
+                (min (z::collision-volume-broad-phase-min volume))
+                (max (z::collision-volume-broad-phase-max volume)))
+    (let ((culled-p (z::frustum-aabb (tr.cam::frustum camera) min max)))
+      (u:when-let ((render (z:find-trait (z::trait-owner collider) 'tr.ren:render)))
+        (setf (tr.ren::culled-p render) culled-p))
+      (u:when-let* ((source (source collider))
+                    (render (z:find-trait source 'tr.ren:render)))
+        (setf (tr.ren::culled-p render) culled-p))))
+  nil)
+
 ;;; Hooks
 
 (u:fn-> setup (collider) null)
@@ -95,6 +111,7 @@
   (let ((system (z::context-collision-system (z:trait-context collider)))
         (volume (volume collider)))
     (z::register-collision-volume system volume)
+    (frustum-cull-collider collider)
     nil))
 
 (u:fn-> render (collider) null)

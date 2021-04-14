@@ -52,6 +52,7 @@
 
 (defpackage #:zed.trait.collider
   (:local-nicknames
+   (#:tr.cam #:zed.trait.camera)
    (#:tr.mesh #:zed.trait.mesh)
    (#:tr.ren #:zed.trait.render)
    (#:u #:golden-utils)
