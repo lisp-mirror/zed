@@ -3,6 +3,7 @@
 (defpackage #:zed.trait.camera
   (:local-nicknames
    (#:const #:zed.math.constants)
+   (#:frustum #:zed.math.frustum)
    (#:m3 #:zed.math.matrix3)
    (#:m4 #:zed.math.matrix4)
    (#:q #:zed.math.quaternion)

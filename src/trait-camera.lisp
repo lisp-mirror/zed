@@ -38,7 +38,11 @@
    (%projection :reader projection
                 :inline t
                 :type m4:mat
-                :initform (m4:id)))
+                :initform (m4:id))
+   (%frustum :reader frustum
+             :inline t
+             :type frustum:frustum
+             :initform (frustum:make-frustum)))
   (:setup setup)
   (:update update))
 
@@ -130,4 +134,5 @@
 
 (defun update (camera)
   (update-view camera)
-  (update-projection camera))
+  (update-projection camera)
+  (frustum:update (frustum camera) (view camera) (projection camera)))

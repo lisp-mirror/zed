@@ -824,3 +824,20 @@
    #:x
    #:y
    #:z))
+
+(defpackage #:zed.math.frustum
+  (:local-nicknames
+   (#:u #:golden-utils)
+   (#:m4 #:zed.math.matrix4)
+   (#:v4 #:zed.math.vector4))
+  (:use #:cl)
+  (:export
+   #:bottom
+   #:far
+   #:frustum
+   #:left
+   #:make-frustum
+   #:near
+   #:right
+   #:top
+   #:update))
