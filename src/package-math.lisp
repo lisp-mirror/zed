@@ -825,6 +825,23 @@
    #:y
    #:z))
 
+(defpackage #:zed.math.line3d
+  (:local-nicknames
+   (#:p3 #:zed.math.point3d)
+   (#:u #:golden-utils)
+   (#:v3 #:zed.math.vector3))
+  (:use #:cl)
+  (:shadow
+   #:length)
+  (:export
+   #:direction
+   #:end
+   #:length
+   #:length-squared
+   #:line
+   #:midpoint
+   #:start))
+
 (defpackage #:zed.math.frustum
   (:local-nicknames
    (#:u #:golden-utils)

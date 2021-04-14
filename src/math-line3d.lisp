@@ -1,0 +1,40 @@
+(in-package #:zed.math.line3d)
+
+(declaim (inline %line))
+(defstruct (line
+            (:predicate nil)
+            (:copier nil)
+            (:constructor %line (start end))
+            (:conc-name nil))
+  (start (p3:point 0.0 0.0 0.0) :type p3:point)
+  (end (p3:point 0.0 0.0 0.0) :type p3:point))
+
+(u:fn-> line (&key (:start p3:point) (:end p3:point)) line)
+(declaim (inline line))
+(defun line (&key (start (p3:point 0.0 0.0 0.0)) (end (p3:point 0.0 0.0 0.0)))
+  (declare (optimize speed))
+  (%line start end))
+
+(u:fn-> length (line) u:f32)
+(declaim (inline length))
+(defun length (line)
+  (declare (optimize speed))
+  (v3:length (v3:- (end line) (start line))))
+
+(u:fn-> length-squared (line) u:f32)
+(declaim (inline length-squared))
+(defun length-squared (line)
+  (declare (optimize speed))
+  (v3:length-squared (v3:- (end line) (start line))))
+
+(u:fn-> midpoint (line) p3:point)
+(declaim (inline midpoint))
+(defun midpoint (line)
+  (declare (optimize speed))
+  (v3:lerp (start line) (end line) 0.5))
+
+(u:fn-> direction (line) v3:vec)
+(declaim (inline direction))
+(defun direction (line)
+  (declare (optimize speed))
+  (v3:normalize (v3:- (end line) (start line))))

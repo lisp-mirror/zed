@@ -51,6 +51,7 @@
    (:file "math-quaternion")
    (:file "math-point2d")
    (:file "math-point3d")
+   (:file "math-line3d")
    (:file "math-frustum")
    (:file "util-binary-parser")
    (:file "util-ordered-class")

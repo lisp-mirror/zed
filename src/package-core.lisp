@@ -14,6 +14,7 @@
   (:local-nicknames
    (#:const #:zed.math.constants)
    (#:frustum #:zed.math.frustum)
+   (#:line3d #:zed.math.line3d)
    (#:m3 #:zed.math.matrix3)
    (#:m4 #:zed.math.matrix4)
    (#:p3 #:zed.math.point3d)
