@@ -1,13 +1,11 @@
 (in-package #:zed-examples)
 
-(z:define-prefab colliders2/left (:template 'colliders2/object
-                                  :translate (v3:vec -0.55 0.0 0.0)
+(z:define-prefab colliders2/left (:translate (v3:vec -0.55 0.0 0.0)
                                   :rotate-velocity (v3:velocity v3:+forward+ const:+pi/4+))
   (z.collider:collider :volume :box
                        :layer 'object))
 
-(z:define-prefab colliders2/right (:template 'colliders2/object
-                                   :translate (v3:vec 0.5 0.0 0.0))
+(z:define-prefab colliders2/right (:translate (v3:vec 0.5 0.0 0.0))
   (z.collider:collider :volume :box
                        :layer 'object))
 
