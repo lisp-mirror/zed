@@ -5,6 +5,8 @@
   (let ((success-p nil))
     (unwind-protect
          (progn
+           ;; Load the pack file (if running in release mode).
+           (read-pack)
            ;; Enable logging.
            (start-logging config)
            (let* ((vsync-p (config-vsync-p config))
@@ -25,10 +27,6 @@
                                    :draw-order draw-order
                                    :viewports (make-viewport-manager window)
                                    :collision-system (make-collision-system collision-plan))
-               ;; Setup live coding support. This instructs SLIME or Sly's REPL to run inside our
-               ;; game loop.
-               ;; Load the pack file (if running in release mode).
-               (read-pack)
                ;; Start the audio system.
                (start-audio)
                ;; Register all defined shader programs with the thread pool so they are updated when
