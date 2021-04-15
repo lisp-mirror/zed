@@ -87,13 +87,18 @@
     (read-sequence bytes stream)
     (babel:octets-to-string bytes :encoding :utf-8)))
 
+(defun read-pack-character-stream (stream)
+  (let ((string (read-pack-string stream)))
+    (util.ss::make-stream-slice (make-string-input-stream string) 0 (length string))))
+
 (defmacro with-pack-file ((data path &key (format :binary)) &body body)
   (u:with-gensyms (pack-stream offset size stream)
     `(destructuring-bind (,offset . ,size) (u:href =pack-index= ,path)
        (u:with-binary-input (,pack-stream (get-pack-path))
          (let* ((,stream (util.ss::make-stream-slice ,pack-stream ,offset ,size))
                 (,data ,(ecase format
-                          (:binary stream)
+                          (:binary-stream stream)
+                          (:character-stream `(read-pack-character-stream ,stream))
                           (:string `(read-pack-string ,stream))
                           (:lisp `(read-from-string (read-pack-string ,stream))))))
            ,@body)))))

@@ -8,7 +8,8 @@
     (let ((path (uiop:merge-pathnames* path #.(make-pathname :directory '(:relative "data")))))
       (asdf:system-relative-pathname system-name path))))
 
-(defmacro with-asset ((asset path data &key (length-binding '#:length) (format :binary)) &body body)
+(defmacro with-asset ((asset path data &key (length-binding '#:length) (format :binary-stream))
+                      &body body)
   `(let ((,path (resolve-asset-path ,asset)))
      #+zed.release
      (with-pack-file (,data ,path :format ,format)
@@ -16,12 +17,15 @@
          (declare (ignorable ,length-binding))
          ,@body))
      #-zed.release
-     ,(ecase format
-        (:binary
+     ,(case format
+        (:binary-stream
          `(u:with-binary-input (,data ,path)
             (let ((,length-binding (file-length ,data)))
               (declare (ignorable ,length-binding))
               ,@body)))
+        (:character-stream
+         `(with-open-file (,data ,path)
+            ,@body))
         (:string
          `(with-open-file (,data ,path)
             (u:read-stream-content-into-string ,data)))
