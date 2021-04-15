@@ -63,6 +63,7 @@
    (:file "shader-library-color")
    (:file "shader-library-sprite")
    (:file "shader-library-collider")
+   (:file "shader-library-font")
    (:file "early-types")
    (:file "common")
    (:file "config")
