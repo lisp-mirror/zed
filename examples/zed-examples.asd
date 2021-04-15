@@ -13,8 +13,10 @@
    (:module "shaders"
     :components
     ((:file "mesh")
+     (:file "texture")
      (:file "geometry")))
    (:file "common")
+   (:file "texture")
    (:file "sprite")
    (:file "mesh")
    (:file "geometry")

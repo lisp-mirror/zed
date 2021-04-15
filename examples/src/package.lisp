@@ -5,7 +5,8 @@
   ;; shaders
   (:export
    #:geometry
-   #:mesh))
+   #:mesh
+   #:texture))
 
 (defpackage #:zed-examples
   (:local-nicknames
@@ -29,4 +30,5 @@
    #:colliders2
    #:geometry
    #:mesh
-   #:sprite))
+   #:sprite
+   #:texture))
