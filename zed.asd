@@ -111,6 +111,7 @@
    (:file "collision-hash-grid")
    (:file "collision-tests")
    (:file "collision-system")
+   (:file "collision-picking")
    (:file "draw-order")
    (:file "resource-cache")
    (:file "spritesheet")

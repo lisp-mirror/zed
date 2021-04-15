@@ -6,7 +6,9 @@
             (:copier nil))
   (layers (u:dict #'eq) :type hash-table)
   (grid nil :type hash-grid)
-  (contact-table (u:dict #'eq) :type hash-table))
+  (contact-table (u:dict #'eq) :type hash-table)
+  (picker (line3d:line :start (p3:point 0.0 0.0 0.0) :end (p3:point 0.0 0.0 0.0))
+   :type line3d:line))
 
 (u:define-printer (collision-system stream :type nil)
   (format stream "COLLISION-SYSTEM"))
