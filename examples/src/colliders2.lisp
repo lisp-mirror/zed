@@ -9,7 +9,7 @@
   (z.collider:collider :volume :box
                        :layer 'object))
 
-(z:define-prefab colliders2 (:scale 15.0)
+(z:define-prefab colliders2 (:scale 128.0)
   ((test1 :translate (v3:vec -2.0 0.0 0.0))
    ((left :template 'colliders2/left))
    ((right :template 'colliders2/right)))
@@ -19,7 +19,7 @@
            :scale 0.5)
     (z.collider:collider :volume :sphere))))
 
-(z:define-collision-plan colliders2 (:cell-size 8)
+(z:define-collision-plan colliders2 (:cell-size 256)
   (object (object)))
 
 (defun colliders2-prelude (context)
