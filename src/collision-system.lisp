@@ -55,6 +55,11 @@
       (t
        `(error "Invalid collision hook type: ~s." ',hook)))))
 
+(defmacro define-picked-hook ((layer source) &body body)
+  (u:with-gensyms (layer-symbol)
+    `(defmethod on-game-object-picked ((,layer-symbol (eql ',layer)) ,source)
+       ,@body)))
+
 (u:fn-> %on-collision-enter (collision-volume collision-volume) null)
 (declaim (inline %on-collision-enter))
 (defun %on-collision-enter (volume1 volume2)

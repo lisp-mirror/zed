@@ -40,7 +40,6 @@
    #:game-object-enabled-p
    #:game-object-paused-p
    #:make-game-object
-   #:on-game-object-picked
    #:pause-game-object
    #:reparent-game-object
    #:spawn-game-object
@@ -82,4 +81,5 @@
    #:define-geometry
    #:define-geometry-layout
    #:define-material
+   #:define-picked-hook
    #:define-texture))
