@@ -62,21 +62,24 @@
 (defun shutdown-context (context)
   (setf (context-running-p context) nil))
 
+(defmacro with-init-context (() &body body)
+  (if (find :zed.release *features*)
+      `(progn ,@body)
+      `(bt:make-thread (lambda () ,@body) :name "Zed")))
+
 (defmacro with-context (context (config) &body body)
   `(if =context=
        (warn "There is a context already running.")
-       (bt:make-thread
-        (lambda ()
-          (with-thread-pool ()
-            (let ((,context (make-context ,config)))
-              (setf =context= ,context)
-              (unwind-protect
-                   (progn
-                     (with-scope (:prelude)
-                       (v:debug :zed "Executing prelude...")
-                       (funcall (config-prelude ,config) ,context)
-                       (v:debug :zed "Finished executing prelude"))
-                     ,@body)
-                (setf =context= nil)
-                (destroy-context ,context)))))
-        :name "Zed")))
+       (with-init-context ()
+         (with-thread-pool ()
+           (let ((,context (make-context ,config)))
+             (setf =context= ,context)
+             (unwind-protect
+                  (progn
+                    (with-scope (:prelude)
+                      (v:debug :zed "Executing prelude...")
+                      (funcall (config-prelude ,config) ,context)
+                      (v:debug :zed "Finished executing prelude"))
+                    ,@body)
+               (setf =context= nil)
+               (destroy-context ,context)))))))
