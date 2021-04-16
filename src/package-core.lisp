@@ -77,9 +77,8 @@
    #:translate/velocity)
   ;; Prefab
   (:export
-   #:define-prefab
    #:load-prefab
-   #:ref)
+   #:prefab-reference)
   ;; Input
   (:export
    #:disable-relative-mouse-mode
@@ -102,4 +101,5 @@
    #:define-geometry-layout
    #:define-material
    #:define-picked-hook
+   #:define-prefab
    #:define-texture))

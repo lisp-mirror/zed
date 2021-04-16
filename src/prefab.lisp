@@ -303,7 +303,7 @@
         (t
          (error "Reference spec type must be :UP, :DOWN, or :PATH."))))))
 
-(defmacro ref (&rest reference-spec)
+(defmacro prefab-reference (&rest reference-spec)
   `(%make-prefab-reference :func (generate-prefab-reference-function ',reference-spec)))
 
 (defmacro define-prefab (name options &body body)
