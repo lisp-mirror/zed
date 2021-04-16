@@ -20,16 +20,26 @@
            :type symbol
            :initarg :layer
            :initform nil)
-   (%source :reader source
+   (%source :accessor source
             :inline t
             :type (or z:game-object null)
             :initarg :source
             :initform nil)
-   (%pickable-p :reader pickable-p
-                :inline t
-                :type boolean
-                :initarg :pickable-p
-                :initform t))
+   (%picked-hook :reader picked-hook
+                 :inline t
+                 :type (or function symbol)
+                 :initarg :picked-hook
+                 :initform nil)
+   (%view-enter-hook :reader view-enter-hook
+                     :inline t
+                     :type function
+                     :initarg :view-enter-hook
+                     :initform (constantly nil))
+   (%view-exit-hook :reader view-exit-hook
+                    :inline t
+                    :type function
+                    :initarg :view-exit-hook
+                    :initform (constantly nil)))
   (:setup setup)
   (:attach attach)
   (:physics physics)
@@ -79,9 +89,14 @@
                 (min (z::collision-volume-broad-phase-min volume))
                 (max (z::collision-volume-broad-phase-max volume)))
     (let ((culled-p (z::frustum-aabb (tr.cam::frustum camera) min max)))
-      (u:when-let ((render (z:find-trait (z:trait-owner collider) 'tr.ren:render)))
-        (setf (tr.ren::culled-p render) culled-p))))
-  nil)
+      (u:when-let* ((source (source collider))
+                    (render (z:find-trait source 'tr.ren:render)))
+        (when (eq (tr.ren::culled-p render) (not culled-p))
+          (if culled-p
+              (funcall (view-exit-hook collider) source)
+              (funcall (view-enter-hook collider) source))
+          (setf (tr.ren::culled-p render) culled-p))))
+    nil))
 
 ;;; Hooks
 
@@ -97,7 +112,8 @@
   (declare (optimize speed))
   (let* ((source (or (source collider) (z:trait-owner collider)))
          (volume (make-volume (volume-type collider) collider source)))
-    (setf (volume collider) volume)
+    (setf (volume collider) volume
+          (source collider) source)
     (when (visible-p collider)
       (enable-visibility collider))
     nil))

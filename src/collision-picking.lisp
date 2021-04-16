@@ -83,7 +83,6 @@
 
 (u:fn-> pick-game-object (context) (or game-object null))
 (defun pick-game-object (context)
-  (declare (optimize speed))
   (u:mvlet* ((active-traits (trait-manager-active-by-type (context-trait-manager context)))
              (collision-system (context-collision-system context))
              (mx my (get-mouse-position context))
@@ -92,10 +91,10 @@
     (u:do-hash-keys (k (u:href active-traits 'tr.col:collider))
       (u:when-let* ((volume (tr.col::volume k))
                     (n (pick-collision-volume collision-system volume)))
-        (when (tr.col::pickable-p k)
+        (when (tr.col::picked-hook k)
           (push (cons n k) picked))))
     (when picked
       (let* ((collider (cdar (stable-sort picked #'< :key #'car)))
              (game-object (trait-owner collider)))
-        (on-game-object-picked (tr.col::layer collider) game-object)
+        (funcall (tr.col::picked-hook collider) game-object)
         game-object))))

@@ -100,6 +100,5 @@
    #:define-geometry
    #:define-geometry-layout
    #:define-material
-   #:define-picked-hook
    #:define-prefab
    #:define-texture))

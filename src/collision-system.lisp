@@ -39,9 +39,6 @@
 (defgeneric on-collision-exit (layer1 source1 layer2 source2)
   (:method (layer1 source1 layer2 source2)))
 
-(defgeneric on-game-object-picked (layer source)
-  (:method (layer source)))
-
 (defmacro define-collision-hook (hook layer-spec &body body)
   (u:with-gensyms (layer1-symbol layer2-symbol)
     (case hook
@@ -54,11 +51,6 @@
               ,@body))))
       (t
        `(error "Invalid collision hook type: ~s." ',hook)))))
-
-(defmacro define-picked-hook ((layer source) &body body)
-  (u:with-gensyms (layer-symbol)
-    `(defmethod on-game-object-picked ((,layer-symbol (eql ',layer)) ,source)
-       ,@body)))
 
 (u:fn-> %on-collision-enter (collision-volume collision-volume) null)
 (declaim (inline %on-collision-enter))
