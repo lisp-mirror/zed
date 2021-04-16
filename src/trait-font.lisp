@@ -74,7 +74,7 @@
 (defun center-text (font width height)
   (let ((game-object (z:trait-owner font)))
     (v2:with-components ((d (dimensions font))
-                         (s (z::get-scale game-object)))
+                         (s (z:get-scale game-object)))
       (setf dx width
             dy height)
       (z::translate game-object (v3:vec (* (- dx) sx) (* dy sy) 0.0) :replace-p t :instant-p t))))

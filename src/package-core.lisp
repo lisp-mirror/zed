@@ -57,6 +57,24 @@
    #:trait
    #:trait-context
    #:trait-owner)
+  ;; Transform
+  (:export
+   #:get-rotation
+   #:get-scale
+   #:get-translation
+   #:rotate
+   #:rotate/velocity
+   #:scale
+   #:scale/velocity
+   #:transform-direction
+   #:transform-direction!
+   #:transform-point
+   #:transform-point!
+   #:transform-vector
+   #:transform-vector!
+   #:translate
+   #:translate/clamp
+   #:translate/velocity)
   ;; Prefab
   (:export
    #:define-prefab
