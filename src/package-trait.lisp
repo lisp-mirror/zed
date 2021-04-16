@@ -50,6 +50,17 @@
   (:export
    #:sprite))
 
+(defpackage #:zed.trait.font
+  (:local-nicknames
+   (#:tr.geo #:zed.trait.geometry)
+   (#:u #:golden-utils)
+   (#:v2 #:zed.math.vector2)
+   (#:v3 #:zed.math.vector3)
+   (#:z #:zed))
+  (:use #:cl)
+  (:export
+   #:font))
+
 (defpackage #:zed.trait.collider
   (:local-nicknames
    (#:tr.cam #:zed.trait.camera)

@@ -20,5 +20,6 @@
    (:file "sprite")
    (:file "mesh")
    (:file "geometry")
+   (:file "font")
    (:file "colliders1")
    (:file "colliders2")))

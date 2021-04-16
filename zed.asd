@@ -7,7 +7,9 @@
   :license "MIT"
   :source-control (:git "https://git.mfiano.net/mfiano/zed.git")
   :encoding :utf-8
-  :depends-on (#:babel
+  :depends-on (#:3b-bmfont
+               #:3b-bmfont/json
+               #:babel
                #:bordeaux-threads
                #:cffi
                #:cl-cpus
@@ -75,6 +77,7 @@
    (:file "image-png")
    (:file "image-hdr")
    (:file "gltf")
+   (:file "font")
    (:file "whitelist")
    (:file "clock")
    (:file "time-buffer")
@@ -133,6 +136,7 @@
    (:file "trait-render")
    (:file "trait-mesh")
    (:file "trait-sprite")
+   (:file "trait-font")
    (:file "trait-collider")
    (:file "collision-picking")
    (:file "game-loop")

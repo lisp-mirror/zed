@@ -3,6 +3,7 @@
 (defpackage #:zed
   ;; Third-party aliases
   (:local-nicknames
+   (#:font #:3b-bmfont)
    (#:glob #:global-vars)
    (#:io #:fast-io)
    (#:lp #:lparallel)

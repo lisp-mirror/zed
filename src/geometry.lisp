@@ -9,7 +9,8 @@
   (buffers (vector) :type vector)
   (buffer-names (u:dict #'eq) :type hash-table)
   (primitive :triangles :type keyword)
-  (vertex-count 0 :type u:ub32))
+  (vertex-count 0 :type u:ub32)
+  (primitive-count 0 :type u:ub32))
 
 (glob:define-global-var =geometry= (u:dict #'eq))
 
@@ -83,21 +84,26 @@
         (values)))))
 
 (defun make-geometry (name)
-  (let* ((geometry (funcall (u:href =geometry= name)))
-         (id (geometry-data-id geometry)))
-    (v:debug :zed "Created geometry: ~s (VAO: ~d)" name id)
-    geometry))
+  (let ((geometry-data (u:href =geometry= name)))
+    (unless geometry-data
+      (error "Geometry ~s is not defined." name))
+    (let* ((geometry (funcall (u:href =geometry= name)))
+           (id (geometry-data-id geometry)))
+      (v:debug :zed "Created geometry: ~s (VAO: ~d)" name id)
+      geometry)))
 
 (defun update-geometry (geometry buffer-name data)
   (let ((data (or data (make-array (geometry-data-vertex-count geometry) :initial-element 0))))
     (fill-geometry-buffer geometry buffer-name data)
+    (setf (geometry-data-primitive-count geometry) (length data))
     (values)))
 
 (defun draw-geometry (geometry instance-count)
   (gl:bind-vertex-array (geometry-data-id geometry))
   (%gl:draw-arrays-instanced (geometry-data-primitive geometry)
                              0
-                             (geometry-data-vertex-count geometry)
+                             (* (geometry-data-primitive-count geometry)
+                                (geometry-data-vertex-count geometry))
                              instance-count)
   (gl:bind-vertex-array 0)
   (values))

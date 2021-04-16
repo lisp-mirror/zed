@@ -52,4 +52,7 @@
    #:xyz->xyy)
   ;; Sprite
   (:export
-   #:sprite))
+   #:sprite)
+  ;; Font
+  (:export
+   #:font))
