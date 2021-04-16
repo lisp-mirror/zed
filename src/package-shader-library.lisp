@@ -6,6 +6,9 @@
   (:inherit #:shadow.glsl)
   ;; Common
   (:export
+   #:camera-data
+   #:camera/view
+   #:camera/proj
    #:mesh-attrs
    #:mesh/pos
    #:mesh/normal

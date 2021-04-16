@@ -12,6 +12,10 @@
   (mesh/joints :vec4)
   (mesh/weights :vec4))
 
+(defstruct camera-data
+  (view :mat4 :accessor camera/view)
+  (proj :mat4 :accessor camera/proj))
+
 (defmacro mvlet* ((&rest bindings) &body body)
   (destructuring-bind (&optional car . cdr) bindings
     (etypecase car

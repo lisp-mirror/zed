@@ -172,16 +172,15 @@
 (defun mesh/vertex ((mesh-attrs mesh-attrs)
                     &uniforms
                     (model :mat4)
-                    (view :mat4)
-                    (proj :mat4)
+                    (camera camera-data :ssbo :std-430)
                     (normal-matrix :mat3))
   (with-slots (mesh/pos mesh/normal mesh/tangent mesh/uv1) mesh-attrs
     (let* ((pos (* model (vec4 mesh/pos 1)))
            (world-pos (/ (.xyz pos) (.w pos)))
            (normal (* normal-matrix mesh/normal))
-           (camera-pos (.xyz (aref (inverse view) 3)))
+           (camera-pos (.xyz (aref (inverse (camera/view camera)) 3)))
            (view-dir (normalize (- camera-pos world-pos))))
-      (values (* proj view pos)
+      (values (* (camera/proj camera) (camera/view camera) pos)
               world-pos
               view-dir
               normal

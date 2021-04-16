@@ -4,9 +4,8 @@
                         (uv :vec2)
                         &uniforms
                         (model :mat4)
-                        (view :mat4)
-                        (proj :mat4))
-  (values (* proj view model (vec4 pos 0 1))
+                        (camera camera-data :ssbo :std-430))
+  (values (* (camera/proj camera) (camera/view camera) model (vec4 pos 0 1))
           uv))
 
 (defun geometry/fragment ((uv :vec2))

@@ -10,10 +10,9 @@
                     (uv :vec2)
                     &uniforms
                     (model :mat4)
-                    (view :mat4)
-                    (proj :mat4)
+                    (camera camera-data :ssbo :std-430)
                     (sampler :sampler-2d))
-  (values (* proj model (vec4 pos 0 1))
+  (values (* (camera/proj camera) model (vec4 pos 0 1))
           uv))
 
 (defun font/fragment ((uv :vec2)
