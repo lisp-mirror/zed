@@ -26,9 +26,9 @@
             (clock (context-clock context)))
         (activate-traits context)
         (deactivate-traits context)
+        (invoke-trait-hook context :update)
         (walk-game-object-tree (game-object scene-tree)
           (resolve-world-matrix game-object (clock-interpolation-factor clock)))
-        (invoke-trait-hook context :update)
         nil))))
 
 (u:fn-> start-game-loop (context &key (:profile-p boolean) (:frame-count (or fixnum null))) null)
