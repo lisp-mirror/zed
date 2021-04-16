@@ -13,7 +13,8 @@
                 :initarg context
                 :inline t
                 :type context)
-     (%%owner :accessor trait-owner
+     (%%owner :accessor %trait-owner
+              :reader trait-owner
               :inline t
               :type (or game-object null)
               :initform nil)
@@ -175,7 +176,7 @@
       (when (u:href by-type type)
         (error "A game object can only have 1 trait of a given type attached to it."))
       (register-trait trait)
-      (setf (trait-owner trait) game-object
+      (setf (%trait-owner trait) game-object
             (u:href by-id trait) trait
             (u:href by-type type) trait)
       (call-trait-hook trait :attach)
@@ -191,7 +192,7 @@
       (error "Trait ~s is not attached to game object ~s." trait game-object))
     (call-trait-hook trait :detach)
     (unregister-trait trait)
-    (setf (trait-owner trait) nil)
+    (setf (%trait-owner trait) nil)
     (remhash trait (game-object-traits-by-id game-object))
     (remhash (get-trait-type trait) (game-object-traits-by-type game-object))
     nil))

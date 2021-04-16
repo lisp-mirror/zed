@@ -55,7 +55,8 @@
    #:find-trait
    #:make-trait
    #:trait
-   #:trait-context)
+   #:trait-context
+   #:trait-owner)
   ;; Prefab
   (:export
    #:define-prefab

@@ -76,7 +76,7 @@
 (declaim (inline update-projection/isometric))
 (defun update-projection/isometric (camera)
   (declare (optimize speed))
-  (let* ((owner (z::trait-owner camera))
+  (let* ((owner (z:trait-owner camera))
          (transform (z::game-object-transform owner))
          (rotation #.(q:inverse
                       (q:rotate-euler
@@ -97,7 +97,7 @@
 (u:fn-> update-view (camera) null)
 (defun update-view (camera)
   (declare (optimize speed))
-  (let* ((world-matrix (m4:copy (z::get-transform (z::trait-owner camera) :space :world)))
+  (let* ((world-matrix (m4:copy (z::get-transform (z:trait-owner camera) :space :world)))
          (view (view camera))
          (eye (m4:get-translation world-matrix))
          (target (v3:+ eye (v3:negate (m4:rotation-axis-to-vec3 world-matrix :z))))

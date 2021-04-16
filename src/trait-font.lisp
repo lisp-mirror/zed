@@ -53,7 +53,7 @@
 
 (defun make-geometry (font)
   (let* ((context (z:trait-context font))
-         (game-object (z::trait-owner font))
+         (game-object (z:trait-owner font))
          (geometry (z:make-trait context 'tr.geo:geometry :name 'text)))
     (z:attach-trait game-object geometry)))
 
@@ -72,7 +72,7 @@
     (z::update-geometry (tr.geo::resource geometry) :data data)))
 
 (defun center-text (font width height)
-  (let ((game-object (z::trait-owner font)))
+  (let ((game-object (z:trait-owner font)))
     (v2:with-components ((d (dimensions font))
                          (s (z::get-scale game-object)))
       (setf dx width
@@ -100,7 +100,7 @@
 (defun update (font)
   (declare (optimize speed))
   (let* ((context (z:trait-context font))
-         (game-object (z::trait-owner font))
+         (game-object (z:trait-owner font))
          (clock (z::context-clock context))
          (elapsed-time (z::clock-elapsed-time clock))
          (geometry (z:find-trait game-object 'tr.geo:geometry)))

@@ -94,7 +94,7 @@
   (declare (optimize speed))
   (let* ((asset (asset sprite))
          (shader-manager (z::context-shader-manager (z:trait-context sprite)))
-         (render-trait (z:find-trait (z::trait-owner sprite) 'tr.ren:render))
+         (render-trait (z:find-trait (z:trait-owner sprite) 'tr.ren:render))
          (material (tr.ren::material render-trait)))
     (z::set-uniform material :sprite.index (index sprite))
     (z::with-shader-buffers (shader-manager asset)
