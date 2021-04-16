@@ -80,9 +80,6 @@
                 (max (z::collision-volume-broad-phase-max volume)))
     (let ((culled-p (z::frustum-aabb (tr.cam::frustum camera) min max)))
       (u:when-let ((render (z:find-trait (z::trait-owner collider) 'tr.ren:render)))
-        (setf (tr.ren::culled-p render) culled-p))
-      (u:when-let* ((source (source collider))
-                    (render (z:find-trait source 'tr.ren:render)))
         (setf (tr.ren::culled-p render) culled-p))))
   nil)
 
