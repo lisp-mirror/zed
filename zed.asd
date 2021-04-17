@@ -58,8 +58,7 @@
      (:file "binary-parser")
      (:file "ordered-class")
      (:file "red-black-tree")
-     (:file "slice-stream")
-     (:file "octree")))
+     (:file "slice-stream")))
    (:module "shader-library"
     :components
     ((:file "package")
