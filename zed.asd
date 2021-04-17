@@ -52,7 +52,8 @@
      (:file "point3d")
      (:file "line3d")
      (:file "frustum")
-     (:file "easing")))
+     (:file "easing")
+     (:file "geometry-aabb")
    (:module "util"
     :components
     ((:file "package")

@@ -899,3 +899,23 @@
    #:bounce-in-out
    #:hermite-curve
    #:quintic-curve))
+
+(defpackage #:zed.math.geometry.aabb
+  (:local-nicknames
+   (#:p3 #:zed.math.point3d)
+   (#:u #:golden-utils)
+   (#:v2 #:zed.math.vector2)
+   (#:v3 #:zed.math.vector3))
+  (:use #:cl)
+  (:shadow
+   #:max
+   #:min)
+  (:export
+   #:aabb
+   #:interval
+   #:max
+   #:min
+   #:origin
+   #:size
+   #:vertices))
+
