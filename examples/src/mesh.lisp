@@ -26,16 +26,18 @@
               :use-ibl t)
    :features (:enable (:texture-cube-map-seamless))))
 
-(z:define-prefab mesh (:rotate-velocity (v3:velocity v3:+up+ const:+pi/6+)
-                       :scale 32.0)
+(z:define-prefab mesh (:scale 32.0)
   (z.mesh:mesh :name "helmet"
                :asset '(:zed-examples "meshes/damaged-helmet.glb"))
   (z.render:render :material 'mesh))
 
+(z:define-prefab mesh-carousel (:template 'mesh
+                                :rotate-velocity (v3:velocity v3:+up+ const:+pi/6+)))
+
 (defun mesh-prelude (context)
   (z:load-prefab context 'quitter)
   (z:load-prefab context 'camera/perspective)
-  (z:load-prefab context 'mesh))
+  (z:load-prefab context 'mesh-carousel))
 
 (defun mesh ()
   (z:start-game :window-width 1280

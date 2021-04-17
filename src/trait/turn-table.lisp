@@ -82,16 +82,19 @@
 (defun update (turn-table)
   (declare (optimize speed))
   (let* ((context (z:trait-context turn-table))
-         (game-object (z:trait-owner turn-table))
          (dragging-p (dragging-p turn-table))
-         (button (rotation-button turn-table))
-         (started (z:on-button-enter context :mouse button))
-         (stopped (z:on-button-exit context :mouse button)))
-    (when (or (and started (eq (z::pick-game-object context) game-object)) dragging-p)
-      (when started
-        (start-rotation turn-table))
-      (when dragging-p
-        (rotate turn-table))
-      (when stopped
-        (finish-rotation turn-table)))
+         (button (rotation-button turn-table)))
+    (cond
+      ((and (z:on-button-enter context :mouse button)
+            ;; Check if the source of the picked collider is the game object with the turn table.
+            (u:when-let* ((picked (z::pick-game-object context))
+                          (collider (z:find-trait picked 'tr.col:collider)))
+              (eq (tr.col::source collider)
+                  (z:trait-owner turn-table))))
+       (start-rotation turn-table))
+      ((and (z:on-button-exit context :mouse button)
+            dragging-p)
+       (finish-rotation turn-table))
+      (dragging-p
+       (rotate turn-table)))
     nil))

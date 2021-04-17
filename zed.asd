@@ -161,7 +161,8 @@
      (:file "mesh")
      (:file "sprite")
      (:file "font")
-     (:file "collider")))
+     (:file "collider")
+     (:file "turn-table")))
    (:module "late"
     :components
     ((:file "picking")

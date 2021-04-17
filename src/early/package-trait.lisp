@@ -72,7 +72,16 @@
    (#:z #:zed)
    (#:zsl #:zed.shader-library))
   (:use #:cl)
-  (:shadow
-   #:continue)
   (:export
    #:collider))
+
+(defpackage #:zed.trait.turn-table
+  (:local-nicknames
+   (#:q #:zed.math.quaternion)
+   (#:tr.col #:zed.trait.collider)
+   (#:u #:golden-utils)
+   (#:v2 #:zed.math.vector2)
+   (#:z #:zed))
+  (:use #:cl)
+  (:export
+   #:turn-table))

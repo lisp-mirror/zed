@@ -24,7 +24,8 @@
    (#:z.geometry #:zed.trait.geometry)
    (#:z.mesh #:zed.trait.mesh)
    (#:z.render #:zed.trait.render)
-   (#:z.sprite #:zed.trait.sprite))
+   (#:z.sprite #:zed.trait.sprite)
+   (#:z.turn-table #:zed.trait.turn-table))
   (:use #:cl)
   (:export
    #:colliders1
@@ -33,4 +34,5 @@
    #:geometry
    #:mesh
    #:sprite
-   #:texture))
+   #:texture
+   #:turn-table))
