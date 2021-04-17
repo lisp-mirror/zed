@@ -37,7 +37,7 @@
          (p (v3:- (collision-volume-world-center volume) (line3d:start picker)))
          (f (v3:vec (v3:dot x-axis dir) (v3:dot y-axis dir) (v3:dot z-axis dir)))
          (e (v3:vec (v3:dot x-axis p) (v3:dot y-axis p) (v3:dot z-axis p)))
-         (x (make-array 6 :element-type 'u:f32 :initial-element 0.0)))
+         (x (u:make-f32-array 6)))
     (declare (dynamic-extent x-axis y-axis z-axis dir p f e x))
     (dotimes (i 3)
       (let ((ei (aref e i))
