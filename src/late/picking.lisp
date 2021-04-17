@@ -83,8 +83,8 @@
                                   (float (viewport-height viewport) 1f0)))
                 (mx (float x 1f0))
                 (my (float y 1f0)))
-    (v3:copy! start (p3:unproject (p3:point mx my 0.0) view projection viewport))
-    (v3:copy! end (p3:unproject (p3:point mx my 1.0) view projection viewport))
+    (v3:copy! start (p3:unproject (p3:point mx my 0) view projection viewport))
+    (v3:copy! end (p3:unproject (p3:point mx my 1) view projection viewport))
     nil))
 
 (u:fn-> pick-game-object (context) (or game-object null))
