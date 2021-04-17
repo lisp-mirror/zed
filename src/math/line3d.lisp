@@ -6,12 +6,12 @@
             (:copier nil)
             (:constructor %line (start end))
             (:conc-name nil))
-  (start (p3:point 0.0 0.0 0.0) :type p3:point)
-  (end (p3:point 0.0 0.0 0.0) :type p3:point))
+  (start (p3:point) :type p3:point)
+  (end (p3:point) :type p3:point))
 
 (u:fn-> line (&key (:start p3:point) (:end p3:point)) line)
 (declaim (inline line))
-(defun line (&key (start (p3:point 0.0 0.0 0.0)) (end (p3:point 0.0 0.0 0.0)))
+(defun line (&key (start (p3:point)) (end (p3:point)))
   (declare (optimize speed))
   (%line start end))
 

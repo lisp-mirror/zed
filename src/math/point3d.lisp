@@ -2,9 +2,9 @@
 
 (deftype point () 'v3:vec)
 
-(u:fn-> point (u:f32 u:f32 u:f32) point)
+(u:fn-> point (&optional u:f32 u:f32 u:f32) point)
 (declaim (inline point))
-(defun point (x y z)
+(defun point (&optional (x 0.0) (y 0.0) (z 0.0))
   (declare (optimize speed))
   (v3:vec x y z))
 
