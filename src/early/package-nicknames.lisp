@@ -17,7 +17,4 @@
 
 (add #:tr.cam #:zed.trait.camera #:zed)
 (add #:tr.col #:zed.trait.collider #:zed)
-(add #:tr.geo #:zed.trait.geometry #:zed)
-(add #:tr.mesh #:zed.trait.mesh #:zed)
 (add #:tr.ren #:zed.trait.render #:zed)
-(add #:tr.sprite #:zed.trait.sprite #:zed)
