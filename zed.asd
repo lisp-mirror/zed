@@ -51,7 +51,8 @@
      (:file "point2d")
      (:file "point3d")
      (:file "line3d")
-     (:file "frustum")))
+     (:file "frustum")
+     (:file "easing")))
    (:module "util"
     :components
     ((:file "package")
