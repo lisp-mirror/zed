@@ -210,12 +210,8 @@
           (destructuring-bind (min-x min-y min-z) min-extent
             (destructuring-bind (max-x max-y max-z) max-extent
               (setf (gltf-primitive-element-count primitive) count
-                    (gltf-primitive-extent-min primitive) (v3:vec (float min-x 1f0)
-                                                                  (float min-y 1f0)
-                                                                  (float min-z 1f0))
-                    (gltf-primitive-extent-max primitive) (v3:vec (float max-x 1f0)
-                                                                  (float max-y 1f0)
-                                                                  (float max-z 1f0))))))))))
+                    (gltf-primitive-extent-min primitive) (v3:vec min-x min-y min-z)
+                    (gltf-primitive-extent-max primitive) (v3:vec max-x max-y max-z)))))))))
 
 (defun make-gltf-index-buffer (gltf primitive data)
   (u:when-let* ((indices (get-gltf-property gltf "indices" data))

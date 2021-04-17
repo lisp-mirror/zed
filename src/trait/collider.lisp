@@ -47,8 +47,8 @@
 
 (z::define-material collider ()
   (:shader zsl::collider
-   :uniforms (:hit-color (v4:vec 0.0 1.0 0.0 0.35)
-              :miss-color (v4:vec 1.0 0.0 0.0 0.35))
+   :uniforms (:hit-color (v4:vec 0 1 0 0.35)
+              :miss-color (v4:vec 1 0 0 0.35))
    :features (:enable (:line-smooth)
               :disable (:cull-face)
               :polygon-mode :line

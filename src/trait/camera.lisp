@@ -81,7 +81,7 @@
          (rotation #.(q:inverse
                       (q:rotate-euler
                        q:+id+
-                       (v3:vec (- (asin (/ (sqrt 3)))) 0.0 const::+pi/4+)))))
+                       (v3:vec (- (asin (/ (sqrt 3)))) 0 const::+pi/4+)))))
     (update-projection/orthographic camera)
     (z::initialize-rotate-state transform rotation)
     nil))

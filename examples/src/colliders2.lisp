@@ -1,19 +1,19 @@
 (in-package #:zed-examples)
 
-(z:define-prefab colliders2/left (:translate (v3:vec -0.55 0.0 0.0)
+(z:define-prefab colliders2/left (:translate (v3:vec -0.55 0 0)
                                   :rotate-velocity (v3:velocity v3:+forward+ const:+pi/4+))
   (z.collider:collider :volume :box
                        :layer 'object))
 
-(z:define-prefab colliders2/right (:translate (v3:vec 0.5 0.0 0.0))
+(z:define-prefab colliders2/right (:translate (v3:vec 0.5 0 0))
   (z.collider:collider :volume :box
                        :layer 'object))
 
 (z:define-prefab colliders2 (:scale 128.0)
-  ((test1 :translate (v3:vec -2.0 0.0 0.0))
+  ((test1 :translate (v3:vec -2 0 0))
    ((left :template 'colliders2/left))
    ((right :template 'colliders2/right)))
-  ((test2 :translate (v3:vec 2.0 0.0 0.0))
+  ((test2 :translate (v3:vec 2 0 0))
    ((left :template 'colliders2/left))
    ((right :template 'colliders2/right
            :scale 0.5)

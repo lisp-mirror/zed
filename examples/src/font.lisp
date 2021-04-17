@@ -7,7 +7,7 @@
 (z:define-material font ()
   (:shader zsl:font
    :uniforms (:sampler 'font
-              :color (v4:vec 0.0 1.0 0.0 0.75))))
+              :color (v4:vec 0 1 0 0.75))))
 
 (z:define-prefab font (:scale 4.0)
   (z.font:font :asset '(:zed-examples "metadata/font.json")

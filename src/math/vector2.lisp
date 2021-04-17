@@ -12,14 +12,13 @@
             `(with-components ,rest ,@body)
             `(progn ,@body)))))
 
-(u:fn-> vec (u:f32 u:f32) vec)
+(u:fn-> vec (&optional real real) vec)
 (declaim (inline vec))
 (u:eval-always
-  (defun vec (x y)
-    (declare (optimize speed))
+  (defun vec (&optional (x 0.0) (y 0.0))
     (let ((vec (u:make-f32-array 2)))
-      (setf (aref vec 0) x
-            (aref vec 1) y)
+      (setf (aref vec 0) (float x 1f0)
+            (aref vec 1) (float y 1f0))
       vec)))
 
 (u:fn-> x (vec) u:f32)

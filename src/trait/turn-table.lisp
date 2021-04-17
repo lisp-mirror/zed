@@ -39,7 +39,7 @@
   (declare (optimize speed))
   (u:mvlet* ((context (z:trait-context turn-table))
              (x y (z:get-mouse-position context)))
-    (setf (drag-start turn-table) (v2:vec (float x 1f0) (float y 1f0))
+    (setf (drag-start turn-table) (v2:vec x y)
           (dragging-p turn-table) t)
     nil))
 
@@ -51,7 +51,7 @@
              (x y (z:get-mouse-position context))
              (speed (rotation-speed turn-table)))
     (v2:with-components ((r (rotation-vector turn-table))
-                         (v (v2:- (v2:vec (float x 1f0) (float y 1f0)) (drag-start turn-table))))
+                         (v (v2:- (v2:vec x y) (drag-start turn-table))))
       (z:rotate game-object
                 (q:rotate (q:orient :local :y (+ rx (* vx speed)) :x (- (+ ry (* vy speed))))
                           (initial turn-table))
@@ -65,7 +65,7 @@
              (x y (z:get-mouse-position context))
              (vector (rotation-vector turn-table))
              (start (drag-start turn-table))
-             (end (v2:vec (float x 1f0) (float y 1f0))))
+             (end (v2:vec x y)))
     (setf (dragging-p turn-table) nil
           (drag-end turn-table) end)
     (v2:+! vector vector (v2:scale (v2:- end start) (rotation-speed turn-table)))

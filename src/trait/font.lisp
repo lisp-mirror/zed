@@ -77,7 +77,7 @@
                          (s (z:get-scale game-object)))
       (setf dx width
             dy height)
-      (z::translate game-object (v3:vec (* (- dx) sx) (* dy sy) 0.0) :replace-p t :instant-p t))))
+      (z::translate game-object (v3:vec (* (- dx) sx) (* dy sy) 0) :replace-p t :instant-p t))))
 
 (defun update-p (font)
   (let* ((context (z:trait-context font))
