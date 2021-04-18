@@ -921,3 +921,16 @@
    #:size
    #:vertices))
 
+(defpackage #:zed.math.geometry.sphere
+  (:local-nicknames
+   (#:aabb #:zed.math.geometry.aabb)
+   (#:p3 #:zed.math.point3d)
+   (#:u #:golden-utils)
+   (#:v3 #:zed.math.vector3))
+  (:use #:cl)
+  (:export
+   #:bounding-aabb
+   #:bounding-aabb!
+   #:origin
+   #:radius
+   #:sphere))

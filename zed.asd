@@ -54,6 +54,7 @@
      (:file "frustum")
      (:file "easing")
      (:file "geometry-aabb")
+     (:file "geometry-sphere")))
    (:module "util"
     :components
     ((:file "package")
