@@ -14,8 +14,7 @@
   (source nil :type game-object)
   (center (v3:zero) :type v3:vec)
   (world-center (v3:zero) :type v3:vec)
-  (broad-phase-min (v3:zero) :type v3:vec)
-  (broad-phase-max (v3:zero) :type v3:vec)
+  (broad-phase-volume (aabb:aabb) :type aabb:aabb)
   (update-func (constantly nil) :type function))
 
 (u:define-printer (collision-volume stream :type nil)

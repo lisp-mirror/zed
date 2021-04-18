@@ -63,6 +63,7 @@
 
 (defpackage #:zed.trait.collider
   (:local-nicknames
+   (#:aabb #:zed.math.geometry.aabb)
    (#:tr.cam #:zed.trait.camera)
    (#:tr.mesh #:zed.trait.mesh)
    (#:tr.ren #:zed.trait.render)

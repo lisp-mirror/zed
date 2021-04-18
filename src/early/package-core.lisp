@@ -13,6 +13,7 @@
    (#:u #:golden-utils))
   ;; Internal aliases
   (:local-nicknames
+   (#:aabb #:zed.math.geometry.aabb)
    (#:const #:zed.math.constants)
    (#:frustum #:zed.math.frustum)
    (#:line3d #:zed.math.line3d)

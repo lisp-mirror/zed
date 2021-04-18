@@ -912,6 +912,8 @@
    #:min)
   (:export
    #:aabb
+   #:from-min/max
+   #:from-min/max!
    #:interval
    #:max
    #:min
