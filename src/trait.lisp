@@ -157,6 +157,7 @@
         whole)))
 
 (u:fn-> find-trait (game-object symbol) (or trait null))
+(declaim (inline find-trait))
 (defun find-trait (game-object type)
   (declare (optimize speed))
   (u:href (game-object-traits-by-type game-object) type))

@@ -1,6 +1,7 @@
 (in-package #:zed.math.primitive-test)
 
 (u:fn-> sphere/sphere (sphere:sphere sphere:sphere) boolean)
+(declaim (inline sphere/sphere))
 (defun sphere/sphere (sphere1 sphere2)
   (declare (optimize speed))
   (<= (p3:distance-squared (sphere:origin sphere1) (sphere:origin sphere2))
@@ -16,16 +17,19 @@
        (expt (sphere:radius sphere) 2))))
 
 (u:fn-> sphere/obb (sphere:sphere obb:obb) boolean)
+(declaim (inline sphere/obb))
 (defun sphere/obb (sphere obb)
   (declare (optimize speed))
   (%sphere/obb sphere obb))
 
 (u:fn-> obb/sphere (obb:obb sphere:sphere) boolean)
+(declaim (inline obb/sphere))
 (defun obb/sphere (obb sphere)
   (declare (optimize speed))
   (%sphere/obb sphere obb))
 
 (u:fn-> obb/obb (obb:obb obb:obb) boolean)
+(declaim (inline obb/obb))
 (defun obb/obb (obb1 obb2)
   (declare (optimize speed))
   (u:mvlet ((r r-abs (obb::make-obb-obb-rotation obb1 obb2)))
@@ -99,11 +103,13 @@
       nil)))
 
 (u:fn-> frustum/aabb (frustum:frustum aabb:aabb) boolean)
+(declaim (inline frustum/aabb))
 (defun frustum/aabb (frustum aabb)
   (declare (optimize speed))
   (%frustum/aabb frustum aabb))
 
 (u:fn-> aabb/frustum (aabb:aabb frustum:frustum) boolean)
+(declaim (inline aabb/frustum))
 (defun aabb/frustum (aabb frustum)
   (declare (optimize speed))
   (%frustum/aabb frustum aabb))

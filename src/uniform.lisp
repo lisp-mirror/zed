@@ -83,19 +83,24 @@
     (funcall func)))
 
 (u:fn-> resolve-uniform-value (core game-object uniform) t)
+(declaim (inline resolve-uniform-value))
 (defun resolve-uniform-value (core game-object uniform)
+  (declare (optimize speed))
   (let ((value (uniform-value uniform)))
     (etypecase value
       (boolean value)
-      ((or symbol function) (funcall value core game-object))
+      (function (funcall value core game-object))
       (t value))))
 
 (u:fn-> resolve-uniform-function (core game-object uniform) t)
 (defun resolve-uniform-function (core game-object uniform)
-  (funcall (uniform-func uniform)
-           (uniform-program uniform)
-           (uniform-key uniform)
-           (resolve-uniform-value core game-object uniform)))
+  (let ((func (uniform-func uniform)))
+    (declare (optimize speed)
+             (function func))
+    (funcall func
+             (uniform-program uniform)
+             (uniform-key uniform)
+             (resolve-uniform-value core game-object uniform))))
 
 (u:fn-> load-uniform-texture (core material uniform) null)
 (defun load-uniform-texture (core material uniform)

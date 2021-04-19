@@ -320,6 +320,7 @@
   (rotate-euler! (id) quat vec :space space))
 
 (u:fn-> rotate! (quat quat quat &key (:space keyword)) quat)
+(declaim (inline rotate!))
 (defun rotate! (out quat1 quat2 &key (space :local))
   (declare (optimize speed))
   (ecase space
