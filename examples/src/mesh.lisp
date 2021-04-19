@@ -34,10 +34,10 @@
 (z:define-prefab mesh-carousel (:template 'mesh
                                 :rotate-velocity (v3:velocity v3:+up+ const:+pi/6+)))
 
-(defun mesh-prelude (context)
-  (z:load-prefab context 'quitter)
-  (z:load-prefab context 'camera/perspective)
-  (z:load-prefab context 'mesh-carousel))
+(defun mesh-prelude (core)
+  (z:load-prefab core 'quitter)
+  (z:load-prefab core 'camera/perspective)
+  (z:load-prefab core 'mesh-carousel))
 
 (defun mesh ()
   (z:start-game :window-width 1280

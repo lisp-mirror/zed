@@ -10,10 +10,10 @@
 (z:define-collision-plan turn-table ()
   (object ()))
 
-(defun turn-table-prelude (context)
-  (z:load-prefab context 'quitter)
-  (z:load-prefab context 'camera/perspective)
-  (z:load-prefab context 'turn-table))
+(defun turn-table-prelude (core)
+  (z:load-prefab core 'quitter)
+  (z:load-prefab core 'camera/perspective)
+  (z:load-prefab core 'turn-table))
 
 (defun turn-table ()
   (z:start-game :window-width 1280

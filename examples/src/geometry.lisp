@@ -24,10 +24,10 @@
   (z.geometry:geometry :name 'tile)
   (z.render:render :material 'tile))
 
-(defun geometry-prelude (context)
-  (z:load-prefab context 'quitter)
-  (z:load-prefab context 'camera/perspective)
-  (z:load-prefab context 'tile))
+(defun geometry-prelude (core)
+  (z:load-prefab core 'quitter)
+  (z:load-prefab core 'camera/perspective)
+  (z:load-prefab core 'tile))
 
 (defun geometry ()
   (z:start-game :window-width 1280

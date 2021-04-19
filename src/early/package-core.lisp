@@ -35,7 +35,7 @@
   (:use #:cl)
   ;; Core
   (:export
-   #:context
+   #:core
    #:pause-game
    #:start-game
    #:stop-game
@@ -61,7 +61,7 @@
    #:find-trait
    #:make-trait
    #:trait
-   #:trait-context
+   #:trait-core
    #:trait-owner)
   ;; Transform
   (:export

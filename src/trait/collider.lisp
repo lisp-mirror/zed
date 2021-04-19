@@ -55,18 +55,18 @@
 
 (u:fn-> enable-visibility (collider) null)
 (defun enable-visibility (collider)
-  (let ((context (z:trait-context collider))
+  (let ((core (z:trait-core collider))
         (owner (z:trait-owner collider)))
     (when (or (z:find-trait owner 'tr.mesh:mesh)
               (z:find-trait owner 'tr.ren:render))
       (error "Game object ~a has a visible collider, but it must not also have a mesh or render ~
               trait."
              owner))
-    (let ((mesh (z:make-trait context
+    (let ((mesh (z:make-trait core
                               'tr.mesh:mesh
                               :asset '(:zed "meshes/colliders.glb")
                               :name (z::volume-mesh-name (volume collider))))
-          (render (z:make-trait context 'tr.ren:render :material 'collider)))
+          (render (z:make-trait core 'tr.ren:render :material 'collider)))
       (z:attach-trait owner mesh)
       (z:attach-trait owner render)
       nil)))
@@ -82,8 +82,8 @@
 (u:fn-> frustum-cull-collider (collider) null)
 (defun frustum-cull-collider (collider)
   (declare (optimize speed))
-  (u:when-let* ((context (z:trait-context collider))
-                (camera (z::context-active-camera context))
+  (u:when-let* ((core (z:trait-core collider))
+                (camera (z::core-active-camera core))
                 (volume (volume collider)))
     (let ((culled-p (geo.test:frustum/aabb (tr.cam::frustum camera)
                                            (z::volume-broad-geometry volume))))
@@ -119,7 +119,7 @@
 (u:fn-> physics (collider) null)
 (defun physics (collider)
   (declare (optimize speed))
-  (let ((system (z::context-collision-system (z:trait-context collider)))
+  (let ((system (z::core-collision-system (z:trait-core collider)))
         (volume (volume collider)))
     (z::register-volume system volume)
     (frustum-cull-collider collider)

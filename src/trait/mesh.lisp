@@ -41,9 +41,9 @@
   (let ((asset (asset mesh)))
     (unless asset
       (error "A mesh trait must have an asset specified."))
-    (let* ((context (z:trait-context mesh))
+    (let* ((core (z:trait-core mesh))
            (name (name mesh))
-           (gltf (z::with-resource-cache (context :mesh asset)
+           (gltf (z::with-resource-cache (core :mesh asset)
                    (destructuring-bind (asset-system asset-path) asset
                      (prog1 (z::load-gltf asset)
                        (v:debug :zed "Cached mesh resource: ~a (~s)" asset-path asset-system)))))

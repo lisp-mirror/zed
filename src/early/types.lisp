@@ -37,10 +37,10 @@
 (u:define-printer (trait-manager stream :type nil)
   (format stream "TRAIT-MANAGER"))
 
-(glob:define-global-var =context= nil)
+(glob:define-global-var =core= nil)
 
-(defstruct (context
-            (:constructor %make-context)
+(defstruct (core
+            (:constructor %make-core)
             (:predicate nil)
             (:copier nil))
   (running-p nil :type boolean)
@@ -59,5 +59,5 @@
   (collision-system nil :type collision-system)
   (active-camera nil))
 
-(u:define-printer (context stream :type nil :identity t)
-  (format stream "CONTEXT"))
+(u:define-printer (core stream :type nil :identity t)
+  (format stream "CORE"))

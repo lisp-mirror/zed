@@ -65,8 +65,8 @@
 (u:fn-> setup (sprite) null)
 (defun setup (sprite)
   (declare (optimize speed))
-  (let* ((context (z:trait-context sprite))
-         (spritesheet (z::make-spritesheet context (asset sprite) (buffer-spec sprite))))
+  (let* ((core (z:trait-core sprite))
+         (spritesheet (z::make-spritesheet core (asset sprite) (buffer-spec sprite))))
     (setf (spritesheet sprite) spritesheet
           (index sprite) (z::find-sprite spritesheet (name sprite))
           (initial-index sprite) (index sprite))
@@ -77,7 +77,7 @@
   (declare (optimize speed))
   (unless (pause-p sprite)
     (let* ((duration (duration sprite))
-           (clock (z::context-clock (z:trait-context sprite))))
+           (clock (z::core-clock (z:trait-core sprite))))
       (incf (elapsed sprite) (z::get-frame-time clock))
       (if (>= (elapsed sprite) duration)
           (setf (elapsed sprite) 0.0
@@ -93,7 +93,7 @@
 (defun render (sprite)
   (declare (optimize speed))
   (let* ((asset (asset sprite))
-         (shader-manager (z::context-shader-manager (z:trait-context sprite)))
+         (shader-manager (z::core-shader-manager (z:trait-core sprite)))
          (render-trait (z:find-trait (z:trait-owner sprite) 'tr.ren:render))
          (material (tr.ren::material render-trait)))
     (z::set-uniform material :sprite.index (index sprite))

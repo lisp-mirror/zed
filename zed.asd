@@ -93,7 +93,7 @@
      (:file "monitor")
      (:file "window")
      (:file "audio")
-     (:file "context")
+     (:file "core")
      (:file "viewport-data")
      (:file "viewport")
      (:file "viewport-manager")))

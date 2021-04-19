@@ -86,10 +86,10 @@
     texture))
 
 (u:fn-> load-texture
-        (context symbol &key (:width (or u:ub16 null)) (:height (or u:ub16 null)))
+        (core symbol &key (:width (or u:ub16 null)) (:height (or u:ub16 null)))
         texture)
-(defun load-texture (context name &key width height)
-  (with-resource-cache (context :texture name)
+(defun load-texture (core name &key width height)
+  (with-resource-cache (core :texture name)
     (v:debug :zed "Loading texture: ~s..." name)
     (let* ((data (find-texture-data name))
            (type (texture-data-type data))
@@ -104,13 +104,10 @@
       texture)))
 
 (defmethod recompile ((type (eql :texture)) data)
-  (u:when-let ((texture (find-resource =context= :texture data)))
+  (u:when-let ((texture (find-resource =core= :texture data)))
     (gl:delete-texture (texture-id texture))
-    (delete-resource =context= :texture data)
-    (load-texture =context=
-                  data
-                  :width (texture-width texture)
-                  :height (texture-height texture))
+    (delete-resource =core= :texture data)
+    (load-texture =core= data :width (texture-width texture) :height (texture-height texture))
     (dolist (material-name (texture-materials texture))
       (recompile :material material-name))
     (v:debug :zed "Recompiled texture: ~s" data)))

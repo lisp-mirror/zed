@@ -11,10 +11,10 @@
   (z.geometry:geometry :name 'tile)
   (z.render:render :material 'texture))
 
-(defun texture-prelude (context)
-  (z:load-prefab context 'quitter)
-  (z:load-prefab context 'camera/orthographic)
-  (z:load-prefab context 'texture))
+(defun texture-prelude (core)
+  (z:load-prefab core 'quitter)
+  (z:load-prefab core 'camera/orthographic)
+  (z:load-prefab core 'texture))
 
 (defun texture ()
   (z:start-game :window-width 1280

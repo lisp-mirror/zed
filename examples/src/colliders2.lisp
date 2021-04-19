@@ -25,10 +25,10 @@
 (z:define-collision-plan colliders2 (:cell-size 256)
   (object (object)))
 
-(defun colliders2-prelude (context)
-  (z:load-prefab context 'quitter)
-  (z:load-prefab context 'camera/orthographic)
-  (z:load-prefab context 'colliders2))
+(defun colliders2-prelude (core)
+  (z:load-prefab core 'quitter)
+  (z:load-prefab core 'camera/orthographic)
+  (z:load-prefab core 'colliders2))
 
 (defun colliders2 ()
   (z:start-game :window-width 1280

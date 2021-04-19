@@ -19,11 +19,11 @@
           (aref data pointer) time)
     buffer))
 
-(defmacro with-time-buffer ((context buffer-name) &body body)
+(defmacro with-time-buffer ((core buffer-name) &body body)
   (u:with-gensyms (clock buffer start-time)
     (if (member :zed.release *features*)
         `(progn ,@body)
-        `(let* ((,clock (context-clock ,context))
+        `(let* ((,clock (core-clock ,core))
                 (,start-time (get-clock-time ,clock)))
            (unless (u:href =time-buffers= ',buffer-name)
              (setf (u:href =time-buffers= ',buffer-name) (make-time-buffer 1000)))
@@ -32,7 +32,7 @@
                (insert-time-buffer ,buffer (- (get-clock-time ,clock) ,start-time))))))))
 
 (defun print-time-buffers ()
-  (let* ((clock (context-clock =context=))
+  (let* ((clock (core-clock =core=))
          (ups (clock-units-per-second clock))
          (refresh-time-units (clock-refresh-time-units clock))
          (refresh-time-ms (* 1000 (/ refresh-time-units ups)))

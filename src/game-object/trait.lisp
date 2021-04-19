@@ -1,7 +1,7 @@
 (in-package #:zed)
 
 (u:define-constant +trait-slot-order+
-    '(%%context %%owner %%setup-hook %%attach-hook %%detach-hook %%update-hook %%render-hook)
+    '(%%core %%owner %%setup-hook %%attach-hook %%detach-hook %%update-hook %%render-hook)
   :test #'equal)
 
 (u:define-constant +trait-hook-names+
@@ -9,10 +9,10 @@
 
 (u:eval-always
   (util.oc::define-ordered-class trait ()
-    ((%%context :reader trait-context
-                :initarg context
-                :inline t
-                :type context)
+    ((%%core :reader trait-core
+             :initarg core
+             :inline t
+             :type core)
      (%%owner :accessor %trait-owner
               :reader trait-owner
               :inline t
@@ -116,7 +116,7 @@
        (thread-pool-enqueue (list :trait ',type)))))
 
 (defmethod recompile ((type (eql :trait)) data)
-  (let ((trait-manager (context-trait-manager =context=)))
+  (let ((trait-manager (core-trait-manager =core=)))
     (setf (trait-manager-order trait-manager) (sort-trait-types))
     (v:debug :zed "Recompiled trait: ~s" data)))
 
@@ -126,21 +126,21 @@
 
 ;; Create an instance of a trait of the given type. Slow path, for when the type is not a quoted
 ;; symbol.
-(u:fn-> make-trait (context symbol &rest t) trait)
-(defun make-trait (context type &rest args)
+(u:fn-> make-trait (core symbol &rest t) trait)
+(defun make-trait (core type &rest args)
   (declare (optimize speed))
   (with-allowed-scopes make-trait
       (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
        :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook
        :collision-hook)
     (if (subtypep type 'trait)
-        (let ((trait (apply #'make-instance type 'context context args)))
+        (let ((trait (apply #'make-instance type 'core core args)))
           (call-trait-hook trait :setup)
           trait)
         (error "Trait type ~s is not defined." type))))
 
 ;; Create an instance of a trait of the given type. Fast path, for when the type is a quoted symbol.
-(define-compiler-macro make-trait (&whole whole context type &rest args)
+(define-compiler-macro make-trait (&whole whole core type &rest args)
   (u:with-gensyms (trait)
     (if (and (consp type)
              (eq (car type) 'quote))
@@ -151,7 +151,7 @@
                (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
                 :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook
                 :collision-hook)
-             (let ((,trait (make-instance ',type 'context ,context ,@args)))
+             (let ((,trait (make-instance ',type 'core ,core ,@args)))
                (funcall (fdefinition (trait-setup-hook ,trait)) ,trait)
                ,trait)))
         whole)))

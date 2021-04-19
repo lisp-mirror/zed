@@ -136,10 +136,10 @@
      :copy nil)
     nil))
 
-(u:fn-> compute-collisions (context) null)
-(defun compute-collisions (context)
+(u:fn-> compute-collisions (core) null)
+(defun compute-collisions (core)
   (declare (optimize speed))
-  (let* ((system (context-collision-system context))
+  (let* ((system (core-collision-system core))
          (layers (collision-system-layers system)))
     (map nil
          (lambda (x)

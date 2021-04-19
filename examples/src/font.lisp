@@ -15,10 +15,10 @@
                :text (lambda () (format nil "~d" (random 1000.0))))
   (z.render:render :material 'font))
 
-(defun font-prelude (context)
-  (z:load-prefab context 'quitter)
-  (z:load-prefab context 'camera/orthographic)
-  (z:load-prefab context 'font))
+(defun font-prelude (core)
+  (z:load-prefab core 'quitter)
+  (z:load-prefab core 'camera/orthographic)
+  (z:load-prefab core 'font))
 
 (defun font ()
   (z:start-game :window-width 1280

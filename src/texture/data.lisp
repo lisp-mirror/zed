@@ -41,7 +41,7 @@
           (texture-data-mipmaps-p data) mipmaps-p
           (texture-data-parameters data) parameters
           (texture-data-source data) source)
-    (when =context=
+    (when =core=
       (thread-pool-enqueue (list :texture name)))
     nil))
 

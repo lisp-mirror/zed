@@ -37,13 +37,13 @@
   (with-asset (asset path data :format :lisp)
     data))
 
-(u:fn-> make-spritesheet (context list list) spritesheet)
-(defun make-spritesheet (context asset buffer-spec)
+(u:fn-> make-spritesheet (core list list) spritesheet)
+(defun make-spritesheet (core asset buffer-spec)
   (declare (optimize speed))
-  (with-resource-cache (context :spritesheet asset)
+  (with-resource-cache (core :spritesheet asset)
     (let ((spritesheet (%make-spritesheet :name asset
                                           :spec (read-spritesheet-spec-file asset)
                                           :vao (gl:gen-vertex-array))))
-      (apply #'make-shader-buffer (context-shader-manager context) asset buffer-spec)
+      (apply #'make-shader-buffer (core-shader-manager core) asset buffer-spec)
       (update-spritesheet-buffer spritesheet)
       spritesheet)))

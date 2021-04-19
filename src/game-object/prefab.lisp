@@ -253,18 +253,18 @@
 
 (defun update-prefab (prefab)
   (parse-prefab prefab)
-  (when =context=
+  (when =core=
     (thread-pool-enqueue (list :prefab (prefab-name prefab))))
   (dolist (spec (prefab-slaves prefab))
     (u:when-let ((slave (u:href =prefabs= spec)))
       (clrhash (prefab-nodes slave))
       (update-prefab slave))))
 
-(defun load-prefab (context name &key parent)
+(defun load-prefab (core name &key parent)
   (let ((prefabs =prefabs=))
     (u:if-let ((prefab (u:href prefabs name)))
       (let* ((factory (prefab-factory prefab))
-             (game-object (funcall (prefab-factory-func factory) context :parent parent)))
+             (game-object (funcall (prefab-factory-func factory) core :parent parent)))
         (clrhash (prefab-factory-game-objects factory))
         game-object)
       (error "Prefab ~s not defined." name))))
@@ -317,19 +317,19 @@
 
 (defmethod recompile ((type (eql :prefab)) data)
   (with-scope (:prefab-recompile)
-    (dolist (game-object (u:href (context-prefabs =context=) data))
-      (destroy-game-object =context= game-object)
+    (dolist (game-object (u:href (core-prefabs =core=) data))
+      (destroy-game-object =core= game-object)
       (let* ((parent (game-object-parent game-object))
              (translation (get-translation game-object))
-             (new-game-object (load-prefab =context= data :parent parent)))
+             (new-game-object (load-prefab =core= data :parent parent)))
         (translate new-game-object translation :replace-p t)))
     (v:debug :zed "Recompiled prefab: ~s" data)))
 
-(defun realize-prefab-node (context node root)
+(defun realize-prefab-node (core node root)
   (let* ((factory (prefab-factory (prefab-node-prefab node)))
          (game-objects (prefab-factory-game-objects factory))
          (game-object (u:href game-objects (prefab-node-path node))))
-    (spawn-game-object context
+    (spawn-game-object core
                        game-object
                        (u:if-let ((parent (prefab-node-parent node)))
                          (u:href game-objects (prefab-node-path parent))
@@ -342,16 +342,16 @@
                            (funcall (prefab-reference-func arg) factory)
                            arg))
               :into args
-            :finally (let ((trait (apply #'make-trait context type args)))
+            :finally (let ((trait (apply #'make-trait core type args)))
                        (attach-trait game-object trait))))
     game-object))
 
-(defun register-prefab-root (context prefab)
+(defun register-prefab-root (core prefab)
   (let* ((factory (prefab-factory prefab))
          (root (u:href (prefab-factory-game-objects factory)
                        (prefab-node-path (prefab-root prefab))))
          (prefab-name (prefab-name prefab)))
-    (push root (u:href (context-prefabs context) prefab-name))
+    (push root (u:href (core-prefabs core) prefab-name))
     (setf (game-object-prefab-name root) prefab-name)
     root))
 
@@ -369,7 +369,7 @@
                             (u:href node-options :scale-velocity))))
 
 (defun make-prefab-factory-function (prefab)
-  (lambda (context &key parent)
+  (lambda (core &key parent)
     (let ((factory (prefab-factory prefab))
           (nodes (prefab-nodes prefab)))
       (u:do-hash (path node nodes)
@@ -380,9 +380,9 @@
       (u:do-hash-values (node nodes)
         (setf (prefab-factory-current-node factory) node)
         (with-scope (:prefab-instantiate)
-          (realize-prefab-node context node parent)))
+          (realize-prefab-node core node parent)))
       (setf (prefab-factory-current-node factory) nil)
-      (register-prefab-root context prefab))))
+      (register-prefab-root core prefab))))
 
 (defun build-prefab (prefab)
   (let ((factory (prefab-factory prefab)))

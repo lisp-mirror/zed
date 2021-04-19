@@ -59,6 +59,6 @@
   nil)
 
 (defmethod recompile ((type (eql :viewport)) data)
-  (u:when-let ((viewport (find-viewport (context-viewports =context=) data)))
+  (u:when-let ((viewport (find-viewport (core-viewports =core=) data)))
     (update-viewport viewport)
     (v:debug :zed "Recompiled viewport: ~s" data)))

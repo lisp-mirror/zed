@@ -41,20 +41,20 @@
    :primitive :triangles))
 
 (defun load-font-asset (font)
-  (let ((context (z:trait-context font))
+  (let ((core (z:trait-core font))
         (asset (asset font)))
     (unless asset
       (error "A font trait must have an asset specified."))
-    (z::with-resource-cache (context :font asset)
+    (z::with-resource-cache (core :font asset)
       (destructuring-bind (asset-system asset-path) asset
         (prog1 (z::with-asset (asset asset-path data :format :character-stream)
                  (3b-bmfont-json:read-bmfont-json data))
           (v:debug :zed "Cached font resource: ~a (~s)" asset-path asset-system))))))
 
 (defun make-geometry (font)
-  (let* ((context (z:trait-context font))
+  (let* ((core (z:trait-core font))
          (game-object (z:trait-owner font))
-         (geometry (z:make-trait context 'tr.geo:geometry :name 'text)))
+         (geometry (z:make-trait core 'tr.geo:geometry :name 'text)))
     (z:attach-trait game-object geometry)))
 
 (defun resolve-text (font)
@@ -80,8 +80,8 @@
       (z::translate game-object (v3:vec (* (- dx) sx) (* dy sy) 0) :replace-p t :instant-p t))))
 
 (defun update-p (font)
-  (let* ((context (z:trait-context font))
-         (clock (z::context-clock context))
+  (let* ((core (z:trait-core font))
+         (clock (z::core-clock core))
          (elapsed-time (z::clock-elapsed-time clock)))
     (>= elapsed-time (+ (update-time font)
                         (the fixnum (round (z::clock-units-per-second clock)
@@ -99,9 +99,9 @@
 (u:fn-> update (font) null)
 (defun update (font)
   (declare (optimize speed))
-  (let* ((context (z:trait-context font))
+  (let* ((core (z:trait-core font))
          (game-object (z:trait-owner font))
-         (clock (z::context-clock context))
+         (clock (z::core-clock core))
          (elapsed-time (z::clock-elapsed-time clock))
          (geometry (z:find-trait game-object 'tr.geo:geometry)))
     (when (update-p font)

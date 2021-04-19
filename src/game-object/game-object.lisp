@@ -164,14 +164,14 @@
 ;; Walk the sub-tree rooted at a game object, modifying each game object's depth property. This
 ;; simply records an integral depth for each game object that is mapped over. This is called
 ;; whenever a game object is spawned or moved around in the scene tree.
-(u:fn-> %recalculate-game-object-sub-tree-depths (context game-object) null)
-(defun %recalculate-game-object-sub-tree-depths (context game-object)
+(u:fn-> %recalculate-game-object-sub-tree-depths (core game-object) null)
+(defun %recalculate-game-object-sub-tree-depths (core game-object)
   (declare (optimize speed))
   (walk-game-object-tree (x game-object)
     (setf (game-object-depth x) (1+ (game-object-depth (game-object-parent x))))
     ;; When a game object's depth changes, we also have to resort its draw call in the draw order
     ;; manager.
-    (resort-draw-order context game-object)))
+    (resort-draw-order core game-object)))
 
 ;; Update the game object's path string after it has been spawned or moved in the scene tree. This
 ;; is done by appending the game object's label to the resolved path of its parent game object,
@@ -196,16 +196,16 @@
 ;; NOTE: In debug mode, it is checked and an error is signalled if attempting to re-parent a game
 ;; object under itslef or one of its children, as the result would not be a tree structure. This
 ;; safeguard is not checked in release mode for performance reasons, so be careful.
-(u:fn-> reparent-game-object (context game-object game-object) game-object)
+(u:fn-> reparent-game-object (core game-object game-object) game-object)
 (declaim (inline reparent-game-object))
-(defun reparent-game-object (context game-object new-parent)
+(defun reparent-game-object (core game-object new-parent)
   (declare (optimize speed))
   (with-allowed-scopes reparent-game-object
       (:prefab-instantiate :trait-setup-hook :trait-destroy-hook :trait-attach-hook
        :trait-detach-hook :trait-physics-hook :trait-update-hook)
     (let (;; We need the clock so we can resolve the world matrix of the newly placed game object
           ;; the correct interpolation factor.
-          (clock (context-clock context)))
+          (clock (core-clock core)))
       ;; Ensure the root is not moved when in debug mode.
       (debug-check (not (game-object-root-p game-object)))
       ;; Only in debug mode, error if the new parent is within the sub-tree rooted at the game
@@ -220,7 +220,7 @@
       ;; Make the game object a child of the new parent game object.
       (push game-object (game-object-children new-parent))
       ;; Update the tree depth of the moved game object and all of its children.
-      (%recalculate-game-object-sub-tree-depths context game-object)
+      (%recalculate-game-object-sub-tree-depths core game-object)
       ;; Set the game object's new path used for printing.
       (%resolve-game-object-path game-object new-parent)
       ;; Set the game object's pause mode to be that of the new parent if it has a pause mode of
@@ -236,26 +236,26 @@
 ;; parent is not rooted in the scene tree, in which case the spawned game object is part of that
 ;; parent's disjoint tree until it is connected to the main scene tree. This allows building up
 ;; trees of game objects that are not yet registered with the scene.
-(u:fn-> spawn-game-object (context game-object &optional game-object) game-object)
-(defun spawn-game-object (context game-object &optional parent)
+(u:fn-> spawn-game-object (core game-object &optional game-object) game-object)
+(defun spawn-game-object (core game-object &optional parent)
   (declare (optimize speed))
   (with-allowed-scopes spawn-game-object
       (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
        :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook)
-    (reparent-game-object context game-object (or parent (context-scene-tree context)))
+    (reparent-game-object core game-object (or parent (core-scene-tree core)))
     (dolist (child (game-object-children game-object))
-      (spawn-game-object context child game-object))
+      (spawn-game-object core child game-object))
     game-object))
 
-(u:fn-> destroy-game-object (context game-object &key (:reparent-p boolean)) null)
-(defun destroy-game-object (context game-object &key reparent-p)
+(u:fn-> destroy-game-object (core game-object &key (:reparent-p boolean)) null)
+(defun destroy-game-object (core game-object &key reparent-p)
   (declare (optimize speed))
   (with-allowed-scopes destroy-game-object
       (:prefab-recompile :trait-setup-hook :trait-destroy-hook :trait-attach-hook
        :trait-detach-hook :trait-physics-hook :trait-update-hook :collision-hook)
-    (flet ((deregister-prefab (context game-object)
+    (flet ((deregister-prefab (core game-object)
              (u:when-let ((prefab-name (game-object-prefab-name game-object))
-                          (table (context-prefabs context)))
+                          (table (core-prefabs core)))
                (u:deletef (the list (u:href table prefab-name)) game-object)
                (unless (u:href table prefab-name)
                  (remhash prefab-name table))
@@ -265,9 +265,9 @@
       (let ((parent (game-object-parent game-object)))
         (dolist (child (game-object-children game-object))
           (if reparent-p
-              (reparent-game-object context child parent)
-              (destroy-game-object context child)))
+              (reparent-game-object core child parent)
+              (destroy-game-object core child)))
         (destroy-all-traits game-object)
-        (deregister-prefab context game-object)
+        (deregister-prefab core game-object)
         (u:deletef (game-object-children parent) game-object)
         nil))))

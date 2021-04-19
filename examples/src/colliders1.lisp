@@ -34,10 +34,10 @@
 (z:define-collision-hook :enter ((player player) (destroyer destroyer))
   (z::translate player (v3:vec -30 0 0) :replace-p t :instant-p t))
 
-(defun colliders1-prelude (context)
-  (z:load-prefab context 'quitter)
-  (z:load-prefab context 'camera/perspective)
-  (z:load-prefab context 'colliders1))
+(defun colliders1-prelude (core)
+  (z:load-prefab core 'quitter)
+  (z:load-prefab core 'camera/perspective)
+  (z:load-prefab core 'colliders1))
 
 (defun colliders1 ()
   (z:start-game :window-width 1280
