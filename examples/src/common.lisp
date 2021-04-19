@@ -26,16 +26,16 @@
   (z.camera:camera))
 
 (z:define-prefab camera/perspective (:template 'camera
-                                     :translate (v3:vec 0 0 50)))
+                                     :translate (v3:vec 0.0 0.0 50.0)))
 
 (z:define-prefab camera/orthographic (:template 'camera
-                                      :translate (v3:vec 0 0 1))
+                                      :translate (v3:vec 0.0 0.0 1.0))
   (z.camera:camera :mode :orthographic
                    :clip-near -1000.0
                    :clip-far 1000.0))
 
 (z:define-prefab camera/isometric (:template 'camera
-                                   :translate (v3:vec 0 0 1))
+                                   :translate (v3:vec 0.0 0.0 1.0))
   (z.camera:camera :mode :isometric
                    :clip-near -1000.0
                    :clip-far 1000.0))
@@ -51,6 +51,8 @@
 
 (defun quitter/update (quitter)
   (let ((context (z:trait-context quitter)))
+    (when (z:on-button-enter context :mouse :left)
+      (z::pick-game-object context))
     (when (or (z:on-button-enter context :key :escape)
               (z:on-button-enter context :window :close))
       (z:stop-game context))))

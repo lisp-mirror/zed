@@ -919,11 +919,9 @@
    #:bounding-aabb
    #:bounding-aabb!
    #:obb
-   #:interval
    #:origin
    #:rotation
-   #:size
-   #:vertices))
+   #:size))
 
 (defpackage #:zed.math.geometry.sphere
   (:local-nicknames
@@ -968,22 +966,10 @@
    #:top
    #:update))
 
-(defpackage #:zed.math.geometry.closest-point
-  (:local-nicknames
-   (#:m3 #:zed.math.matrix3)
-   (#:obb #:zed.math.geometry.obb)
-   (#:p3 #:zed.math.point3d)
-   (#:u #:golden-utils)
-   (#:v3 #:zed.math.vector3))
-  (:use #:cl)
-  (:export
-   #:obb))
-
 (defpackage #:zed.math.geometry.test
   (:local-nicknames
    (#:aabb #:zed.math.geometry.aabb)
    (#:frustum #:zed.math.geometry.frustum)
-   (#:geo.cp #:zed.math.geometry.closest-point)
    (#:m3 #:zed.math.matrix3)
    (#:obb #:zed.math.geometry.obb)
    (#:p3 #:zed.math.point3d)

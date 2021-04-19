@@ -57,7 +57,6 @@
      (:file "geometry-sphere")
      (:file "geometry-ray")
      (:file "geometry-frustum")
-     (:file "geometry-closest-point")
      (:file "geometry-test")
      (:file "geometry-raycast")))
    (:module "util"
