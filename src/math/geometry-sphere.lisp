@@ -9,6 +9,9 @@
   (origin (p3:point) :type p3:point)
   (radius 1.0 :type u:f32))
 
+(u:define-printer (sphere stream :type nil)
+  (format stream "Sphere"))
+
 (u:fn-> bounding-aabb! (aabb:aabb sphere) aabb:aabb)
 (defun bounding-aabb! (aabb sphere)
   (declare (optimize speed))

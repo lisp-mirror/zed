@@ -1,4 +1,4 @@
-(in-package #:zed.math.frustum)
+(in-package #:zed.math.geometry.frustum)
 
 (defstruct (frustum
             (:conc-name nil)

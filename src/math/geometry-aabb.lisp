@@ -9,6 +9,9 @@
   (origin (p3:point) :type p3:point)
   (size (v3:uniform 1.0) :type v3:vec))
 
+(u:define-printer (aabb stream :type nil)
+  (format stream "AABB"))
+
 (u:fn-> from-min/max! (aabb p3:point p3:point) aabb)
 (declaim (inline from-min/max!))
 (defun from-min/max! (aabb min max)

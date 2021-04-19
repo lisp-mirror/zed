@@ -5,6 +5,8 @@
    (#:u #:golden-utils))
   (:use #:cl)
   (:shadow
+   #:=)
+  (:export
    #:=))
 
 (defpackage #:zed.math.constants
@@ -842,23 +844,6 @@
    #:midpoint
    #:start))
 
-(defpackage #:zed.math.frustum
-  (:local-nicknames
-   (#:u #:golden-utils)
-   (#:m4 #:zed.math.matrix4)
-   (#:v4 #:zed.math.vector4))
-  (:use #:cl)
-  (:export
-   #:bottom
-   #:far
-   #:frustum
-   #:left
-   #:make-frustum
-   #:near
-   #:right
-   #:top
-   #:update))
-
 (defpackage #:zed.math.easing
   (:local-nicknames
    (#:const #:zed.math.constants)
@@ -921,6 +906,25 @@
    #:size
    #:vertices))
 
+(defpackage #:zed.math.geometry.obb
+  (:local-nicknames
+   (#:aabb #:zed.math.geometry.aabb)
+   (#:m3 #:zed.math.matrix3)
+   (#:p3 #:zed.math.point3d)
+   (#:u #:golden-utils)
+   (#:v2 #:zed.math.vector2)
+   (#:v3 #:zed.math.vector3))
+  (:use #:cl)
+  (:export
+   #:bounding-aabb
+   #:bounding-aabb!
+   #:obb
+   #:interval
+   #:origin
+   #:rotation
+   #:size
+   #:vertices))
+
 (defpackage #:zed.math.geometry.sphere
   (:local-nicknames
    (#:aabb #:zed.math.geometry.aabb)
@@ -934,3 +938,81 @@
    #:origin
    #:radius
    #:sphere))
+
+(defpackage #:zed.math.geometry.ray
+  (:local-nicknames
+   (#:p3 #:zed.math.point3d)
+   (#:u #:golden-utils)
+   (#:v3 #:zed.math.vector3))
+  (:use #:cl)
+  (:export
+   #:direction
+   #:from-points
+   #:origin
+   #:ray))
+
+(defpackage #:zed.math.geometry.frustum
+  (:local-nicknames
+   (#:u #:golden-utils)
+   (#:m4 #:zed.math.matrix4)
+   (#:v4 #:zed.math.vector4))
+  (:use #:cl)
+  (:export
+   #:bottom
+   #:far
+   #:frustum
+   #:left
+   #:make-frustum
+   #:near
+   #:right
+   #:top
+   #:update))
+
+(defpackage #:zed.math.geometry.closest-point
+  (:local-nicknames
+   (#:m3 #:zed.math.matrix3)
+   (#:obb #:zed.math.geometry.obb)
+   (#:p3 #:zed.math.point3d)
+   (#:u #:golden-utils)
+   (#:v3 #:zed.math.vector3))
+  (:use #:cl)
+  (:export
+   #:obb))
+
+(defpackage #:zed.math.geometry.test
+  (:local-nicknames
+   (#:aabb #:zed.math.geometry.aabb)
+   (#:frustum #:zed.math.geometry.frustum)
+   (#:geo.cp #:zed.math.geometry.closest-point)
+   (#:m3 #:zed.math.matrix3)
+   (#:obb #:zed.math.geometry.obb)
+   (#:p3 #:zed.math.point3d)
+   (#:sphere #:zed.math.geometry.sphere)
+   (#:u #:golden-utils)
+   (#:v2 #:zed.math.vector2)
+   (#:v3 #:zed.math.vector3)
+   (#:v4 #:zed.math.vector4))
+  (:use #:cl)
+  (:export
+   #:aabb/frustum
+   #:frustum/aabb
+   #:obb/obb
+   #:obb/sphere
+   #:sphere/obb
+   #:sphere/sphere))
+
+(defpackage #:zed.math.geometry.raycast
+  (:local-nicknames
+   (#:com #:%zed.math.common)
+   (#:aabb #:zed.math.geometry.aabb)
+   (#:m3 #:zed.math.matrix3)
+   (#:obb #:zed.math.geometry.obb)
+   (#:ray #:zed.math.geometry.ray)
+   (#:sphere #:zed.math.geometry.sphere)
+   (#:u #:golden-utils)
+   (#:v3 #:zed.math.vector3))
+  (:use #:cl)
+  (:export
+   #:ray/aabb
+   #:ray/obb
+   #:ray/sphere))

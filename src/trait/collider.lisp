@@ -8,7 +8,7 @@
                  :initform :box)
    (%volume :accessor volume
             :inline t
-            :type (or z::collision-volume null)
+            :type (or z::volume null)
             :initform nil)
    (%visible-p :reader visible-p
                :inline t
@@ -47,12 +47,11 @@
 
 (z::define-material collider ()
   (:shader zsl::collider
-   :uniforms (:hit-color (v4:vec 0 1 0 0.35)
-              :miss-color (v4:vec 1 0 0 0.35))
+   :uniforms (:hit-color (v4:vec 0 1 0 0.75)
+              :miss-color (v4:vec 1 0 0 0.75))
    :features (:enable (:line-smooth)
-              :disable (:cull-face)
               :polygon-mode :line
-              :line-width 2.0)))
+              :line-width 1.0)))
 
 (u:fn-> enable-visibility (collider) null)
 (defun enable-visibility (collider)
@@ -66,30 +65,28 @@
     (let ((mesh (z:make-trait context
                               'tr.mesh:mesh
                               :asset '(:zed "meshes/colliders.glb")
-                              :name (z::collision-volume-mesh-name (volume collider))))
+                              :name (z::volume-mesh-name (volume collider))))
           (render (z:make-trait context 'tr.ren:render :material 'collider)))
       (z:attach-trait owner mesh)
       (z:attach-trait owner render)
       nil)))
 
-(u:fn-> make-volume (z::collision-volume-type collider z:game-object) z::collision-volume)
+(u:fn-> make-volume (z::volume-type collider z:game-object) z::volume)
 (defun make-volume (type collider source)
   (declare (optimize speed))
   (let ((layer (layer collider)))
     (ecase type
-      (:box (z::make-collision-volume-box :collider collider :layer layer :source source))
-      (:sphere (z::make-collision-volume-sphere :collider collider :layer layer :source source)))))
+      (:box (z::make-volume/box collider layer source))
+      (:sphere (z::make-volume/sphere collider layer source)))))
 
 (u:fn-> frustum-cull-collider (collider) null)
 (defun frustum-cull-collider (collider)
   (declare (optimize speed))
   (u:when-let* ((context (z:trait-context collider))
                 (camera (z::context-active-camera context))
-                (volume (volume collider))
-                (broad-phase-volume (z::collision-volume-broad-phase-volume volume))
-                (min (aabb:min broad-phase-volume))
-                (max (aabb:max broad-phase-volume)))
-    (let ((culled-p (z::frustum-aabb (tr.cam::frustum camera) min max)))
+                (volume (volume collider)))
+    (let ((culled-p (geo.test:frustum/aabb (tr.cam::frustum camera)
+                                           (z::volume-broad-geometry volume))))
       (u:when-let* ((source (source collider))
                     (render (z:find-trait source 'tr.ren:render)))
         (when (eq (tr.ren::culled-p render) (not culled-p))
@@ -124,7 +121,7 @@
   (declare (optimize speed))
   (let ((system (z::context-collision-system (z:trait-context collider)))
         (volume (volume collider)))
-    (z::register-collision-volume system volume)
+    (z::register-volume system volume)
     (frustum-cull-collider collider)
     nil))
 
@@ -135,5 +132,5 @@
     (let* ((volume (volume collider))
            (render-trait (z:find-trait (z:trait-owner collider) 'tr.ren:render))
            (material (tr.ren::material render-trait))
-           (hit-p (plusp (hash-table-count (z::collision-volume-contacts volume)))))
+           (hit-p (plusp (hash-table-count (z::volume-contacts volume)))))
       (z::set-uniform material :contact hit-p))))

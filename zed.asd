@@ -51,10 +51,15 @@
      (:file "point2d")
      (:file "point3d")
      (:file "line3d")
-     (:file "frustum")
      (:file "easing")
      (:file "geometry-aabb")
-     (:file "geometry-sphere")))
+     (:file "geometry-obb")
+     (:file "geometry-sphere")
+     (:file "geometry-ray")
+     (:file "geometry-frustum")
+     (:file "geometry-closest-point")
+     (:file "geometry-test")
+     (:file "geometry-raycast")))
    (:module "util"
     :components
     ((:file "package")
@@ -134,8 +139,6 @@
     :components
     ((:file "plan")
      (:file "volume")
-     (:file "volume-box")
-     (:file "volume-sphere")
      (:file "hash-grid")
      (:file "tests")
      (:file "system")))
