@@ -12,6 +12,7 @@
   (declare (optimize speed))
   (let* ((sphere-origin (sphere:origin sphere))
          (closest-point (geo.cp:obb obb sphere-origin)))
+    (declare (dynamic-extent closest-point))
     (< (p3:distance-squared closest-point sphere-origin)
        (expt (sphere:radius sphere) 2))))
 

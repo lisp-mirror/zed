@@ -67,7 +67,7 @@
 (defun interval (aabb axis)
   (declare (optimize speed))
   (let* ((vertices (vertices aabb))
-         (v (v2:vec (v3:dot axis (aref vertices 0)))))
+         (v (v2:uniform (v3:dot axis (aref vertices 0)))))
     (declare (dynamic-extent vertices v))
     (v2:with-components ((r v))
       (dotimes (i 8)

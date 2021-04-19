@@ -1,6 +1,7 @@
 (in-package #:zed.math.geometry.closest-point)
 
 (u:fn-> obb (obb:obb p3:point) p3:point)
+(declaim (inline obb))
 (defun obb (obb point)
   (declare (optimize speed))
   (let* ((origin (obb:origin obb))

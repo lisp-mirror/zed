@@ -14,6 +14,7 @@
   (format stream "OBB"))
 
 (u:fn-> vertices (obb) (simple-vector 8))
+(declaim (inline vertices))
 (defun vertices (obb)
   (declare (optimize speed))
   (let* ((origin (origin obb))
@@ -50,10 +51,12 @@
     (vector v1 v2 v3 v4 v5 v6 v7 v8)))
 
 (u:fn-> interval (obb v3:vec) v2:vec)
+(declaim (notinline interval))
 (defun interval (obb axis)
   (declare (optimize speed))
   (let* ((vertices (vertices obb))
-         (v (v2:vec (v3:dot axis (aref vertices 0)))))
+         (v (v2:uniform (v3:dot axis (aref vertices 0)))))
+    (declare (dynamic-extent vertices v))
     (v2:with-components ((r v))
       (dotimes (i 8)
         (let ((projection (v3:dot axis (aref vertices i))))
