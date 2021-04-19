@@ -24,21 +24,20 @@
     (format stream "[~,6f, ~,6f, ~,6f~% ~,6f, ~,6f, ~,6f~% ~,6f, ~,6f, ~,6f]"
             m00 m01 m02 m10 m11 m12 m20 m21 m22)))
 
-(u:fn-> mat (u:f32 u:f32 u:f32 u:f32 u:f32 u:f32 u:f32 u:f32 u:f32) mat)
+(u:fn-> mat (real real real real real real real real real) mat)
 (declaim (inline mat))
 (u:eval-always
   (defun mat (m00 m10 m20 m01 m11 m21 m02 m12 m22)
-    (declare (optimize speed))
     (let ((mat (u:make-f32-array 9)))
-      (setf (aref mat 0) m00
-            (aref mat 1) m10
-            (aref mat 2) m20
-            (aref mat 3) m01
-            (aref mat 4) m11
-            (aref mat 5) m21
-            (aref mat 6) m02
-            (aref mat 7) m12
-            (aref mat 8) m22)
+      (setf (aref mat 0) (float m00 1f0)
+            (aref mat 1) (float m10 1f0)
+            (aref mat 2) (float m20 1f0)
+            (aref mat 3) (float m01 1f0)
+            (aref mat 4) (float m11 1f0)
+            (aref mat 5) (float m21 1f0)
+            (aref mat 6) (float m02 1f0)
+            (aref mat 7) (float m12 1f0)
+            (aref mat 8) (float m22 1f0))
       mat)))
 
 (u:define-constant +zero+ (mat 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0) :test #'equalp)

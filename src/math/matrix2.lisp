@@ -18,16 +18,15 @@
   (with-components ((m matrix))
     (format stream "[~,6f, ~,6f~% ~,6f, ~,6f]" m00 m01 m10 m11)))
 
-(u:fn-> mat (u:f32 u:f32 u:f32 u:f32) mat)
+(u:fn-> mat (real real real real) mat)
 (declaim (inline mat))
 (u:eval-always
   (defun mat (m00 m10 m01 m11)
-    (declare (optimize speed))
     (let ((mat (u:make-f32-array 4)))
-      (setf (aref mat 0) m00
-            (aref mat 1) m10
-            (aref mat 2) m01
-            (aref mat 3) m11)
+      (setf (aref mat 0) (float m00 1f0)
+            (aref mat 1) (float m10 1f0)
+            (aref mat 2) (float m01 1f0)
+            (aref mat 3) (float m11 1f0))
       mat)))
 
 (u:define-constant +zero+ (mat 0.0 0.0 0.0 0.0) :test #'equalp)
