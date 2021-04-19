@@ -96,7 +96,8 @@
      (:file "core")
      (:file "viewport-data")
      (:file "viewport")
-     (:file "viewport-manager")))
+     (:file "viewport-manager")
+     (:file "free-look-state")))
    (:module "asset"
     :components
     ((:file "pack")

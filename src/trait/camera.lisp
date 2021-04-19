@@ -26,6 +26,15 @@
           :type u:f32
           :initarg :zoom
           :initform 1.0)
+   (%free-look-p :reader free-look-p
+                 :inline t
+                 :type boolean
+                 :initarg :free-look-p
+                 :initform nil)
+   (%free-look-state :accessor free-look-state
+                     :inline t
+                     :type (or z::free-look-state null)
+                     :initform nil)
    (%translate-view-p :reader translate-view-p
                       :inline t
                       :type boolean
@@ -44,6 +53,7 @@
              :type frustum:frustum
              :initform (frustum:make-frustum)))
   (:setup setup)
+  (:attach attach)
   (:update update))
 
 (u:fn-> update-projection/orthographic (camera) null)
@@ -106,6 +116,8 @@
     (m4:look-at! view eye target up)
     (unless (translate-view-p camera)
       (m4:set-translation! view view v3:+zero+))
+    (u:when-let ((free-look-state (free-look-state camera)))
+      (z::set-initial-free-look-orientation free-look-state world-matrix))
     nil))
 
 (defun make-active (camera)
@@ -128,12 +140,29 @@
 
 ;;; Hooks
 
+(u:fn-> setup (camera) null)
 (defun setup (camera)
+  (declare (optimize speed))
   (setf (fov-y camera) (* (fov-y camera) const:+deg+))
   (unless (z::core-active-camera (z:trait-core camera))
-    (make-active camera)))
+    (make-active camera))
+  nil)
 
+(u:fn-> attach (camera) null)
+(defun attach (camera)
+  (declare (optimize speed))
+  (when (free-look-p camera)
+    (let ((game-object (z:trait-owner camera)))
+      (setf (free-look-state camera) (z::make-free-look-state game-object))
+      nil)))
+
+(u:fn-> update (camera) null)
 (defun update (camera)
-  (update-view camera)
-  (update-projection camera)
-  (frustum:update (frustum camera) (view camera) (projection camera)))
+  (declare (optimize speed))
+  (let ((core (z:trait-core camera)))
+    (u:when-let ((free-look-state (free-look-state camera)))
+      (z::update-free-look-state core free-look-state))
+    (update-view camera)
+    (update-projection camera)
+    (frustum:update (frustum camera) (view camera) (projection camera))
+    nil))
