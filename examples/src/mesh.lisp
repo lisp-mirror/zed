@@ -39,7 +39,5 @@
   (z:load-prefab core 'camera/perspective)
   (z:load-prefab core 'mesh-carousel))
 
-(defun mesh ()
-  (z:start-game :window-width 1280
-                :window-height 720
-                :prelude #'mesh-prelude))
+(z:define-context mesh ()
+  (:prelude #'mesh-prelude))

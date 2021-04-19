@@ -16,7 +16,5 @@
   (z:load-prefab core 'camera/orthographic)
   (z:load-prefab core 'texture))
 
-(defun texture ()
-  (z:start-game :window-width 1280
-                :window-height 720
-                :prelude #'texture-prelude))
+(z:define-context texture ()
+  (:prelude #'texture-prelude))

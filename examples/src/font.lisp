@@ -20,7 +20,5 @@
   (z:load-prefab core 'camera/orthographic)
   (z:load-prefab core 'font))
 
-(defun font ()
-  (z:start-game :window-width 1280
-                :window-height 720
-                :prelude #'font-prelude))
+(z:define-context font ()
+  (:prelude #'font-prelude))

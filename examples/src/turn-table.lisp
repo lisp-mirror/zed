@@ -15,8 +15,6 @@
   (z:load-prefab core 'camera/perspective)
   (z:load-prefab core 'turn-table))
 
-(defun turn-table ()
-  (z:start-game :window-width 1280
-                :window-height 720
-                :collision-plan 'turn-table
-                :prelude #'turn-table-prelude))
+(z:define-context turn-table ()
+  (:collision-plan 'turn-table
+   :prelude #'turn-table-prelude))

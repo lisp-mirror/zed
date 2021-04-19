@@ -171,4 +171,5 @@
     :components
     ((:file "picking")
      (:file "game-loop")
+     (:file "context")
      (:file "core")))))

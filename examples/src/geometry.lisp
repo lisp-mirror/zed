@@ -29,7 +29,5 @@
   (z:load-prefab core 'camera/perspective)
   (z:load-prefab core 'tile))
 
-(defun geometry ()
-  (z:start-game :window-width 1280
-                :window-height 720
-                :prelude #'geometry-prelude))
+(z:define-context geometry ()
+  (:prelude #'geometry-prelude))

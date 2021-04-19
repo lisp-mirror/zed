@@ -102,6 +102,7 @@
   (:export
    #:define-collision-hook
    #:define-collision-plan
+   #:define-context
    #:define-framebuffer
    #:define-geometry
    #:define-geometry-layout

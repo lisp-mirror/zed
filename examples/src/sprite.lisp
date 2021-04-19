@@ -36,7 +36,5 @@
   (z:load-prefab core 'planet)
   (z:load-prefab core 'ship))
 
-(defun sprite ()
-  (z:start-game :window-width 1280
-                :window-height 720
-                :prelude #'sprite-prelude))
+(z:define-context sprite ()
+  (:prelude #'sprite-prelude))

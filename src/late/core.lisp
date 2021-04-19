@@ -2,13 +2,8 @@
 
 ;; The entry point of the engine. This constructs a core using the optional user-supplied
 ;; arguments, and then enters the main game loop.
-(defun start-game (&rest options)
-  (let ((config (apply #'make-config options)))
-    (v:info :zed "Started ~a" (config-window-title config))
-    (with-core core (config)
-      (start-game-loop core
-                       :profile-p (config-profile-p config)
-                       :frame-count (config-frame-count config))))
+(defun start-game (context)
+  (make-instance (find-context context))
   (values))
 
 ;; Stop the game associated with the given core.

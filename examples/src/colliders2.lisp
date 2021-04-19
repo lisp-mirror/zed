@@ -30,8 +30,6 @@
   (z:load-prefab core 'camera/orthographic)
   (z:load-prefab core 'colliders2))
 
-(defun colliders2 ()
-  (z:start-game :window-width 1280
-                :window-height 720
-                :collision-plan 'colliders2
-                :prelude #'colliders2-prelude))
+(z:define-context colliders2 ()
+  (:collision-plan 'colliders2
+   :prelude #'colliders2-prelude))

@@ -39,8 +39,6 @@
   (z:load-prefab core 'camera/perspective)
   (z:load-prefab core 'colliders1))
 
-(defun colliders1 ()
-  (z:start-game :window-width 1280
-                :window-height 720
-                :collision-plan 'colliders1
-                :prelude #'colliders1-prelude))
+(z:define-context colliders1 ()
+  (:collision-plan 'colliders1
+   :prelude #'colliders1-prelude))
