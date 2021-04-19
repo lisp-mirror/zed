@@ -1,4 +1,4 @@
-(in-package #:zed.math.geometry.raycast)
+(in-package #:zed.math.raycast)
 
 (u:fn-> ray/sphere (ray:ray sphere:sphere) (or u:f32 null))
 (defun ray/sphere (ray sphere)

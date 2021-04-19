@@ -1,4 +1,4 @@
-(in-package #:zed.math.geometry.test)
+(in-package #:zed.math.primitive-test)
 
 (u:fn-> sphere/sphere (sphere:sphere sphere:sphere) boolean)
 (defun sphere/sphere (sphere1 sphere2)

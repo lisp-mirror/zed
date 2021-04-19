@@ -885,7 +885,7 @@
    #:hermite-curve
    #:quintic-curve))
 
-(defpackage #:zed.math.geometry.aabb
+(defpackage #:zed.math.aabb
   (:local-nicknames
    (#:p3 #:zed.math.point3d)
    (#:u #:golden-utils)
@@ -906,9 +906,9 @@
    #:size
    #:vertices))
 
-(defpackage #:zed.math.geometry.obb
+(defpackage #:zed.math.obb
   (:local-nicknames
-   (#:aabb #:zed.math.geometry.aabb)
+   (#:aabb #:zed.math.aabb)
    (#:m3 #:zed.math.matrix3)
    (#:p3 #:zed.math.point3d)
    (#:u #:golden-utils)
@@ -923,9 +923,9 @@
    #:rotation
    #:size))
 
-(defpackage #:zed.math.geometry.sphere
+(defpackage #:zed.math.sphere
   (:local-nicknames
-   (#:aabb #:zed.math.geometry.aabb)
+   (#:aabb #:zed.math.aabb)
    (#:p3 #:zed.math.point3d)
    (#:u #:golden-utils)
    (#:v3 #:zed.math.vector3))
@@ -937,7 +937,7 @@
    #:radius
    #:sphere))
 
-(defpackage #:zed.math.geometry.ray
+(defpackage #:zed.math.ray
   (:local-nicknames
    (#:p3 #:zed.math.point3d)
    (#:u #:golden-utils)
@@ -949,7 +949,7 @@
    #:origin
    #:ray))
 
-(defpackage #:zed.math.geometry.frustum
+(defpackage #:zed.math.frustum
   (:local-nicknames
    (#:u #:golden-utils)
    (#:m4 #:zed.math.matrix4)
@@ -966,14 +966,14 @@
    #:top
    #:update))
 
-(defpackage #:zed.math.geometry.test
+(defpackage #:zed.math.primitive-test
   (:local-nicknames
-   (#:aabb #:zed.math.geometry.aabb)
-   (#:frustum #:zed.math.geometry.frustum)
+   (#:aabb #:zed.math.aabb)
+   (#:frustum #:zed.math.frustum)
    (#:m3 #:zed.math.matrix3)
-   (#:obb #:zed.math.geometry.obb)
+   (#:obb #:zed.math.obb)
    (#:p3 #:zed.math.point3d)
-   (#:sphere #:zed.math.geometry.sphere)
+   (#:sphere #:zed.math.sphere)
    (#:u #:golden-utils)
    (#:v2 #:zed.math.vector2)
    (#:v3 #:zed.math.vector3)
@@ -987,14 +987,14 @@
    #:sphere/obb
    #:sphere/sphere))
 
-(defpackage #:zed.math.geometry.raycast
+(defpackage #:zed.math.raycast
   (:local-nicknames
    (#:com #:%zed.math.common)
-   (#:aabb #:zed.math.geometry.aabb)
+   (#:aabb #:zed.math.aabb)
    (#:m3 #:zed.math.matrix3)
-   (#:obb #:zed.math.geometry.obb)
-   (#:ray #:zed.math.geometry.ray)
-   (#:sphere #:zed.math.geometry.sphere)
+   (#:obb #:zed.math.obb)
+   (#:ray #:zed.math.ray)
+   (#:sphere #:zed.math.sphere)
    (#:u #:golden-utils)
    (#:v3 #:zed.math.vector3))
   (:use #:cl)

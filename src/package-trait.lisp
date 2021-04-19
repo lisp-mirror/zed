@@ -3,7 +3,7 @@
 (defpackage #:zed.trait.camera
   (:local-nicknames
    (#:const #:zed.math.constants)
-   (#:frustum #:zed.math.geometry.frustum)
+   (#:frustum #:zed.math.frustum)
    (#:m3 #:zed.math.matrix3)
    (#:m4 #:zed.math.matrix4)
    (#:q #:zed.math.quaternion)
@@ -63,8 +63,8 @@
 
 (defpackage #:zed.trait.collider
   (:local-nicknames
-   (#:aabb #:zed.math.geometry.aabb)
-   (#:geo.test #:zed.math.geometry.test)
+   (#:aabb #:zed.math.aabb)
+   (#:geo.test #:zed.math.primitive-test)
    (#:tr.cam #:zed.trait.camera)
    (#:tr.mesh #:zed.trait.mesh)
    (#:tr.ren #:zed.trait.render)

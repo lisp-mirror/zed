@@ -1,4 +1,4 @@
-(in-package #:zed.math.geometry.ray)
+(in-package #:zed.math.ray)
 
 (declaim (inline %ray))
 (defstruct (ray

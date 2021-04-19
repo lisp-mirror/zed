@@ -1,4 +1,4 @@
-(in-package #:zed.math.geometry.aabb)
+(in-package #:zed.math.aabb)
 
 (declaim (inline aabb))
 (defstruct (aabb

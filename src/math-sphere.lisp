@@ -1,4 +1,4 @@
-(in-package #:zed.math.geometry.sphere)
+(in-package #:zed.math.sphere)
 
 (declaim (inline sphere))
 (defstruct (sphere

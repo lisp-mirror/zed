@@ -1,4 +1,4 @@
-(in-package #:zed.math.geometry.obb)
+(in-package #:zed.math.obb)
 
 (declaim (inline obb))
 (defstruct (obb
