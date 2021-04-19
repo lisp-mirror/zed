@@ -102,6 +102,7 @@
          (eye (m4:get-translation world-matrix))
          (target (v3:+ eye (v3:negate (m4:rotation-axis-to-vec3 world-matrix :z))))
          (up (m4:rotation-axis-to-vec3 world-matrix :y)))
+    (declare (dynamic-extent eye target up))
     (m4:look-at! view eye target up)
     (unless (translate-view-p camera)
       (m4:set-translation! view view v3:+zero+))
@@ -115,7 +116,7 @@
 (defun resolve-normal-matrix (context game-object)
   (declare (optimize speed))
   (let* ((transform-state (z::game-object-transform game-object))
-         (normal-matrix (z::transform-state-normal-matrix transform-state)))
+         (normal-matrix (load-time-value (m4:id))))
     (u:when-let ((camera (z::context-active-camera context)))
       (m4:set-translation! normal-matrix
                            (z::transform-state-world-matrix transform-state)
@@ -123,7 +124,7 @@
       (m4:*! normal-matrix (view camera) normal-matrix)
       (m4:invert! normal-matrix normal-matrix)
       (m4:transpose! normal-matrix normal-matrix))
-    (m4:rotation-to-mat3 normal-matrix)))
+    (m4:rotation-to-mat3! (z::transform-state-normal-matrix transform-state) normal-matrix)))
 
 ;;; Hooks
 

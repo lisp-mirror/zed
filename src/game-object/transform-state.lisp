@@ -22,7 +22,7 @@
   (scale/interpolated (v3:zero) :type v3:vec)
   (local-matrix (m4:id) :type m4:mat)
   (world-matrix (m4:id) :type m4:mat)
-  (normal-matrix (m4:id) :type m4:mat))
+  (normal-matrix (m3:id) :type m3:mat))
 
 (u:define-printer (transform-state stream :type nil)
   (format stream "TRANSFORM-STATE"))
