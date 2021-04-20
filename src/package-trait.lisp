@@ -89,3 +89,17 @@
   (:use #:cl)
   (:export
    #:turn-table))
+
+(defpackage #:zed.trait.curve
+  (:local-nicknames
+   (#:curve #:%zed.utility.bezier-curve)
+   (#:tr.geo #:zed.trait.geometry)
+   (#:tr.ren #:zed.trait.render)
+   (#:u #:golden-utils)
+   (#:v2 #:zed.math.vector2)
+   (#:v3 #:zed.math.vector3)
+   (#:z #:zed)
+   (#:zsl #:zed.shader-library))
+  (:use #:cl)
+  (:export
+   #:curve))

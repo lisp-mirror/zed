@@ -53,6 +53,9 @@
    #:xyy->xyz
    #:xyz->rgb
    #:xyz->xyy)
+  ;; Default
+  (:export
+   #:default)
   ;; Sprite
   (:export
    #:sprite)

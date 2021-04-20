@@ -31,6 +31,14 @@
   (declare (optimize speed))
   (u:href (viewport-manager-table manager) name))
 
+(u:fn-> get-viewport-size (core &optional symbol) v2:vec)
+(defun get-viewport-size (core &optional viewport-name)
+  (let* ((manager (core-viewports core))
+         (viewport (or (find-viewport manager viewport-name)
+                       (viewport-manager-default manager))))
+    (v2:vec (viewport-width viewport)
+            (viewport-height viewport))))
+
 (u:fn-> ensure-viewport (viewport-manager symbol) viewport)
 (defun ensure-viewport (manager name)
   (declare (optimize speed))

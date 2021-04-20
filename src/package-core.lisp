@@ -31,6 +31,7 @@
    (#:util.oc #:%zed.utility.ordered-class)
    (#:util.rb #:%zed.utility.red-black-tree)
    (#:util.ss #:%zed.utility.stream-slice)
+   (#:v2 #:zed.math.vector2)
    (#:v3 #:zed.math.vector3)
    (#:v4 #:zed.math.vector4))
   (:use #:cl)
