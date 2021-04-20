@@ -103,6 +103,7 @@
    (:file "shader")
    (:file "resource-cache")
    (:file "spritesheet")
+   (:file "animation")
    (:file "input-manager")
    (:file "input-transition")
    (:file "input-keyboard")

@@ -103,3 +103,15 @@
   (:use #:cl)
   (:export
    #:curve))
+
+(defpackage #:zed.trait.animate
+  (:local-nicknames
+   (#:u #:golden-utils)
+   (#:util.dll #:%zed.utility.doubly-linked-list)
+   (#:z #:zed))
+  (:use #:cl)
+  (:shadow
+   #:sequence)
+  (:export
+   #:animate
+   #:sequence))

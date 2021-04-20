@@ -16,9 +16,9 @@
    (#:aabb #:zed.math.aabb)
    (#:const #:zed.math.constants)
    (#:curve #:%zed.utility.bezier-curve)
+   (#:easing #:zed.math.easing)
    (#:frustum #:zed.math.frustum)
    (#:geo.test #:zed.math.primitive-test)
-   (#:line3d #:zed.math.line3d)
    (#:m3 #:zed.math.matrix3)
    (#:m4 #:zed.math.matrix4)
    (#:obb #:zed.math.obb)
@@ -101,8 +101,12 @@
    #:on-window-event-enter
    #:on-window-event-exit
    #:relative-mouse-mode-p)
+  ;; Animate trait
+  (:export
+   #:enqueue-animation)
   ;; DSLs
   (:export
+   #:define-animate-hook
    #:define-collision-hook
    #:define-collision-plan
    #:define-context
