@@ -3,9 +3,8 @@
 (defun default/vertex ((pos :vec3)
                        &uniforms
                        (model :mat4)
-                       (view :mat4)
-                       (proj :mat4))
-  (* proj view model (vec4 pos 1)))
+                       (camera camera-data :ssbo :std-430))
+  (* (camera/proj camera) (camera/view camera) model (vec4 pos 1)))
 
 (defun default/fragment (&uniforms
                          (color :vec3)
