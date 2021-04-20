@@ -17,7 +17,7 @@
               :metallic-factor 1
               :roughness-factor 1
               :normal-scale 1
-              :normal-matrix 'z.camera:resolve-normal-matrix
+              :normal-matrix #'z.camera:resolve-normal-matrix
               :occlusion-strength 1
               :emissive-factor 1
               :brdf-lut 'brdf-lut
