@@ -45,3 +45,28 @@
    #:make-curve
    #:point-count-valid-p
    #:point-index-present-p))
+
+(defpackage #:%zed.utility.doubly-linked-list
+  (:local-nicknames
+   (#:u #:golden-utils))
+  (:use #:cl)
+  (:shadow
+   #:delete
+   #:find
+   #:length
+   #:list
+   #:make-list)
+  (:export
+   #:delete
+   #:find
+   #:head
+   #:insert
+   #:length
+   #:list
+   #:list-values
+   #:make-list
+   #:next
+   #:node
+   #:previous
+   #:tail
+   #:value))

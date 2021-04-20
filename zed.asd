@@ -63,6 +63,7 @@
    (:file "util-red-black-tree")
    (:file "util-slice-stream")
    (:file "util-bezier-curve")
+   (:file "util-doubly-linked-list")
    (:file "shader-library-package")
    (:file "shader-library-swizzle")
    (:file "shader-library-common")

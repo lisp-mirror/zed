@@ -28,6 +28,7 @@
    (#:raycast #:zed.math.raycast)
    (#:sphere #:zed.math.sphere)
    (#:util.bin #:%zed.utility.binary-parser)
+   (#:util.dll #:%zed.utility.doubly-linked-list)
    (#:util.oc #:%zed.utility.ordered-class)
    (#:util.rb #:%zed.utility.red-black-tree)
    (#:util.ss #:%zed.utility.stream-slice)
