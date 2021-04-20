@@ -97,6 +97,7 @@
    (:file "image-hdr")
    (:file "gltf")
    (:file "font")
+   (:file "curve-data")
    (:file "shader")
    (:file "resource-cache")
    (:file "spritesheet")

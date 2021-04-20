@@ -15,6 +15,7 @@
   (:local-nicknames
    (#:aabb #:zed.math.aabb)
    (#:const #:zed.math.constants)
+   (#:curve #:%zed.utility.bezier-curve)
    (#:frustum #:zed.math.frustum)
    (#:geo.test #:zed.math.primitive-test)
    (#:line3d #:zed.math.line3d)
@@ -103,6 +104,7 @@
    #:define-collision-hook
    #:define-collision-plan
    #:define-context
+   #:define-curve
    #:define-framebuffer
    #:define-geometry
    #:define-geometry-layout
