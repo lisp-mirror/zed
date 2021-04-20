@@ -53,13 +53,14 @@
   (loop :with points = (ensure-point-list points)
         :with segment-count = (1+ (the fixnum (/ (- (list-length points) 4) 3)))
         :for (a b c d) :on points :by #'cdddr
-        :for av :of-type v3:vec = a
-        :for bv :of-type v3:vec = b
-        :for cv :of-type v3:vec = c
-        :for dv :of-type v3:vec = d
         :for index :of-type fixnum :from 0
         :when (< index segment-count)
-          :do (let ((mat (m4:id)))
+          :do (let ((mat (m4:id))
+                    (av a)
+                    (bv b)
+                    (cv c)
+                    (dv d))
+                (declare (v3:vec av bv cv dv))
                 (v3:with-components ((a av) (b bv) (c cv) (d dv))
                   (m4:set-column! mat mat (v4:vec ax ay az 0.0) 0)
                   (m4:set-column! mat mat (v4:vec bx by bz 0.0) 1)
