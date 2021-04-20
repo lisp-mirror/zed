@@ -23,4 +23,5 @@
    (:file "font")
    (:file "colliders1")
    (:file "colliders2")
-   (:file "turn-table")))
+   (:file "turn-table")
+   (:file "curve")))

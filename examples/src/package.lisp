@@ -20,6 +20,7 @@
    (#:zsl #:zed.shader-library)
    (#:z.camera #:zed.trait.camera)
    (#:z.collider #:zed.trait.collider)
+   (#:z.curve #:zed.trait.curve)
    (#:z.font #:zed.trait.font)
    (#:z.geometry #:zed.trait.geometry)
    (#:z.mesh #:zed.trait.mesh)
@@ -30,6 +31,7 @@
   (:export
    #:colliders1
    #:colliders2
+   #:curve
    #:font
    #:geometry
    #:mesh
