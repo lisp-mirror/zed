@@ -50,7 +50,7 @@
   (:data (:format :interleaved)
          (position :type float :count 3)))
 
-(z:define-geometry line-segments ()
+(z:define-geometry line-segment ()
   (:layout point
    :vertex-count 2
    :primitive :lines))
