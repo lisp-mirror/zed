@@ -163,6 +163,39 @@
    #:value/derivs
    #:value-hermite
    #:value-perlin)
+  ;; SDF functions
+  (:export
+   #:sdf/arc
+   #:sdf/box
+   #:sdf/circle
+   #:sdf/cross
+   #:sdf/difference
+   #:sdf/difference-smooth
+   #:sdf/egg
+   #:sdf/hexagon
+   #:sdf/intersect
+   #:sdf/intersect-smooth
+   #:sdf/mask-fill
+   #:sdf/mask-inner-border
+   #:sdf/mask-outer-border
+   #:sdf/onion
+   #:sdf/parabola
+   #:sdf/pentagon
+   #:sdf/pie
+   #:sdf/rhombus
+   #:sdf/rounded-x
+   #:sdf/segment
+   #:sdf/semi-circle
+   #:sdf/shadow
+   #:sdf/star
+   #:sdf/star5
+   #:sdf/star6
+   #:sdf/trapezoid
+   #:sdf/triangle
+   #:sdf/uneven-capsule
+   #:sdf/union
+   #:sdf/union-smooth
+   #:sdf/vesica)
   ;; Programs
   (:export
    #:default
