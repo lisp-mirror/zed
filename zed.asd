@@ -70,6 +70,7 @@
    (:file "shader-library-common")
    (:file "shader-library-shaping")
    (:file "shader-library-hashing")
+   (:file "shader-library-noise")
    (:file "shader-library-default")
    (:file "shader-library-color")
    (:file "shader-library-sprite")

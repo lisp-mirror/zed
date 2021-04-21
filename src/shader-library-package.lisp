@@ -130,6 +130,39 @@
    #:sgpp
    #:sgpp/2-per-corner
    #:sgpp/3-per-corner)
+  ;; Noise functions
+  (:export
+   #:billow/cellular
+   #:billow/perlin
+   #:billow/simplex
+   #:cellular
+   #:cellular/derivs
+   #:cellular-fast
+   #:cubist
+   #:fbm/cellular
+   #:fbm/perlin
+   #:fbm/simplex
+   #:hermite
+   #:hermite/derivs
+   #:perlin
+   #:perlin/derivs
+   #:perlin-improved
+   #:perlin-surflet
+   #:perlin-surflet/derivs
+   #:polkadot
+   #:polkadot-box
+   #:ridges/cellular
+   #:ridges/perlin
+   #:ridges/simplex
+   #:simplex-cellular
+   #:simplex-perlin
+   #:simplex-perlin/derivs
+   #:simplex-polkadot
+   #:stars
+   #:value
+   #:value/derivs
+   #:value-hermite
+   #:value-perlin)
   ;; Programs
   (:export
    #:default
