@@ -21,7 +21,7 @@
     (* (min (.x d) (.y d)) (/ 1.125))))
 
 (defun noise/cellular ((point :vec2))
-  (noise/cellular point (lambda ((x :vec2)) (hash:fast32/2-per-corner x))))
+  (noise/cellular point (lambda ((x :vec2)) (hash/fast32-2-per-corner x))))
 
 (defun noise/cellular-derivs ((point :vec2)
                               (hash-fn (function (:vec2) (:vec4 :vec4))))
@@ -47,9 +47,7 @@
        (/ 1.125))))
 
 (defun noise/cellular-derivs ((point :vec2))
-  (noise/cellular-derivs point
-                         (lambda ((x :vec2))
-                           (hash:fast32/2-per-corner x))))
+  (noise/cellular-derivs point (lambda ((x :vec2)) (hash/fast32-2-per-corner x))))
 
 (defun noise/cellular-fast ((point :vec2)
                             (hash-fn (function (:vec2) (:vec4 :vec4))))
@@ -66,9 +64,7 @@
     (* (min (.x d) (.y d)) (/ 1.125))))
 
 (defun noise/cellular-fast ((point :vec2))
-  (noise/cellular-fast point
-                       (lambda ((x :vec2))
-                         (hash:fast32/2-per-corner x))))
+  (noise/cellular-fast point (lambda ((x :vec2)) (hash/fast32-2-per-corner x))))
 
 (defun noise/cellular ((point :vec3)
                        (hash-fn
@@ -101,7 +97,7 @@
     (* (min (.x d1) (.y d1)) 0.75)))
 
 (defun noise/cellular ((point :vec3))
-  (noise/cellular point (lambda ((x :vec3)) (hash:fast32/3-per-corner x))))
+  (noise/cellular point (lambda ((x :vec3)) (hash/fast32-3-per-corner x))))
 
 (defun noise/cellular-derivs ((point :vec3)
                               (hash-fn
@@ -152,9 +148,7 @@
        0.75)))
 
 (defun noise/cellular-derivs ((point :vec3))
-  (noise/cellular-derivs point
-                         (lambda ((x :vec3))
-                           (hash:fast32/3-per-corner x))))
+  (noise/cellular-derivs point (lambda ((x :vec3)) (hash/fast32-3-per-corner x))))
 
 (defun noise/cellular-fast ((point :vec3)
                             (hash-fn
@@ -184,9 +178,7 @@
     (* (min (.x d1) (.y d1)) (/ 9 12.0))))
 
 (defun noise/cellular-fast ((point :vec3))
-  (noise/cellular-fast point
-                       (lambda ((x :vec3))
-                         (hash:fast32/3-per-corner x))))
+  (noise/cellular-fast point (lambda ((x :vec3)) (hash/fast32-3-per-corner x))))
 
 (defun noise/hermite ((point :vec2)
                       (hash-fn (function (:vec2) (:vec4 :vec4))))
@@ -198,15 +190,15 @@
            (norm (inversesqrt (+ (* hash-x hash-x) (* hash-y hash-y))))
            (hash-x (* hash-x norm))
            (hash-y (* hash-y norm))
-           (out (shape:quintic-hermite
+           (out (shape/quintic-hermite
                  (.y vec) (.xy hash-x) (.zw hash-x) (.xy hash-y) (.zw hash-y)))
-           (out (* (shape:quintic-hermite
+           (out (* (shape/quintic-hermite
                     (.x vec) (.x out) (.y out) (.z out) (.w out))
                    2.2627418)))
     (map-domain out -1 1 0 1)))
 
 (defun noise/hermite ((point :vec2))
-  (noise/hermite point (lambda ((x :vec2)) (hash:fast32/2-per-corner x))))
+  (noise/hermite point (lambda ((x :vec2)) (hash/fast32-2-per-corner x))))
 
 (defun noise/hermite-derivs ((point :vec2)
                              (hash-fn (function (:vec2) (:vec4 :vec4))))
@@ -218,28 +210,26 @@
            (norm (inversesqrt (+ (* grad-x grad-x) (* grad-y grad-y))))
            (grad-x (* grad-x norm))
            (grad-y (* grad-y norm))
-           (temp-x (shape:quintic-hermite
+           (temp-x (shape/quintic-hermite
                     (.y vec) (.xy grad-x) (.zw grad-x) (.xy grad-y)
                     (.zw grad-y)))
-           (temp-y (shape:quintic-hermite
+           (temp-y (shape/quintic-hermite
                     (.x vec) (.xz grad-y) (.yw grad-y) (.xz grad-x)
                     (.yw grad-x)))
-           (noise (shape:quintic-hermite
+           (noise (shape/quintic-hermite
                    (.x vec) (.x temp-x) (.y temp-x) (.z temp-x) (.w temp-x)))
            (noise (map-domain noise -0.4419417 0.4419417 0 1))
-           (derivs (* (vec2 (shape:quintic-hermite/derivative
+           (derivs (* (vec2 (shape/quintic-hermite-derivative
                              (.x vec) (.x temp-x) (.y temp-x) (.z temp-x)
                              (.w temp-x))
-                            (shape:quintic-hermite/derivative
+                            (shape/quintic-hermite-derivative
                              (.y vec) (.x temp-y) (.y temp-y) (.z temp-y)
                              (.w temp-y)))
                       1.1313709)))
     (vec3 noise derivs)))
 
 (defun noise/hermite-derivs ((point :vec2))
-  (noise/hermite-derivs point
-                        (lambda ((x :vec2))
-                          (hash:fast32/2-per-corner x))))
+  (noise/hermite-derivs point (lambda ((x :vec2)) (hash/fast32-2-per-corner x))))
 
 (defun noise/hermite ((point :vec3)
                       (hash-fn
@@ -265,22 +255,22 @@
            (grad-x1 (* hash-x1 norm1))
            (grad-y1 (* hash-y1 norm1))
            (grad-z1 (* hash-z1 norm1))
-           (ival igrad-x igrad-y (shape:quintic-hermite
+           (ival igrad-x igrad-y (shape/quintic-hermite
                                   (.z vec) grad-x0 grad-x1 grad-y0 grad-y1
                                   grad-z0 grad-z1))
-           (out (shape:quintic-hermite
+           (out (shape/quintic-hermite
                  (.y vec)
                  (vec4 (.xy ival) (.xy igrad-x))
                  (vec4 (.zw ival) (.zw igrad-x))
                  (vec4 (.xy igrad-y) 0 0)
                  (vec4 (.zw igrad-y) 0 0)))
-           (out (* (shape:quintic-hermite
+           (out (* (shape/quintic-hermite
                     (.x vec) (.x out) (.y out) (.z out) (.w out))
                    1.8475208)))
     (map-domain out -1 1 0 1)))
 
 (defun noise/hermite ((point :vec3))
-  (noise/hermite point (lambda ((x :vec3)) (hash:fast32/3-per-corner x))))
+  (noise/hermite point (lambda ((x :vec3)) (hash/fast32-3-per-corner x))))
 
 (defun noise/hermite-derivs ((point :vec3)
                              (hash-fn
@@ -307,10 +297,10 @@
            (grad-x1 (* grad-x1 norm1))
            (grad-y1 (* grad-y1 norm1))
            (grad-z1 (* grad-z1 norm1))
-           (ival-z igrad-xz igrad-yz (shape:quintic-hermite
+           (ival-z igrad-xz igrad-yz (shape/quintic-hermite
                                       (.z vec) grad-x0 grad-x1 grad-y0 grad-y1
                                       grad-z0 grad-z1))
-           (ival-y igrad-xy igrad-zy (shape:quintic-hermite
+           (ival-y igrad-xy igrad-zy (shape/quintic-hermite
                                       (.y vec)
                                       (vec4 (.xy grad-x0) (.xy grad-x1))
                                       (vec4 (.zw grad-x0) (.zw grad-x1))
@@ -318,43 +308,41 @@
                                       (vec4 (.zw grad-z0) (.zw grad-z1))
                                       (vec4 (.xy grad-y0) (.xy grad-y1))
                                       (vec4 (.zw grad-y0) (.zw grad-y1))))
-           (temp-x (shape:quintic-hermite
+           (temp-x (shape/quintic-hermite
                     (.y vec)
                     (vec4 (.xy ival-z) (.xy igrad-xz))
                     (vec4 (.zw ival-z) (.zw igrad-xz))
                     (vec4 (.xy igrad-yz) 0 0)
                     (vec4 (.zw igrad-yz) 0 0)))
-           (temp-y (shape:quintic-hermite
+           (temp-y (shape/quintic-hermite
                     (.x vec)
                     (vec4 (.xz ival-z) (.xz igrad-yz))
                     (vec4 (.yw ival-z) (.yw igrad-yz))
                     (vec4 (.xz igrad-xz) 0 0)
                     (vec4 (.yw igrad-xz) 0 0)))
-           (temp-z (shape:quintic-hermite
+           (temp-z (shape/quintic-hermite
                     (.x vec)
                     (vec4 (.xz ival-y) (.xz igrad-zy))
                     (vec4 (.yw ival-y) (.yw igrad-zy))
                     (vec4 (.xz igrad-xy) 0 0)
                     (vec4 (.yw igrad-xy) 0 0)))
-           (noise (shape:quintic-hermite
+           (noise (shape/quintic-hermite
                    (.x vec) (.x temp-x) (.y temp-x) (.z temp-x) (.w temp-x)))
            (noise (map-domain noise -0.5412659 0.5412659 0 1))
-           (derivs (* (vec3 (shape:quintic-hermite/derivative
+           (derivs (* (vec3 (shape/quintic-hermite-derivative
                              (.x vec) (.x temp-x) (.y temp-x) (.z temp-x)
                              (.w temp-x))
-                            (shape:quintic-hermite/derivative
+                            (shape/quintic-hermite-derivative
                              (.y vec) (.x temp-y) (.y temp-y) (.z temp-y)
                              (.w temp-y))
-                            (shape:quintic-hermite/derivative
+                            (shape/quintic-hermite-derivative
                              (.z vec) (.x temp-z) (.y temp-z) (.z temp-z)
                              (.w temp-z)))
                       0.92376035)))
     (vec4 noise derivs)))
 
 (defun noise/hermite-derivs ((point :vec3))
-  (noise/hermite-derivs point
-                        (lambda ((x :vec3))
-                          (hash:fast32/3-per-corner x))))
+  (noise/hermite-derivs point (lambda ((x :vec3)) (hash/fast32-3-per-corner x))))
 
 (defun noise/perlin ((point :vec2)
                      (hash-fn (function (:vec2) (:vec4 :vec4))))
@@ -363,7 +351,7 @@
            (hash-x hash-y (funcall hash-fn origin))
            (grad-x (- hash-x 0.5 +epsilon+))
            (grad-y (- hash-y 0.5 +epsilon+))
-           (blend (shape:quintic-curve (.xy vecs)))
+           (blend (shape/quintic-curve (.xy vecs)))
            (blend (vec4 blend (- 1 blend)))
            (out (dot (* (inversesqrt (+ (* grad-x grad-x) (* grad-y grad-y)))
                         (+ (* grad-x (.xzxz vecs)) (* grad-y (.yyww vecs)))
@@ -372,7 +360,7 @@
     (map-domain out -1 1 0 1)))
 
 (defun noise/perlin ((point :vec2))
-  (noise/perlin point (lambda ((x :vec2)) (hash:fast32/2-per-corner x))))
+  (noise/perlin point (lambda ((x :vec2)) (hash/fast32-2-per-corner x))))
 
 (defun noise/perlin-derivs ((point :vec2)
                             (hash-fn (function (:vec2) (:vec4 :vec4))))
@@ -392,7 +380,7 @@
            (k0-gk0 (- dotval1-grad1 dotval0-grad0))
            (k1-gk1 (- dotval2-grad2 dotval0-grad0))
            (k2-gk2 (- dotval3-grad3 dotval2-grad2 k0-gk0))
-           (blend (shape:quintic-curve/interpolate-derivative
+           (blend (shape/quintic-curve-interpolate-derivative
                    (.xy vecs)))
            (out (+ dotval0-grad0
                    (* (.x blend) k0-gk0)
@@ -405,9 +393,7 @@
     (vec3 noise derivs)))
 
 (defun noise/perlin-derivs ((point :vec2))
-  (noise/perlin-derivs point
-                       (lambda ((x :vec2))
-                         (hash:fast32/2-per-corner x))))
+  (noise/perlin-derivs point (lambda ((x :vec2)) (hash/fast32-2-per-corner x))))
 
 (defun noise/perlin-surflet ((point :vec2)
                              (hash-fn (function (:vec2) (:vec4 :vec4))))
@@ -418,7 +404,7 @@
            (grad-y (- hash-y 0.5 +epsilon+))
            (vecs-squared (* vecs vecs))
            (vecs-squared (+ (.xzxz vecs-squared) (.yyww vecs-squared)))
-           (out (dot (shape:falloff-squared-c2
+           (out (dot (shape/falloff-squared-c2
                       (min (vec4 1) vecs-squared))
                      (* (inversesqrt (+ (* grad-x grad-x) (* grad-y grad-y)))
                         (+ (* grad-x (.xzxz vecs)) (* grad-y (.yyww vecs)))
@@ -426,9 +412,7 @@
     (map-domain out -1 1 0 1)))
 
 (defun noise/perlin-surflet ((point :vec2))
-  (noise/perlin-surflet point
-                        (lambda ((x :vec2))
-                          (hash:fast32/2-per-corner x))))
+  (noise/perlin-surflet point (lambda ((x :vec2)) (hash/fast32-2-per-corner x))))
 
 (defun noise/perlin-surflet-derivs ((point :vec2)
                                     (hash-fn
@@ -455,16 +439,14 @@
     (vec3 noise derivs)))
 
 (defun noise/perlin-surflet-derivs ((point :vec2))
-  (noise/perlin-surflet-derivs point
-                               (lambda ((x :vec2))
-                                 (hash:fast32/2-per-corner x))))
+  (noise/perlin-surflet-derivs point (lambda ((x :vec2)) (hash/fast32-2-per-corner x))))
 
 (defun noise/perlin-improved ((point :vec2)
                               (hash-fn (function (:vec2) :vec4)))
   (let* ((cell (floor point))
          (vecs (- (.xyxy point) (vec4 cell (1+ cell))))
          (hash (- (funcall hash-fn cell) 0.5))
-         (blend (shape:quintic-curve (.xy vecs)))
+         (blend (shape/quintic-curve (.xy vecs)))
          (blend (vec4 blend (- 1 blend)))
          (out (dot (+ (* (.xzxz vecs) (sign hash))
                       (* (.yyww vecs) (sign (- (abs hash) 0.25))))
@@ -472,7 +454,7 @@
     (map-domain out -1 1 0 1)))
 
 (defun noise/perlin-improved ((point :vec2))
-  (perlin-improved point (lambda ((x :vec2)) (hash:fast32 x))))
+  (perlin-improved point (lambda ((x :vec2)) (hash/fast32 x))))
 
 (defun noise/perlin ((point :vec3)
                      (hash-fn
@@ -499,14 +481,14 @@
                      (+ (* (.xyxy (vec2 (.x vec) (.x vec-1))) grad-x1)
                         (* (.xxyy (vec2 (.y vec) (.y vec-1))) grad-y1)
                         (* (.z vec-1) grad-z1))))
-           (blend (shape:quintic-curve vec))
+           (blend (shape/quintic-curve vec))
            (out (mix temp1 temp2 (.z blend)))
            (blend (vec4 (.xy blend) (- 1 (.xy blend))))
            (out (* (dot out (* (.zxzx blend) (.wwyy blend))) 1.1547005)))
     (map-domain out -1 1 0 1)))
 
 (defun noise/perlin ((point :vec3))
-  (noise/perlin point (lambda ((x :vec3)) (hash:fast32/3-per-corner x))))
+  (noise/perlin point (lambda ((x :vec3)) (hash/fast32-3-per-corner x))))
 
 (defun noise/perlin-derivs ((point :vec3)
                             (hash-fn
@@ -556,8 +538,8 @@
            (k5-gk5 (- dot6-grad6 dot4-grad4 k1-gk1))
            (k6-gk6 (- (- dot7-grad7 dot6-grad6) (- dot5-grad5 dot4-grad4)
                       k3-gk3))
-           (blend (shape:quintic-curve vec))
-           (blend-deriv (shape:quintic-curve/derivative vec))
+           (blend (shape/quintic-curve vec))
+           (blend-deriv (shape/quintic-curve-derivative vec))
            (out (+ dot0-grad0
                    (* (.x blend) (+ k0-gk0 (* (.y blend) k3-gk3)))
                    (* (.y blend) (+ k1-gk1 (* (.z blend) k5-gk5)))
@@ -590,9 +572,7 @@
     (vec4 noise derivs)))
 
 (defun noise/perlin-derivs ((point :vec3))
-  (noise/perlin-derivs point
-                       (lambda ((x :vec3))
-                         (hash:fast32/3-per-corner x))))
+  (noise/perlin-derivs point (lambda ((x :vec3)) (hash/fast32-3-per-corner x))))
 
 (defun noise/perlin-surflet ((point :vec3)
                              (hash-fn
@@ -624,19 +604,17 @@
            (vec-1 (* vec-1 vec-1))
            (vecs-squared (+ (vec4 (.x vec) (.x vec-1) (.x vec) (.x vec-1))
                             (vec4 (.yy vec) (.yy vec-1))))
-           (out (* (+ (dot (shape:falloff-squared-c2
+           (out (* (+ (dot (shape/falloff-squared-c2
                             (min (vec4 1) (+ vecs-squared (.z vec))))
                            temp1)
-                      (dot (shape:falloff-squared-c2
+                      (dot (shape/falloff-squared-c2
                             (min (vec4 1) (+ vecs-squared (.z vec-1))))
                            temp2))
                    2.3703704)))
     (map-domain out -1 1 0 1)))
 
 (defun noise/perlin-surflet ((point :vec3))
-  (noise/perlin-surflet point
-                        (lambda ((x :vec3))
-                          (hash:fast32/3-per-corner x))))
+  (noise/perlin-surflet point (lambda ((x :vec3)) (hash/fast32-3-per-corner x))))
 
 (defun noise/perlin-surflet-derivs ((point :vec3)
                                     (hash-fn
@@ -700,9 +678,7 @@
     (vec4 noise derivs)))
 
 (defun noise/perlin-surflet-derivs ((point :vec3))
-  (noise/perlin-surflet-derivs point
-                               (lambda ((x :vec3))
-                                 (hash:fast32/3-per-corner x))))
+  (noise/perlin-surflet-derivs point (lambda ((x :vec3)) (hash/fast32-3-per-corner x))))
 
 (defun noise/perlin-improved ((point :vec3)
                               (hash-fn (function (:vec3) (:vec4 :vec4))))
@@ -722,14 +698,14 @@
            (grad-12 (* (.z vec-1) (sign (- (abs hash-high-z) 0.125))))
            (grad-0 (+ grad-00 grad-01 grad-02))
            (grad-1 (+ grad-10 grad-11 grad-12))
-           (blend (shape:quintic-curve vec))
+           (blend (shape/quintic-curve vec))
            (out (mix grad-0 grad-1 (.z blend)))
            (blend (vec4 (.xy blend) (- 1 (.xy blend))))
            (out (* (dot out (* (.zxzx blend) (.wwyy blend))) (/ 2 3.0))))
     (map-domain out -1 1 0 1)))
 
 (defun noise/perlin-improved ((point :vec3))
-  (noise/perlin-improved point (lambda ((x :vec3)) (hash:fast32 x))))
+  (noise/perlin-improved point (lambda ((x :vec3)) (hash/fast32 x))))
 
 (defun noise/perlin ((point :vec4)
                      (hash-fn
@@ -779,7 +755,7 @@
                          (* (.xxyy (vec2 (.y vec) (.y vec-1))) d1)
                          (* (.z vec-1) d2)
                          (* (.w vec-1) d3))))
-           (blend (shape:quintic-curve vec))
+           (blend (shape/quintic-curve vec))
            (temp (+ temp-a (* (- temp-c temp-a) (.w blend))))
            (temp (+ temp (* (- (+ temp-b (* (- temp-d temp-b) (.w blend))) temp)
                             (.z blend))))
@@ -787,7 +763,7 @@
     (map-domain (dot temp (* (.zxzx blend) (.wwyy blend))) -1 1 0 1)))
 
 (defun noise/perlin ((point :vec4))
-  (noise/perlin point (lambda ((x :vec4)) (hash:fast32-2/4-per-corner x))))
+  (noise/perlin point (lambda ((x :vec4)) (hash/fast32-2-4-per-corner x))))
 
 (defun noise/polkadot ((point :vec2)
                        (radius-low :float)
@@ -802,13 +778,12 @@
          (radius (/ 2 radius))
          (vec (+ (* (.xy hash) (- radius 2))
                  (- (* vec radius) (1- radius)))))
-    (* (shape:falloff-squared-c2 (min (dot vec vec) 1.0)) value)))
+    (* (shape/falloff-squared-c2 (min (dot vec vec) 1.0)) value)))
 
 (defun noise/polkadot ((point :vec2)
                        (radius-low :float)
                        (radius-high :float))
-  (noise/polkadot point radius-low radius-high (lambda ((x :vec2))
-                                                 (hash:fast32/cell x))))
+  (noise/polkadot point radius-low radius-high (lambda ((x :vec2)) (hash/fast32-cell x))))
 
 (defun noise/polkadot-box ((point :vec2)
                            (radius-low :float)
@@ -824,13 +799,12 @@
          (vec (expt (+ (* (.xy hash) (- radius 2))
                        (- (* vec radius) (1- radius)))
                     (vec2 2))))
-    (* (shape:falloff-squared-c2 (min (dot vec vec) 1.0)) value)))
+    (* (shape/falloff-squared-c2 (min (dot vec vec) 1.0)) value)))
 
 (defun noise/polkadot-box ((point :vec2)
                            (radius-low :float)
                            (radius-high :float))
-  (noise/polkadot-box point radius-low radius-high (lambda ((x :vec2))
-                                                     (hash:fast32/cell x))))
+  (noise/polkadot-box point radius-low radius-high (lambda ((x :vec2)) (hash/fast32-cell x))))
 
 (defun noise/polkadot ((point :vec3)
                        (radius-low :float)
@@ -845,13 +819,12 @@
          (radius (/ 2 radius))
          (vec (+ (- (* vec radius) (1- radius))
                  (* (.xyz hash) (- radius 2)))))
-    (* (shape:falloff-squared-c2 (min (dot vec vec) 1)) value)))
+    (* (shape/falloff-squared-c2 (min (dot vec vec) 1)) value)))
 
 (defun noise/polkadot ((point :vec3)
                        (radius-low :float)
                        (radius-high :float))
-  (noise/polkadot point radius-low radius-high (lambda ((x :vec3))
-                                                 (hash:fast32/cell x))))
+  (noise/polkadot point radius-low radius-high (lambda ((x :vec3)) (hash/fast32-cell x))))
 
 (defun noise/polkadot-box ((point :vec3)
                            (radius-low :float)
@@ -867,13 +840,12 @@
          (vec (+ (- (* vec radius) (1- radius))
                  (* (.xyz hash) (- radius 2))))
          (vec (* vec vec)))
-    (* (shape:falloff-squared-c2 (min (dot vec vec) 1)) value)))
+    (* (shape/falloff-squared-c2 (min (dot vec vec) 1)) value)))
 
 (defun noise/polkadot-box ((point :vec3)
                            (radius-low :float)
                            (radius-high :float))
-  (noise/polkadot-box point radius-low radius-high (lambda ((x :vec3))
-                                                     (hash:fast32/cell x))))
+  (noise/polkadot-box point radius-low radius-high (lambda ((x :vec3)) (hash/fast32-cell x))))
 
 (defconstant +simplex-2d/skew-factor+ (* 0.5 (1- (sqrt 3))))
 
@@ -927,8 +899,8 @@
          (surflet-weights (max (- 0.5 surflet-weights) 0)))
     (* surflet-weights surflet-weights surflet-weights)))
 
-(defun noise/simplex-perlin ((point :vec2)
-                             (hash-fn (function (:vec2) (:vec4 :vec4))))
+(defun noise/simplex ((point :vec2)
+                      (hash-fn (function (:vec2) (:vec4 :vec4))))
   (mvlet* ((simplex-points (vec3 (- 1 +simplex-2d/unskew-factor+)
                                  (- +simplex-2d/unskew-factor+)
                                  (- 1 (* 2 +simplex-2d/unskew-factor+))))
@@ -961,13 +933,13 @@
                    +simplex-2d/norm-factor+)))
     (map-domain out -1 1 0 1)))
 
-(defun noise/simplex-perlin ((point :vec2))
-  (noise/simplex-perlin point (lambda ((x :vec2)) (hash:fast32/2-per-corner x))))
+(defun noise/simplex ((point :vec2))
+  (noise/simplex point (lambda ((x :vec2)) (hash/fast32-2-per-corner x))))
 
-(defun noise/simplex-perlin/derivs ((point :vec2)
-                                    (hash-fn
-                                     (function (:vec2)
-                                      (:vec4 :vec4))))
+(defun noise/simplex/derivs ((point :vec2)
+                             (hash-fn
+                              (function (:vec2)
+                               (:vec4 :vec4))))
   (mvlet* ((simplex-points (vec3 (- 1 +simplex-2d/unskew-factor+)
                                  (- +simplex-2d/unskew-factor+)
                                  (- 1 (* 2 +simplex-2d/unskew-factor+))))
@@ -1009,15 +981,13 @@
                       49.60217)))
     (vec3 noise derivs)))
 
-(defun noise/simplex-perlin-derivs ((point :vec2))
-  (noise/simplex-perlin-derivs point
-                               (lambda ((x :vec2))
-                                 (hash:fast32/2-per-corner x))))
+(defun noise/simplex-derivs ((point :vec2))
+  (noise/simplex-derivs point (lambda ((x :vec2)) (hash/fast32-2-per-corner x))))
 
-(defun noise/simplex-perlin ((point :vec3)
-                             (hash-fn
-                              (function (:vec3 :vec3 :vec3)
-                               (:vec4 :vec4 :vec4))))
+(defun noise/simplex ((point :vec3)
+                      (hash-fn
+                       (function (:vec3 :vec3 :vec3)
+                        (:vec4 :vec4 :vec4))))
   (mvlet* ((cell1 cell2 cell3 corners-x corners-y corners-z
                   (noise/simplex-get-corner-vectors point))
            (hash0 hash1 hash2 (funcall hash-fn cell1 cell2 cell3))
@@ -1035,14 +1005,13 @@
                    +simplex-3d/norm-factor+)))
     (map-domain out -1 1 0 1)))
 
-(defun noise/simplex-perlin ((point :vec3))
-  (noise/simplex-perlin point (lambda ((x :vec3) (y :vec3) (z :vec3))
-                                (hash:fast32/3-per-corner x y z))))
+(defun noise/simplex ((point :vec3))
+  (noise/simplex point (lambda ((x :vec3) (y :vec3) (z :vec3)) (hash/fast32-3-per-corner x y z))))
 
-(defun noise/simplex-perlin-derivs ((point :vec3)
-                                    (hash-fn (function
-                                              (:vec3 :vec3 :vec3)
-                                              (:vec4 :vec4 :vec4))))
+(defun noise/simplex-derivs ((point :vec3)
+                             (hash-fn (function
+                                       (:vec3 :vec3 :vec3)
+                                       (:vec4 :vec4 :vec4))))
   (mvlet* ((cell1 cell2 cell3 corners-x corners-y corners-z
                   (noise/simplex-get-corner-vectors point))
            (hash0 hash1 hash2 (funcall hash-fn cell1 cell2 cell3))
@@ -1073,9 +1042,10 @@
                       18.918613)))
     (vec4 noise derivs)))
 
-(defun noise/simplex-perlin-derivs ((point :vec3))
-  (noise/simplex-perlin-derivs point (lambda ((x :vec3) (y :vec3) (z :vec3))
-                                       (hash:fast32/3-per-corner x y z))))
+(defun noise/simplex-derivs ((point :vec3))
+  (noise/simplex-derivs point
+                        (lambda ((x :vec3) (y :vec3) (z :vec3))
+                          (hash/fast32-3-per-corner x y z))))
 
 (defun noise/simplex-cellular ((point :vec2)
                                (hash-fn (function (:vec2) (:vec4 :vec4))))
@@ -1100,9 +1070,7 @@
     (min (.x temp) (.y temp))))
 
 (defun noise/simplex-cellular ((point :vec2))
-  (noise/simplex-cellular point
-                          (lambda ((x :vec2))
-                            (hash:fast32/2-per-corner x))))
+  (noise/simplex-cellular point (lambda ((x :vec2)) (hash/fast32-2-per-corner x))))
 
 (defun noise/simplex-cellular ((point :vec3)
                                (hash-fn
@@ -1130,7 +1098,7 @@
 (defun noise/simplex-cellular ((point :vec3))
   (noise/simplex-cellular point
                           (lambda ((x :vec3) (y :vec3) (z :vec3))
-                            (hash:fast32/3-per-corner x y z))))
+                            (hash/fast32-3-per-corner x y z))))
 
 (defun noise/simplex-polkadot ((point :vec2)
                                (radius :float)
@@ -1153,8 +1121,7 @@
 (defun noise/simplex-polkadot ((point :vec2)
                                (radius :float)
                                (max-dimness :float))
-  (noise/simplex-polkadot point radius max-dimness (lambda ((x :vec2))
-                                                     (hash:fast32 x))))
+  (noise/simplex-polkadot point radius max-dimness (lambda ((x :vec2)) (hash/fast32 x))))
 
 (defun noise/simplex-polkadot ((point :vec3)
                                (radius :float)
@@ -1178,54 +1145,56 @@
 (defun noise/simplex-polkadot ((point :vec3)
                                (radius :float)
                                (max-dimness :float))
-  (noise/simplex-polkadot point radius max-dimness
+  (noise/simplex-polkadot point
+                          radius
+                          max-dimness
                           (lambda ((x :vec3) (y :vec3) (z :vec3))
-                            (hash:fast32 x y z))))
+                            (hash/fast32 x y z))))
 
 (defun noise/value ((point :vec2)
                     (hash-fn (function (:vec2) :vec4)))
   (let* ((cell (floor point))
          (vec (- point cell))
          (hash (funcall hash-fn cell))
-         (blend (shape:quintic-curve vec))
+         (blend (shape/quintic-curve vec))
          (blend (vec4 blend (- 1 blend))))
     (dot hash (* (.zxzx blend) (.wwyy blend)))))
 
 (defun noise/value ((point :vec2))
-  (noise/value point (lambda ((x :vec2)) (hash:fast32 x))))
+  (noise/value point (lambda ((x :vec2)) (hash/fast32 x))))
 
 (defun noise/value-derivs ((point :vec2)
                            (hash-fn (function (:vec2) :vec4)))
   (let* ((cell (floor point))
          (vec (- point cell))
          (hash (funcall hash-fn cell))
-         (blend (shape:quintic-curve/interpolate-derivative vec))
+         (blend (shape/quintic-curve-interpolate-derivative vec))
          (out (mix (.xyxz hash) (.zwyw hash) (.yyxx blend))))
     (+ (vec3 (.x out) 0 0)
        (* (- (.yyw out) (.xxz out)) (.xzw blend)))))
 
 (defun noise/value-derivs ((point :vec2))
-  (noise/value-derivs point (lambda ((x :vec2)) (hash:fast32 x))))
+  (noise/value-derivs point (lambda ((x :vec2)) (hash/fast32 x))))
 
 (defun noise/value ((point :vec3)
                     (hash-fn (function (:vec3) (:vec4 :vec4))))
   (mvlet* ((cell (floor point))
            (vec (- point cell))
            (low-z high-z (funcall hash-fn cell))
-           (blend (shape:quintic-curve vec))
+           (blend (shape/quintic-curve vec))
            (out (mix low-z high-z (.z blend)))
            (blend (vec4 (.xy blend) (- 1 (.xy blend)))))
     (dot out (* (.zxzx blend) (.wwyy blend)))))
 
 (defun noise/value ((point :vec3))
-  (noise/value point (lambda ((x :vec3)) (hash:fast32 x))))
+  (noise/value point (lambda ((x :vec3)) (hash/fast32 x))))
 
 (defun noise/value-derivs ((point :vec3)
                            (hash-fn (function (:vec3) (:vec4 :vec4))))
   (mvlet* ((cell (floor point))
            (vec (- point cell))
            (low-z high-z (funcall hash-fn cell))
-           (blend (shape:quintic-curve vec))
+           (blend (shape/quintic-curve vec))
            (temp1 (mix low-z high-z (.z blend)))
            (temp1 (mix (.xyxz temp1) (.zwyw temp1) (.yyxx blend)))
            (temp2 (mix (vec4 (.xy low-z) (.xy high-z))
@@ -1234,17 +1203,17 @@
            (temp2 (mix (.xz temp2) (.yw temp2) (.x blend))))
     (+ (vec4 (.x temp1) 0 0 0)
        (* (- (vec4 (.yyw temp1) (.y temp2)) (vec4 (.xxz temp1) (.x temp2)))
-          (vec4 (.x blend) (shape:quintic-curve/derivative vec))))))
+          (vec4 (.x blend) (shape/quintic-curve-derivative vec))))))
 
 (defun noise/value-derivs ((point :vec3))
-  (noise/value-derivs point (lambda ((x :vec3)) (hash:fast32 x))))
+  (noise/value-derivs point (lambda ((x :vec3)) (hash/fast32 x))))
 
 (defun noise/value ((point :vec4)
                     (hash-fn (function (:vec4) (:vec4 :vec4 :vec4 :vec4))))
   (mvlet* ((cell (floor point))
            (vec (- point cell))
            (z0w0 z1w0 z0w1 z1w1 (funcall hash-fn cell))
-           (blend (shape:quintic-curve vec))
+           (blend (shape/quintic-curve vec))
            (temp (+ z0w0 (* (- z0w1 z0w0) (.w blend))))
            (temp (+ temp (* (- (+ z1w0 (* (- z1w1 z1w0) (.w blend))) temp)
                             (.z blend))))
@@ -1252,7 +1221,7 @@
     (dot temp (* (.zxzx blend) (.wwyy blend)))))
 
 (defun noise/value ((point :vec4))
-  (noise/value point (lambda ((x :vec4)) (hash:fast32-2 x))))
+  (noise/value point (lambda ((x :vec4)) (hash/fast32-2 x))))
 
 (defun noise/value-hermite ((point :vec2)
                             (value-scale :float)
@@ -1267,13 +1236,13 @@
            (hash-x (* (- hash-z 0.5) value-scale))
            (hash-y (* (- hash-x 0.5 +epsilon+) gradient-scale))
            (hash-z (* (- hash-y 0.5 +epsilon+) gradient-scale))
-           (out (shape:quintic-hermite
+           (out (shape/quintic-hermite
                  (.y vec)
                  (vec4 (.xy hash-x) (.xy hash-y))
                  (vec4 (.zw hash-x) (.zw hash-y))
                  (vec4 (.xy hash-z) 0 0)
                  (vec4 (.zw hash-z) 0 0)))
-           (out (* (shape:quintic-hermite
+           (out (* (shape/quintic-hermite
                     (.x vec) (.x out) (.y out) (.z out) (.w out))
                    normalization-value)))
     (map-domain out -1 1 0 1)))
@@ -1282,8 +1251,11 @@
                             (value-scale :float)
                             (gradient-scale :float)
                             (normalization-value :float))
-  (noise/value-hermite point value-scale gradient-scale normalization-value
-                       (lambda ((x :vec2)) (hash:fast32/3-per-corner x))))
+  (noise/value-hermite point
+                       value-scale
+                       gradient-scale
+                       normalization-value
+                       (lambda ((x :vec2)) (hash/fast32/3-per-corner x))))
 
 (defun noise/value-hermite ((point :vec3)
                             (value-scale :float)
@@ -1305,16 +1277,16 @@
            (hash-y1 (* (- hash-y1 0.5 +epsilon+) gradient-scale))
            (hash-z1 (* (- hash-z1 0.5 +epsilon+) gradient-scale))
            (hash-w1 (* (- hash-w1 0.5 +epsilon+) gradient-scale))
-           (ival igrad-x igrad-y (shape:quintic-hermite
+           (ival igrad-x igrad-y (shape/quintic-hermite
                                   (.z vec) hash-x0 hash-x1 hash-y0 hash-y1
                                   hash-z0 hash-z1 hash-w0 hash-w1))
-           (out (shape:quintic-hermite
+           (out (shape/quintic-hermite
                  (.y vec)
                  (vec4 (.xy ival) (.xy igrad-x))
                  (vec4 (.zw ival) (.zw igrad-x))
                  (vec4 (.xy igrad-y) 0 0)
                  (vec4 (.zw igrad-y) 0 0)))
-           (out (* (shape:quintic-hermite
+           (out (* (shape/quintic-hermite
                     (.x vec) (.x out) (.y out) (.z out) (.w out))
                    normalization-value)))
     (map-domain out -1 1 0 1)))
@@ -1323,8 +1295,11 @@
                             (value-scale :float)
                             (gradient-scale :float)
                             (normalization-value :float))
-  (noise/value-hermite point value-scale gradient-scale normalization-value
-                       (lambda ((x :vec3)) (hash:fast32/4-per-corner x))))
+  (noise/value-hermite point
+                       value-scale
+                       gradient-scale
+                       normalization-value
+                       (lambda ((x :vec3)) (hash/fast32-4-per-corner x))))
 
 (defun noise/value-perlin ((point :vec2)
                            (blend-value :float)
@@ -1341,15 +1316,17 @@
                                     (* grad-y (.yyww vecs)))
                                  1.4142135)
                               blend-value))
-           (blend (shape:quintic-curve (.xy vecs)))
+           (blend (shape/quintic-curve (.xy vecs)))
            (blend (vec4 blend (- 1 blend)))
            (out (dot grad-results (* (.zxzx blend) (.wwyy blend)))))
     (map-domain out -1 1 0 1)))
 
 (defun noise/value-perlin ((point :vec2)
                            (blend-value :float))
-  (noise/value-perlin point blend-value (lambda ((x :vec2))
-                                          (hash:fast32/3-per-corner x))))
+  (noise/value-perlin point
+                      blend-value
+                      (lambda ((x :vec2))
+                        (hash/fast32-3-per-corner x))))
 
 (defun noise/value-perlin ((point :vec3)
                            (blend-value :float)
@@ -1386,7 +1363,7 @@
                              (* (.z vec-1) grad-z1))
                           1.1547005)
                        blend-value))
-           (blend (shape:quintic-curve vec))
+           (blend (shape/quintic-curve vec))
            (out (mix temp1 temp2 (.z blend)))
            (blend (vec4 (.xy blend) (- 1 (.xy blend))))
            (out (dot out (* (.zxzx blend) (.wwyy blend)))))
@@ -1394,8 +1371,9 @@
 
 (defun noise/value-perlin ((point :vec3)
                            (blend-value :float))
-  (noise/value-perlin point blend-value (lambda ((x :vec3))
-                                          (hash:fast32/4-per-corner x))))
+  (noise/value-perlin point
+                      blend-value
+                      (lambda ((x :vec3)) (hash/fast32-4-per-corner x))))
 
 (defun noise/cubist ((point :vec2)
                      (range-clamp :vec2)
@@ -1409,14 +1387,14 @@
                     (/ (* (inversesqrt (+ (* grad-x grad-x) (* grad-y grad-y)))
                           (+ (* grad-x (.xzxz vecs))
                              (* grad-y (.yyww vecs)))))))
-           (blend (shape:quintic-curve (.xy vecs)))
+           (blend (shape/quintic-curve (.xy vecs)))
            (blend (vec4 blend (- 1 blend)))
            (out (dot temp (* (.zxzx blend) (.wwyy blend)))))
     (saturate (* (- out (.x range-clamp)) (.y range-clamp)))))
 
 (defun noise/cubist ((point :vec2)
                      (range-clamp :vec2))
-  (noise/cubist point range-clamp (lambda ((x :vec2)) (hash:fast32/3-per-corner x))))
+  (noise/cubist point range-clamp (lambda ((x :vec2)) (hash/fast32-3-per-corner x))))
 
 (defun noise/cubist ((point :vec3)
                      (range-clamp :vec2)
@@ -1449,17 +1427,16 @@
                            (+ (* (.xyxy (vec2 (.x vec) (.x vec-1))) grad-x1)
                               (* (.xxyy (vec2 (.y vec) (.y vec-1))) grad-y1)
                               (* (.z vec-1) grad-z1))))))
-           (blend (shape:quintic-curve vec))
+           (blend (shape/quintic-curve vec))
            (out (mix temp1 temp2 (.z blend)))
            (blend (vec4 (.xy blend) (- 1 (.xy blend)))))
     (saturate (* (- (dot out (* (.zxzx blend) (.wwyy blend)))
                     (.x range-clamp))
                  (.y range-clamp)))))
 
-(defunnoise/cubist ((point :vec3)
-                    (range-clamp :vec2))
-    (noise/cubist point range-clamp (lambda ((x :vec3))
-                                      (hash:fast32/4-per-corner x))))
+(defun noise/cubist ((point :vec3)
+                     (range-clamp :vec2))
+  (noise/cubist point range-clamp (lambda ((x :vec3)) (hash/fast32-4-per-corner x))))
 
 (defun noise/stars ((point :vec2)
                     (probability-threshold :float)
@@ -1474,15 +1451,18 @@
     (decf vec (vec2 (1- radius)))
     (incf vec (* (.xy hash) (- radius 2)))
     (if (< (.w hash) probability-threshold)
-        (* (shape:falloff-squared-c1 (min (dot vec vec) 1)) value)
+        (* (shape/falloff-squared-c1 (min (dot vec vec) 1)) value)
         0.0)))
 
 (defun noise/stars ((point :vec2)
                     (probability-threshold :float)
                     (max-dimness :float)
                     (radius :float))
-  (noise/stars point probability-threshold max-dimness radius
-               (lambda ((x :vec2)) (hash:fast32/cell x))))
+  (noise/stars point
+               probability-threshold
+               max-dimness
+               radius
+               (lambda ((x :vec2)) (hash/fast32-cell x))))
 
 (defun noise/fbm-perlin ((point :vec2)
                          (octaves :uint)
@@ -1518,7 +1498,7 @@
   (let ((value 0.0)
         (amplitude 0.5))
     (dotimes (i octaves)
-      (incf value (* amplitude (noise/simplex-perlin (* point frequency))))
+      (incf value (* amplitude (noise/simplex (* point frequency))))
       (setf point (* point lacunarity)
             amplitude (* amplitude gain)))
     value))
@@ -1531,7 +1511,7 @@
   (let ((value 0.0)
         (amplitude 0.5))
     (dotimes (i octaves)
-      (incf value (* amplitude (noise/simplex-perlin (* point frequency))))
+      (incf value (* amplitude (noise/simplex (* point frequency))))
       (setf point (* point lacunarity)
             amplitude (* amplitude gain)))
     value))
@@ -1613,7 +1593,7 @@
         (amplitude 0.5)
         (previous 1.0))
     (dotimes (i octaves)
-      (let* ((n (noise/simplex-perlin (* point frequency)))
+      (let* ((n (noise/simplex (* point frequency)))
              (n (- offset (abs n)))
              (n (expt n exponent)))
         (incf value (* n amplitude previous))
@@ -1633,7 +1613,7 @@
         (amplitude 0.5)
         (previous 1.0))
     (dotimes (i octaves)
-      (let* ((n (noise/simplex-perlin (* point frequency)))
+      (let* ((n (noise/simplex (* point frequency)))
              (n (- offset (abs n)))
              (n (expt n exponent)))
         (incf value (* n amplitude previous))
@@ -1718,7 +1698,7 @@
   (let ((value 0.0)
         (amplitude 0.5))
     (dotimes (i octaves)
-      (incf value (* (1- (* (abs (noise/simplex-perlin (* point frequency))) 2))
+      (incf value (* (1- (* (abs (noise/simplex (* point frequency))) 2))
                      amplitude))
       (setf point (* point lacunarity)
             amplitude (* amplitude gain)))
@@ -1732,7 +1712,7 @@
   (let ((value 0.0)
         (amplitude 0.5))
     (dotimes (i octaves)
-      (incf value (* (1- (* (abs (noise/simplex-perlin (* point frequency))) 2))
+      (incf value (* (1- (* (abs (noise/simplex (* point frequency))) 2))
                      amplitude))
       (setf point (* point lacunarity)
             amplitude (* amplitude gain)))

@@ -1,48 +1,48 @@
 (in-package #:zed.shader-library)
 
-(defun blum-blum-shub/coord-prepare ((x :vec4))
+(defun hash/bbs-coord-prepare ((x :vec4))
   (- x (* (floor (* x (/ 61.0))) 61.0)))
 
-(defun blum-blum-shub/permute-and-resolve ((x :vec4))
+(defun hash/bbs-permute-and-resolve ((x :vec4))
   (fract (* x x (/ 61.0))))
 
-(defun blum-blum-shub/permute ((x :vec4))
-  (* (blum-blum-shub/permute-and-resolve x) 61.0))
+(defun hash/bbs-permute ((x :vec4))
+  (* (hash/bbs-permute-and-resolve x) 61.0))
 
-(defun blum-blum-shub ((grid-cell :vec2))
-  (let* ((hash-coord (blum-blum-shub/coord-prepare
+(defun hash/bbs ((grid-cell :vec2))
+  (let* ((hash-coord (hash/bbs-coord-prepare
                       (vec4 grid-cell (1+ grid-cell))))
-         (hash (blum-blum-shub/permute (* (.xzxz hash-coord) 7.0))))
-    (blum-blum-shub/permute-and-resolve (+ hash (.yyww hash-coord)))))
+         (hash (hash/bbs-permute (* (.xzxz hash-coord) 7.0))))
+    (hash/bbs-permute-and-resolve (+ hash (.yyww hash-coord)))))
 
-(defun blum-blum-shub/hq ((grid-cell :vec2))
-  (let* ((hash-coord (blum-blum-shub/coord-prepare
-                      (vec4 grid-cell (1+ grid-cell))))
-         (hash (blum-blum-shub/permute (* (.xzxz hash-coord) 7.0))))
-    (blum-blum-shub/permute-and-resolve
-     (+ (blum-blum-shub/permute (+ hash (.yyww hash-coord)))
-        (.xzxz hash-coord)))))
-
-(defun blum-blum-shub ((grid-cell :vec3))
+(defun hash/bbs ((grid-cell :vec3))
   (decf (.xyz grid-cell) (* (floor (* (.xyz grid-cell) (/ 60.0))) 60.0))
   (let* ((grid-cell-inc1 (* (step grid-cell (vec3 58.5)) (1+ grid-cell)))
-         (p (blum-blum-shub/permute
-             (+ (blum-blum-shub/permute
+         (p (hash/bbs-permute
+             (+ (hash/bbs-permute
                  (.xyxy (vec2 (.x grid-cell) (.x grid-cell-inc1))))
                 (.xxyy (vec2 (.y grid-cell) (.y grid-cell-inc1))))))
-         (low-z (blum-blum-shub/permute-and-resolve (+ p (.z grid-cell))))
-         (high-z (blum-blum-shub/permute-and-resolve
+         (low-z (hash/bbs-permute-and-resolve (+ p (.z grid-cell))))
+         (high-z (hash/bbs-permute-and-resolve
                   (+ p (.z grid-cell-inc1)))))
     (values low-z high-z)))
 
-(defun fast32 ((grid-cell :vec2))
+(defun hash/bbs-hq ((grid-cell :vec2))
+  (let* ((hash-coord (hash/bbs-coord-prepare
+                      (vec4 grid-cell (1+ grid-cell))))
+         (hash (hash/bbs-permute (* (.xzxz hash-coord) 7.0))))
+    (hash/bbs-permute-and-resolve
+     (+ (hash/bbs-permute (+ hash (.yyww hash-coord)))
+        (.xzxz hash-coord)))))
+
+(defun hash/fast32 ((grid-cell :vec2))
   (let ((p (vec4 grid-cell (1+ grid-cell))))
     (decf p (* (floor (* p (/ 71.0))) 71.0))
     (incf p (vec4 26 161 26 161))
     (multf p p)
     (fract (* (.xzxz p) (.yyww p) (/ 951.135664)))))
 
-(defun fast32/2-per-corner ((grid-cell :vec2))
+(defun hash/fast32-2-per-corner ((grid-cell :vec2))
   (let ((p (vec4 grid-cell (1+ grid-cell))))
     (decf p (* (floor (* p (/ 71.0))) 71.0))
     (incf p (vec4 26 161 26 161))
@@ -51,7 +51,7 @@
     (values (fract (* p (/ 951.135664)))
             (fract (* p (/ 642.949883))))))
 
-(defun fast32/3-per-corner ((grid-cell :vec2))
+(defun hash/fast32-3-per-corner ((grid-cell :vec2))
   (let ((p (vec4 grid-cell (1+ grid-cell))))
     (decf p (* (floor (* p (/ 71.0))) 71.0))
     (incf p (vec4 26 161 26 161))
@@ -61,13 +61,13 @@
             (fract (* p (/ 642.949883)))
             (fract (* p (/ 803.202459))))))
 
-(defun fast32/cell ((grid-cell :vec2))
+(defun hash/fast32-cell ((grid-cell :vec2))
   (let ((p (- grid-cell (* (floor (* grid-cell (/ 71.0))) 71.0))))
     (incf p (vec2 26 161))
     (multf p p)
     (fract (* (.x p) (.y p) (/ (vec4 951.1357 642.9499 803.202 986.97327))))))
 
-(defun fast32 ((grid-cell :vec3))
+(defun hash/fast32 ((grid-cell :vec3))
   (decf grid-cell (* (floor (* grid-cell (/ 69.0))) 69.0))
   (let* ((grid-cell-inc1 (* (step grid-cell (vec3 67.5)) (1+ grid-cell)))
          (p (+ (vec4 (.xy grid-cell) (.xy grid-cell-inc1))
@@ -79,9 +79,9 @@
     (values (fract (* p (.x high-z)))
             (fract (* p (.y high-z))))))
 
-(defun fast32 ((grid-cell :vec3)
-               (v1-mask :vec3)
-               (v2-mask :vec3))
+(defun hash/fast32 ((grid-cell :vec3)
+                    (v1-mask :vec3)
+                    (v2-mask :vec3))
   (decf grid-cell (* (floor (* grid-cell (/ 69.0))) 69.0))
   (let* ((grid-cell-inc1 (* (step grid-cell (vec3 67.5)) (1+ grid-cell)))
          (p (+ (vec4 (.xy grid-cell) (.xy grid-cell-inc1))
@@ -105,9 +105,9 @@
                             48.500388)))))
     (fract (* p mod-vals))))
 
-(defun fast32/3-per-corner ((grid-cell :vec3)
-                            (v1-mask :vec3)
-                            (v2-mask :vec3))
+(defun hash/fast32-3-per-corner ((grid-cell :vec3)
+                                 (v1-mask :vec3)
+                                 (v2-mask :vec3))
   (decf grid-cell (* (floor (* grid-cell (/ 69.0))) 69.0))
   (let* ((grid-cell-inc1 (* (step grid-cell (vec3 67.5)) (1+ grid-cell)))
          (p (+ (vec4 (.xy grid-cell) (.xy grid-cell-inc1))
@@ -137,7 +137,7 @@
                               (.z v2-mask)
                               (.z high-z-mods)))))))
 
-(defun fast32/3-per-corner ((grid-cell :vec3))
+(defun hash/fast32-3-per-corner ((grid-cell :vec3))
   (decf grid-cell (* (floor (* grid-cell (/ 69.0))) 69.0))
   (let* ((grid-cell-inc1 (* (step grid-cell (vec3 67.5)) (1+ grid-cell)))
          (p (+ (vec4 (.xy grid-cell) (.xy grid-cell-inc1))
@@ -155,7 +155,7 @@
             (fract (* p (.y high-z-mod)))
             (fract (* p (.z high-z-mod))))))
 
-(defun fast32/4-per-corner ((grid-cell :vec3))
+(defun hash/fast32-4-per-corner ((grid-cell :vec3))
   (decf grid-cell (* (floor (* grid-cell (/ 69.0))) 69.0))
   (let* ((grid-cell-inc1 (* (step grid-cell (vec3 67.5)) (1+ grid-cell)))
          (p (+ (vec4 (.xy grid-cell) (.xy grid-cell-inc1))
@@ -175,7 +175,7 @@
             (fract (* p (.z high-z-3)))
             (fract (* p (.w high-z-3))))))
 
-(defun fast32/cell ((grid-cell :vec3))
+(defun hash/fast32-cell ((grid-cell :vec3))
   (let ((floats (vec4 635.2987 682.3575 668.9265 588.2551))
         (z-inc (vec4 48.500388 65.29412 63.9346 63.279682)))
     (decf grid-cell (* (floor (* grid-cell (/ 71.0))) 71.0))
@@ -185,7 +185,7 @@
               (.y grid-cell)
               (/ (+ floats (* z-inc (.z grid-cell))))))))
 
-(defun fast32-2 ((grid-cell :vec2))
+(defun hash/fast32-2 ((grid-cell :vec2))
   (let ((p (vec4 grid-cell (1+ grid-cell))))
     (setf p (+ (* (- p (* (floor (* p (/ 69.0))) 69.0))
                   (.xyxy (vec2 2.009842 1.372549)))
@@ -193,7 +193,7 @@
     (multf p p)
     (fract (* (.xzxz p) (.yyww p) (/ 32745.708984)))))
 
-(defun fast32-2 ((grid-cell :vec3))
+(defun hash/fast32-2 ((grid-cell :vec3))
   (decf grid-cell (* (floor (* grid-cell (/ 69.0))) 69.0))
   (let* ((offset (vec3 55.882355 63.167774 52.941177))
          (scale (vec3 0.235142 0.205890 0.216449))
@@ -210,7 +210,7 @@
     (values (fract (* x (.z grid-cell) (/ 69412.07)))
             (fract (* x (.z grid-cell-inc1) (/ 69412.07))))))
 
-(defun fast32-2 ((grid-cell :vec4))
+(defun hash/fast32-2 ((grid-cell :vec4))
   (decf grid-cell (* (floor (* grid-cell (/ 69.0))) 69.0))
   (let* ((offset (vec4 16.84123 18.774548 16.873274 13.664607))
          (scale (vec4 0.102007 0.114473 0.139651 0.08455))
@@ -235,7 +235,7 @@
             (fract (* x (.z z)))
             (fract (* x (.w z))))))
 
-(defun fast32-2/4-per-corner ((grid-cell :vec4))
+(defun hash/fast32-2-4-per-corner ((grid-cell :vec4))
   (decf grid-cell (* (floor (* grid-cell (/ 69.0))) 69.0))
   (let* ((offset (vec4 16.84123 18.774548 16.873274 13.664607))
          (scale (vec4 0.102007 0.114473 0.139651 0.08455))
@@ -278,3 +278,63 @@
             z1w0-0 z1w0-1 z1w0-2 z1w0-3
             z0w1-0 z0w1-1 z0w1-2 z0w1-3
             z1w1-0 z1w1-1 z1w1-2 z1w1-3)))
+
+(defun hash/sgpp-coord-prepare ((x :vec3))
+  (- x (* (floor (* x (/ 289.0))) 289.0)))
+
+(defun hash/sgpp-coord-prepare ((x :vec4))
+  (- x (* (floor (* x (/ 289.0))) 289.0)))
+
+(defun hash/sgpp-permute ((x :vec4))
+  (* (fract (* x (+ (* 0.11764706 x) (/ 289.0)))) 289.0))
+
+(defun hash/sgpp-resolve ((x :vec4))
+  (fract (* x 0.024305556)))
+
+(defun hash/sgpp ((grid-cell :vec2))
+  (let ((hash-coord (hash/sgpp-coord-prepare (vec4 grid-cell (1+ grid-cell)))))
+    (hash/sgpp-resolve
+     (hash/sgpp-permute
+      (+ (hash/sgpp-permute (.xzxz hash-coord))
+         (.yyww hash-coord))))))
+
+(defun hash/sgpp-2-per-corner ((grid-cell :vec2))
+  (let* ((hash-coord (hash/sgpp-coord-prepare
+                      (vec4 (.xy grid-cell) (1+ (.xy grid-cell)))))
+         (hash0 (hash/sgpp-permute
+                 (+ (hash/sgpp-permute (.xzxz hash-coord)) (.yyww hash-coord)))))
+    (values (hash/sgpp-resolve hash0)
+            (hash/sgpp-resolve (hash/sgpp-permute hash0)))))
+
+(defun hash/sgpp ((grid-cell :vec3))
+  (let* ((grid-cell (hash/sgpp-coord-prepare grid-cell))
+         (grid-cell-inc1 (* (step grid-cell (vec3 287.5)) (1+ grid-cell)))
+         (x (.xyxy (vec2 (.x grid-cell) (.x grid-cell-inc1))))
+         (y (.xxyy (vec2 (.y grid-cell) (.y grid-cell-inc1))))
+         (high-z (+ (hash/sgpp-permute (+ (hash/sgpp-permute x) y))))
+         (low-z (hash/sgpp-resolve (hash/sgpp-permute (+ high-z (.z grid-cell))))))
+    (setf high-z (hash/sgpp-resolve (hash/sgpp-permute (+ high-z (.z grid-cell-inc1)))))
+    (values low-z high-z)))
+
+(defun hash/sgpp-3-per-corner ((grid-cell :vec3)
+                               (v1-mask :vec3)
+                               (v2-mask :vec3))
+  (let* ((coords0 (- grid-cell (* (floor (* grid-cell (/ 289.0))) 289.0)))
+         (coords3 (* (step coords0 (vec3 287.5)) (1+ coords0)))
+         (coords1 (mix coords0 coords3 v1-mask))
+         (coords2 (mix coords0 coords3 v2-mask))
+         (hash1 (hash/sgpp-permute
+                 (hash/sgpp-permute
+                  (+ (hash/sgpp-permute (vec4 (.x coords0)
+                                              (.x coords1)
+                                              (.x coords2)
+                                              (.x coords3)))
+                     (vec4 (.y coords0) (.y coords1) (.y coords2) (.y coords3))
+                     (vec4 (.z coords0)
+                           (.z coords1)
+                           (.z coords2)
+                           (.z coords3))))))
+         (hash2 (hash/sgpp-permute hash1)))
+    (values (hash/sgpp-resolve hash1)
+            (hash/sgpp-resolve hash2)
+            (hash/sgpp-resolve (hash/sgpp-permute hash2)))))

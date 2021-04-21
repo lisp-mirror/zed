@@ -208,7 +208,7 @@
          (mr-sample (texture sampler (vec3 uv +metal-roughness+)))
          (perceptual-roughness (* (.g mr-sample) roughness-factor))
          (metallic (* (.b mr-sample) metallic-factor))
-         (base-color (* (srgb->rgb (texture sampler (vec3 uv +albedo+))) base-color-factor))
+         (base-color (* (color/srgb->rgb (texture sampler (vec3 uv +albedo+))) base-color-factor))
          (diffuse-color (* (.rgb base-color) (- (vec3 1) f0) (- 1 metallic)))
          (specular-color (mix f0 (.rgb base-color) metallic))
          (perceptual-roughness (clamp perceptual-roughness 0 1))
@@ -226,7 +226,7 @@
          (color (vec3 0))
          (normal-w (get-normal sampler normal-scale uv world-pos normal))
          (ao (.r (texture sampler (vec3 uv +ao+))))
-         (emissive (* (.rgb (srgb->rgb (texture sampler (vec3 uv +emissive+)))) emissive-factor)))
+         (emissive (* (.rgb (color/srgb->rgb (texture sampler (vec3 uv +emissive+)))) emissive-factor)))
     (when use-punctual
       (incf color (apply-directional-light light material-info normal-w view-dir)))
     (when use-ibl
@@ -237,7 +237,7 @@
                                         environment-sampler)))
     (setf color (mix color (* color ao) occlusion-strength))
     (incf color emissive)
-    (vec4 (rgb->srgb (tone-map/aces color 1)) (.a base-color))))
+    (vec4 (color/rgb->srgb (color/tone-map-aces color 1)) (.a base-color))))
 
 (define-shader mesh ()
   (:vertex (mesh/vertex mesh-attrs))
