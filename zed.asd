@@ -66,6 +66,7 @@
    (:file "util-doubly-linked-list")
    (:file "shader-library-package")
    (:file "shader-library-swizzle")
+   (:file "shader-library-vari")
    (:file "shader-library-common")
    (:file "shader-library-default")
    (:file "shader-library-color")
