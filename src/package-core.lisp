@@ -116,4 +116,5 @@
    #:define-geometry-layout
    #:define-material
    #:define-prefab
-   #:define-texture))
+   #:define-texture
+   #:define-viewport))
