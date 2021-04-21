@@ -1,6 +1,6 @@
 (in-package #:zed.trait.font)
 
-(z::define-internal-trait font (:before geometry)
+(z::define-internal-trait font (:before tr.geo:geometry)
   ((%asset :reader asset
            :inline t
            :type list

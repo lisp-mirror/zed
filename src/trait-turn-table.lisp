@@ -1,6 +1,6 @@
 (in-package #:zed.trait.turn-table)
 
-(z::define-internal-trait turn-table (:before render)
+(z::define-internal-trait turn-table (:before tr.ren:render)
   ((%rotation-speed :reader rotation-speed
                     :inline t
                     :type u:f32

@@ -83,6 +83,7 @@
   (:local-nicknames
    (#:q #:zed.math.quaternion)
    (#:tr.col #:zed.trait.collider)
+   (#:tr.ren #:zed.trait.render)
    (#:u #:golden-utils)
    (#:v2 #:zed.math.vector2)
    (#:z #:zed))
