@@ -13,5 +13,5 @@
   (let* ((core (z:trait-core animate))
          (clock (z::core-clock core))
          (game-object (z:trait-owner animate)))
-    (process-animations game-object clock (sequence animate))
+    (z::process-animations game-object clock (sequence animate))
     nil))

@@ -156,6 +156,7 @@
    (:file "trait-collider")
    (:file "trait-turn-table")
    (:file "trait-curve")
+   (:file "trait-animate")
    (:file "picking")
    (:file "game-loop")
    (:file "context")
