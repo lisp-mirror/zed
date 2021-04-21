@@ -73,6 +73,7 @@
    (:file "shader-library-sprite")
    (:file "shader-library-collider")
    (:file "shader-library-font")
+   (:file "shader-library-matcap")
    (:file "package-core")
    (:file "package-trait")
    (:file "package-nicknames")
