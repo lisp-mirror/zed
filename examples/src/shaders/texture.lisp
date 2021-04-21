@@ -4,7 +4,8 @@
                        (uv :vec2)
                        &uniforms
                        (model :mat4)
-                       (camera camera-data :ssbo :std-430))
+                       (view :mat4)
+                       (proj :mat4))
   (values (vec4 (* (.xy pos) 2) 0 1)
           uv))
 

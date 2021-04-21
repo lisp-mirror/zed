@@ -23,11 +23,12 @@
 
 (defun sprite/v (&uniforms
                  (model :mat4)
-                 (camera camera-data :ssbo :std-430)
+                 (view :mat4)
+                 (proj :mat4)
                  (sprite sprite-data)
                  (spritesheet spritesheet-data :ssbo :std-430))
   (mvlet* ((pos uv (make-vertex-data sprite spritesheet)))
-    (values (* (camera/proj camera) (camera/view camera) model (vec4 pos 0 1))
+    (values (* proj view model (vec4 pos 0 1))
             uv)))
 
 (defun sprite/f ((uv :vec2)

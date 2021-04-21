@@ -27,14 +27,6 @@
           (material-attachments material) attachments)
     nil))
 
-(u:fn-> make-material-shader-buffers (core material) null)
-(defun make-material-shader-buffers (core material)
-  (declare (optimize speed))
-  (let ((shader (material-data-shader (material-data material))))
-    (with-resource-cache (core :shader-bindings (cons :camera shader))
-      (make-shader-buffer (core-shader-manager core) :camera :camera shader))
-    nil))
-
 (u:fn-> make-material (core symbol) material)
 (defun make-material (core type)
   (declare (optimize speed))
@@ -46,7 +38,6 @@
     (setf (u:href materials type material) material)
     (make-uniforms core material)
     (ensure-framebuffer core material)
-    (make-material-shader-buffers core material)
     material))
 
 (u:fn-> destroy-material (core material) null)
