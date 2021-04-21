@@ -16,6 +16,12 @@
   (view :mat4 :accessor camera/view)
   (proj :mat4 :accessor camera/proj))
 
+(defconstant +epsilon+ 1e-7)
+
+(defconstant +pi+ (float pi 1f0))
+
+(defconstant +half-pi+ (/ +pi+ 2))
+
 (defmacro mvlet* ((&rest bindings) &body body)
   (destructuring-bind (&optional car . cdr) bindings
     (etypecase car
@@ -53,3 +59,35 @@
 
 (defun log10 ((x :vec4))
   (* (log2 x) 0.30103))
+
+(defun map-domain ((x :float)
+                   (source-min :float)
+                   (source-max :float)
+                   (dest-min :float)
+                   (dest-max :float))
+  (+ dest-min
+     (* (- x source-min) (/ (- dest-max dest-min) (- source-max source-min)))))
+
+(defun map-domain ((x :vec2)
+                   (source-min :vec2)
+                   (source-max :vec2)
+                   (dest-min :vec2)
+                   (dest-max :vec2))
+  (+ dest-min
+     (* (- x source-min) (/ (- dest-max dest-min) (- source-max source-min)))))
+
+(defun map-domain ((x :vec3)
+                   (source-min :vec3)
+                   (source-max :vec3)
+                   (dest-min :vec3)
+                   (dest-max :vec3))
+  (+ dest-min
+     (* (- x source-min) (/ (- dest-max dest-min) (- source-max source-min)))))
+
+(defun map-domain ((x :vec4)
+                   (source-min :vec4)
+                   (source-max :vec4)
+                   (dest-min :vec4)
+                   (dest-max :vec4))
+  (+ dest-min
+     (* (- x source-min) (/ (- dest-max dest-min) (- source-max source-min)))))
