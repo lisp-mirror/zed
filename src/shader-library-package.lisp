@@ -20,7 +20,7 @@
    #:mesh/weights
    #:mvlet*
    #:saturate)
-  ;; Color
+  ;; Color functions
   (:export
    #:color-filter
    #:hcy->rgb
@@ -53,12 +53,72 @@
    #:xyy->xyz
    #:xyz->rgb
    #:xyz->xyy)
-  ;; Default
+  ;; Shaping functions
   (:export
-   #:default)
-  ;; Sprite
+   #:almost-identity
+   #:back-in
+   #:back-in-out
+   #:back-out
+   #:blinn-wyvill-raised-inverted-cosine
+   #:bounce-in
+   #:bounce-in-out
+   #:bounce-out
+   #:circular-in
+   #:circular-in-out
+   #:circular-out
+   #:cubic-in
+   #:cubic-in-out
+   #:cubic-out
+   #:cubic-pulse
+   #:double-circle-seat
+   #:double-circle-sigmoid
+   #:double-cubic-seat
+   #:double-cubic-seat/linear-blend
+   #:double-elliptical-seat
+   #:double-elliptical-sigmoid
+   #:double-exponential-seat
+   #:double-exponential-sigmoid
+   #:double-odd-polynomial-seat
+   #:elastic-in
+   #:elastic-in-out
+   #:elastic-out
+   #:exponential-emphasis
+   #:exponential-in
+   #:exponential-in-out
+   #:exponential-out
+   #:exponential-step
+   #:falloff-squared-c1
+   #:falloff-squared-c2
+   #:gain
+   #:hermite-curve
+   #:impulse
+   #:linear
+   #:logistic-sigmoid
+   #:parabola
+   #:power-curve
+   #:quadratic-in
+   #:quadratic-in-out
+   #:quadratic-out
+   #:quadratic-point
+   #:quartic-in
+   #:quartic-in-out
+   #:quartic-out
+   #:quintic-curve
+   #:quintic-curve/derivative
+   #:quintic-curve/fast
+   #:quintic-curve/interpolate-derivative
+   #:quintic-hermite
+   #:quintic-hermite/derivative
+   #:quintic-in
+   #:quintic-in-out
+   #:quintic-out
+   #:sinc-curve
+   #:sine-in
+   #:sine-in-out
+   #:sine-out)
+  ;; Programs
   (:export
-   #:sprite)
-  ;; Font
-  (:export
-   #:font))
+   #:default
+   #:font
+   #:matcap
+   #:sprite))

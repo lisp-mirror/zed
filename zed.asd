@@ -68,6 +68,7 @@
    (:file "shader-library-swizzle")
    (:file "shader-library-vari")
    (:file "shader-library-common")
+   (:file "shader-library-shaping")
    (:file "shader-library-default")
    (:file "shader-library-color")
    (:file "shader-library-sprite")
