@@ -132,37 +132,37 @@
    #:sgpp/3-per-corner)
   ;; Noise functions
   (:export
-   #:billow/cellular
-   #:billow/perlin
-   #:billow/simplex
-   #:cellular
-   #:cellular/derivs
-   #:cellular-fast
-   #:cubist
-   #:fbm/cellular
-   #:fbm/perlin
-   #:fbm/simplex
-   #:hermite
-   #:hermite/derivs
-   #:perlin
-   #:perlin/derivs
-   #:perlin-improved
-   #:perlin-surflet
-   #:perlin-surflet/derivs
-   #:polkadot
-   #:polkadot-box
-   #:ridges/cellular
-   #:ridges/perlin
-   #:ridges/simplex
-   #:simplex-cellular
-   #:simplex-perlin
-   #:simplex-perlin/derivs
-   #:simplex-polkadot
-   #:stars
-   #:value
-   #:value/derivs
-   #:value-hermite
-   #:value-perlin)
+   #:noise/billow-cellular
+   #:noise/billow-perlin
+   #:noise/billow-simplex
+   #:noise/cellular
+   #:noise/cellular-derivs
+   #:noise/cellular-fast
+   #:noise/cubist
+   #:noise/fbm-cellular
+   #:noise/fbm-perlin
+   #:noise/fbm-simplex
+   #:noise/hermite
+   #:noise/hermite-derivs
+   #:noise/perlin
+   #:noise/perlin-derivs
+   #:noise/perlin-improved
+   #:noise/perlin-surflet
+   #:noise/perlin-surflet-derivs
+   #:noise/polkadot
+   #:noise/polkadot-box
+   #:noise/ridges-cellular
+   #:noise/ridges-perlin
+   #:noise/ridges-simplex
+   #:noise/simplex-cellular
+   #:noise/simplex-perlin
+   #:noise/simplex-perlin-derivs
+   #:noise/simplex-polkadot
+   #:noise/stars
+   #:noise/value
+   #:noise/value-derivs
+   #:noise/value-hermite
+   #:noise/value-perlin)
   ;; SDF functions
   (:export
    #:sdf/arc
