@@ -87,33 +87,31 @@
                               value)))))))
           options)))))
 
-(defmacro define-internal-trait (type (&key order) &body (slots . options))
-  (destructuring-bind (&key before after) order
-    `(progn
-       (u:eval-always
-         (util.oc::define-ordered-class ,type (trait)
-           ,slots
-           (:order (,@+trait-slot-order+ ,@(mapcar #'car slots)))
-           ,@(generate-trait-initargs type options)))
-       (setf (u:href =trait-order= ',type)
-             '(:before ,(u:ensure-list before)
-               :after ,(u:ensure-list after)))
-       (sort-trait-types)
-       (thread-pool-enqueue (list :trait ',type)))))
+(defmacro define-internal-trait (type (&key before after) &body (slots . options))
+  `(progn
+     (u:eval-always
+       (util.oc::define-ordered-class ,type (trait)
+         ,slots
+         (:order (,@+trait-slot-order+ ,@(mapcar #'car slots)))
+         ,@(generate-trait-initargs type options)))
+     (setf (u:href =trait-order= ',type)
+           '(:before ,(u:ensure-list before)
+             :after ,(u:ensure-list after)))
+     (sort-trait-types)
+     (thread-pool-enqueue (list :trait ',type))))
 
-(defmacro define-trait (type (&key order) &body (slots . options))
-  (destructuring-bind (&key before after) order
-    `(progn
-       (u:eval-always
-         (util.oc::define-ordered-class ,type (trait)
-           ,slots
-           (:order ,+trait-slot-order+)
-           ,@(generate-trait-initargs type options)))
-       (setf (u:href =trait-order= ',type)
-             '(:before ,(u:ensure-list before)
-               :after ,(u:ensure-list after)))
-       (sort-trait-types)
-       (thread-pool-enqueue (list :trait ',type)))))
+(defmacro define-trait (type (&key before after) &body (slots . options))
+  `(progn
+     (u:eval-always
+       (util.oc::define-ordered-class ,type (trait)
+         ,slots
+         (:order ,+trait-slot-order+)
+         ,@(generate-trait-initargs type options)))
+     (setf (u:href =trait-order= ',type)
+           '(:before ,(u:ensure-list before)
+             :after ,(u:ensure-list after)))
+     (sort-trait-types)
+     (thread-pool-enqueue (list :trait ',type))))
 
 (defmethod recompile ((type (eql :trait)) data)
   (let ((trait-manager (core-trait-manager =core=)))

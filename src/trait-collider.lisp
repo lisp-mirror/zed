@@ -1,6 +1,6 @@
 (in-package #:zed.trait.collider)
 
-(z::define-internal-trait collider (:order (:before tr.ren:render))
+(z::define-internal-trait collider (:before tr.ren:render)
   ((%volume-type :reader volume-type
                  :inline t
                  :type (or keyword null)
