@@ -44,8 +44,7 @@
   (:local-nicknames
    (#:tr.ren #:zed.trait.render)
    (#:u #:golden-utils)
-   (#:z #:zed)
-   (#:zsl #:zed.shader-library))
+   (#:z #:zed))
   (:use #:cl)
   (:export
    #:sprite))

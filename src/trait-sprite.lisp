@@ -31,11 +31,6 @@
                :type (and (integer 1) fixnum)
                :initarg :instances
                :initform 1)
-   (%buffer-spec :reader buffer-spec
-                 :inline t
-                 :type list
-                 :initarg :buffer-spec
-                 :initform '(:spritesheet zsl:sprite))
    (%spritesheet :accessor spritesheet
                  :inline t
                  :type z::spritesheet
@@ -66,7 +61,7 @@
 (defun setup (sprite)
   (declare (optimize speed))
   (let* ((core (z:trait-core sprite))
-         (spritesheet (z::make-spritesheet core (asset sprite) (buffer-spec sprite))))
+         (spritesheet (z::make-spritesheet core (asset sprite))))
     (setf (spritesheet sprite) spritesheet
           (index sprite) (z::find-sprite spritesheet (name sprite))
           (initial-index sprite) (index sprite))
@@ -92,12 +87,11 @@
 (u:fn-> render (sprite) null)
 (defun render (sprite)
   (declare (optimize speed))
-  (let* ((asset (asset sprite))
-         (shader-manager (z::core-shader-manager (z:trait-core sprite)))
+  (let* ((shader-manager (z::core-shader-manager (z:trait-core sprite)))
          (render-trait (z:find-trait (z:trait-owner sprite) 'tr.ren:render))
          (material (tr.ren::material render-trait)))
     (z::set-uniform material :sprite.index (index sprite))
-    (z::with-shader-buffers (shader-manager asset)
+    (z::with-shader-buffer (shader-manager (asset sprite))
       (gl:bind-vertex-array (z::spritesheet-vao (spritesheet sprite)))
       (gl:draw-arrays-instanced :triangle-strip 0 4 (instances sprite))
       (gl:bind-vertex-array 0))

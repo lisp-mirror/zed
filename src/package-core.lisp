@@ -34,7 +34,8 @@
    (#:util.ss #:%zed.utility.stream-slice)
    (#:v2 #:zed.math.vector2)
    (#:v3 #:zed.math.vector3)
-   (#:v4 #:zed.math.vector4))
+   (#:v4 #:zed.math.vector4)
+   (#:zsl #:zed.shader-library))
   (:use #:cl)
   ;; Core
   (:export

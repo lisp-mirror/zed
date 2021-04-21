@@ -37,13 +37,14 @@
   (with-asset (asset path data :format :lisp)
     data))
 
-(u:fn-> make-spritesheet (core list list) spritesheet)
-(defun make-spritesheet (core asset buffer-spec)
+(u:fn-> make-spritesheet (core list) spritesheet)
+(defun make-spritesheet (core asset)
   (declare (optimize speed))
   (with-resource-cache (core :spritesheet asset)
     (let ((spritesheet (%make-spritesheet :name asset
                                           :spec (read-spritesheet-spec-file asset)
                                           :vao (gl:gen-vertex-array))))
-      (apply #'make-shader-buffer (core-shader-manager core) asset buffer-spec)
+      (shadow:create-block-alias :buffer :spritesheet 'zsl:sprite asset)
+      (make-shader-buffer (core-shader-manager core) asset)
       (update-spritesheet-buffer spritesheet)
       spritesheet)))

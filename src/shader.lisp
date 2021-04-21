@@ -61,15 +61,12 @@
   (shadow:delete-buffer key)
   (shadow:unbind-block key))
 
-(defun make-shader-buffer (manager key block-id shader)
-  (declare (optimize speed))
+(defun make-shader-buffer (manager key)
   (let ((bindings (shader-manager-bindings manager))
         (binding (get-shader-buffer-binding manager)))
     (when (find-shader-buffer key)
       (delete-shader-buffer manager key))
     (setf (u:href bindings key) binding)
-    (shadow:create-block-alias :buffer block-id shader key)
-    (shadow:bind-block key binding)
     (shadow:create-buffer key key)
     (shadow:bind-buffer key binding)
     binding))
@@ -84,20 +81,11 @@
   (shadow:unbind-buffer key)
   (shadow:unbind-block key))
 
-(defmacro with-shader-buffers ((manager &rest keys) &body body)
-  (u:with-gensyms (table)
-    (let ((key-syms (mapcar (lambda (x) (list (u:make-gensym x) x)) keys)))
-      `(let ((,table (shader-manager-bindings ,manager))
-             ,@key-syms)
-         ,@(mapcar
-            (lambda (x)
-              `(shadow:bind-block ,(car x) (u:href ,table ,(car x))))
-            key-syms)
-         ,@body
-         ,@(mapcar
-            (lambda (x)
-              `(unbind-shader-buffer ,(car x)))
-            key-syms)))))
+(defmacro with-shader-buffer ((manager key) &body body)
+  `(progn
+     (bind-shader-buffer ,manager ,key)
+     ,@body
+     (unbind-shader-buffer ,key)))
 
 (defmethod recompile ((type (eql :shader)) data)
   (shadow:recompile-shaders data)
