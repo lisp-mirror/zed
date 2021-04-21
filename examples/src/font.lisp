@@ -5,7 +5,7 @@
    :mipmaps-p nil))
 
 (z:define-material font ()
-  (:shader zsl:font
+  (:shader zsl::font
    :uniforms (:sampler 'font
               :color (v4:vec 0 1 0 0.75))))
 

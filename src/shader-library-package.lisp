@@ -199,6 +199,5 @@
   ;; Programs
   (:export
    #:default
-   #:font
    #:matcap
    #:sprite))
