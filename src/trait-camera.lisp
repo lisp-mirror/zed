@@ -26,6 +26,15 @@
           :type u:f32
           :initarg :zoom
           :initform 1.0)
+   (%viewport-name :reader viewport-name
+                   :inline t
+                   :type symbol
+                   :initarg :viewport
+                   :initform :default)
+   (%viewport :accessor viewport
+              :inline t
+              :type (or z::viewport null)
+              :initform nil)
    (%free-look-p :reader free-look-p
                  :inline t
                  :type boolean
@@ -60,11 +69,10 @@
 (declaim (inline update-projection/orthographic))
 (defun update-projection/orthographic (camera)
   (declare (optimize speed))
-  (let* ((core (z:trait-core camera))
-         (window (z::core-window core))
+  (let* ((viewport (viewport camera))
          (zoom (zoom camera))
-         (w (/ (z::window-width window) zoom 2.0))
-         (h (/ (z::window-height window) zoom 2.0)))
+         (w (/ (z::viewport-width viewport) zoom 2.0))
+         (h (/ (z::viewport-height viewport) zoom 2.0)))
     (m4:ortho! (projection camera) (- w) w (- h) h (clip-near camera) (clip-far camera))
     nil))
 
@@ -72,12 +80,11 @@
 (declaim (inline update-projection/perspective))
 (defun update-projection/perspective (camera)
   (declare (optimize speed))
-  (let* ((core (z:trait-core camera))
-         (window (z::core-window core)))
+  (let ((viewport (viewport camera)))
     (m4:perspective! (projection camera)
                      (/ (fov-y camera) (zoom camera))
-                     (/ (float (z::window-width window) 1f0)
-                        (float (z::window-height window) 1f0))
+                     (/ (float (z::viewport-width viewport) 1f0)
+                        (float (z::viewport-height viewport) 1f0))
                      (clip-near camera)
                      (clip-far camera))
     nil))
@@ -143,9 +150,12 @@
 (u:fn-> setup (camera) null)
 (defun setup (camera)
   (declare (optimize speed))
-  (setf (fov-y camera) (* (fov-y camera) const:+deg+))
-  (unless (z::core-active-camera (z:trait-core camera))
-    (make-active camera))
+  (let* ((core (z:trait-core camera))
+         (viewport-manager (z::core-viewports core)))
+    (setf (fov-y camera) (* (fov-y camera) const:+deg+)
+          (viewport camera) (z::ensure-viewport viewport-manager (viewport-name camera)))
+    (unless (z::core-active-camera core)
+      (make-active camera)))
   nil)
 
 (u:fn-> attach (camera) null)

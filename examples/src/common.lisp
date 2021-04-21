@@ -26,7 +26,8 @@
   (z.camera:camera))
 
 (z:define-prefab camera/perspective (:template 'camera
-                                     :translate (v3:vec 0.0 0.0 50.0)))
+                                     :translate (v3:vec 0.0 0.0 50.0))
+  (z.camera:camera :mode :perspective))
 
 (z:define-prefab camera/orthographic (:template 'camera
                                       :translate (v3:vec 0.0 0.0 1.0))

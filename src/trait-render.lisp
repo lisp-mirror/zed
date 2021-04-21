@@ -22,7 +22,7 @@
    (%viewport-name :reader viewport-name
                    :inline t
                    :type symbol
-                   :initarg :viewport-name
+                   :initarg :viewport
                    :initform :default)
    (%viewport :accessor viewport
               :inline t
