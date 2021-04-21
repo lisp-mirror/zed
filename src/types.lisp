@@ -3,7 +3,7 @@
 (defstruct (uniform
             (:predicate nil)
             (:copier nil))
-  (program nil :type (or shadow::program null))
+  (program nil :type (or shadow:program null))
   (key nil :type symbol)
   (type nil :type (or symbol cons))
   (resolved-type nil :type symbol)
