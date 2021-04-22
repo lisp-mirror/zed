@@ -10,7 +10,6 @@
   (shader nil :type symbol)
   (direct-uniforms (u:dict #'eq) :type hash-table)
   (effective-uniforms (u:dict #'eq) :type hash-table)
-  (pass nil :type symbol)
   (framebuffer nil :type symbol)
   (attachments nil :type list)
   (render-func (constantly nil) :type function))
@@ -67,14 +66,13 @@
   (when framebuffer-name
     (push material-name (framebuffer-data-materials (find-framebuffer-data framebuffer-name)))))
 
-(defun update-material-data (name master shader uniforms pass output func)
+(defun update-material-data (name master shader uniforms output func)
   (let* ((data (find-material-data name))
          (master-data (u:href =materials= master))
          (shader (or shader (and master-data (material-data-shader master-data)))))
     (destructuring-bind (&optional framebuffer attachments) output
       (setf (material-data-master data) master
             (material-data-shader data) shader
-            (material-data-pass data) (or pass :default)
             (material-data-framebuffer data) framebuffer
             (material-data-attachments data) attachments
             (material-data-render-func data) func)
@@ -92,16 +90,14 @@
                             (or (material-data-shader slave)
                                 (material-data-shader master-data))
                             (u:hash->plist (material-data-direct-uniforms slave))
-                            (or (material-data-pass slave)
-                                (material-data-pass master-data))
                             (list (or (material-data-framebuffer slave)
                                       (material-data-framebuffer master-data))
                                   (or (material-data-attachments slave)
                                       (material-data-attachments master-data)))
                             (material-data-render-func slave)))))
 
-(defun make-material-data (name master shader uniforms pass output func)
+(defun make-material-data (name master shader uniforms output func)
   (let ((data (%make-material-data :name name)))
     (setf (u:href =materials= name) data)
-    (update-material-data name master shader uniforms pass output func)
+    (update-material-data name master shader uniforms output func)
     data))

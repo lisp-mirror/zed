@@ -107,13 +107,12 @@
                    `((gl:point-size 1.0))))))))))
 
 (defmacro define-material (name (&optional master) &body body)
-  (destructuring-bind (&key shader uniforms features pass output) (car body)
+  (destructuring-bind (&key shader uniforms features output) (car body)
     (u:with-gensyms (func)
       `(let ((,func ,(generate-material-render-func features output)))
          (if (u:href =materials= ',name)
-             (update-material-data ',name ',master ',shader (list ,@uniforms) ',pass ',output ,func)
-             (make-material-data ',name ',master ',shader (list ,@uniforms) ',pass ',output
-                                 ,func))))))
+             (update-material-data ',name ',master ',shader (list ,@uniforms) ',output ,func)
+             (make-material-data ',name ',master ',shader (list ,@uniforms) ',output ,func))))))
 
 (defmethod recompile ((type (eql :material)) data)
   (let ((material-data (find-material-data data)))
