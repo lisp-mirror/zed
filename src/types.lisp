@@ -56,8 +56,7 @@
   (prefabs (u:dict #'eq) :type hash-table)
   (viewports nil :type viewport-manager)
   (draw-order nil :type (or draw-order-manager null))
-  (collision-system nil :type collision-system)
-  (active-camera nil))
+  (collision-system nil :type collision-system))
 
 (u:define-printer (core stream :type nil :identity t)
   (format stream "CORE"))

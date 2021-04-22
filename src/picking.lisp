@@ -6,7 +6,7 @@
   (u:mvlet ((x y (get-mouse-position core)))
     (let* ((viewport-manager (core-viewports core))
            (viewport (find-viewport-by-coordinates viewport-manager x y))
-           (camera (core-active-camera core))
+           (camera (viewport-camera viewport))
            (view (tr.cam::view camera))
            (projection (tr.cam::projection camera))
            (viewport (v4:vec (viewport-x viewport)

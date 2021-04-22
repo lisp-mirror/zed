@@ -27,7 +27,11 @@
    (%viewport :accessor viewport
               :inline t
               :type z::viewport
-              :initform nil))
+              :initform nil)
+   (%camera :accessor camera
+            :inline t
+            :type (or tr.cam:camera null)
+            :initform nil))
   (:setup setup)
   (:attach attach)
   (:detach detach)
@@ -46,9 +50,9 @@
          (owner (z:trait-owner render-trait))
          (material (material render-trait))
          (func (z::material-data-render-func (z::material-data material))))
-    (z::configure-viewport (viewport render-trait))
     (z::with-debug-group (format nil "Game Object: ~a" (z::game-object-label owner))
-      (funcall func core owner material))
+      (z::with-viewport (core (viewport render-trait))
+        (funcall func core owner material)))
     nil))
 
 (u:fn-> render-frame (z::core) null)
@@ -68,8 +72,15 @@
 (u:fn-> setup (render) null)
 (defun setup (render)
   (declare (optimize speed))
-  (let ((viewport-manager (z::core-viewports (z:trait-core render))))
-    (setf (viewport render) (z::ensure-viewport viewport-manager (viewport-name render)))
+  (let* ((viewport-name (viewport-name render))
+         (viewport-manager (z::core-viewports (z:trait-core render)))
+         (viewport (z::find-viewport viewport-manager viewport-name)))
+    (unless (z::viewport-camera viewport)
+      (error "Viewport ~s of render trait ~s is not associated with a camera."
+             viewport-name
+             render))
+    (setf (viewport render) viewport
+          (camera render) (z::viewport-camera viewport))
     nil))
 
 (u:fn-> attach (render) null)
@@ -93,10 +104,9 @@
 (u:fn-> render (render) null)
 (defun render (render)
   (declare (optimize speed))
-  (u:when-let* ((core (z:trait-core render))
-                (owner (z:trait-owner render))
-                (camera (z::core-active-camera core))
-                (material (material render)))
+  (let ((owner (z:trait-owner render))
+        (camera (camera render))
+        (material (material render)))
     (z::set-uniform material :model (z::get-transform owner :space :world))
     (z::set-uniform material :view (tr.cam::view camera))
     (z::set-uniform material :proj (tr.cam::projection camera))

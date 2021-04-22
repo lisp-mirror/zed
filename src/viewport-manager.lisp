@@ -6,6 +6,7 @@
             (:copier nil))
   (window nil :type window)
   (table (u:dict #'eq) :type hash-table)
+  (active nil :type (or viewport null))
   (default nil :type (or viewport null)))
 
 (u:define-printer (viewport-manager stream :type nil)
@@ -18,13 +19,6 @@
          (manager (%make-viewport-manager :window window :default default)))
     (setf (u:href (viewport-manager-table manager) :default) default)
     manager))
-
-(u:fn-> register-viewport (viewport-manager symbol) null)
-(defun register-viewport (manager name)
-  (declare (optimize speed))
-  (setf (u:href (viewport-manager-table manager) name)
-        (make-viewport name (viewport-manager-window manager)))
-  nil)
 
 (u:fn-> find-viewport (viewport-manager symbol) (or viewport null))
 (defun find-viewport (manager name)
@@ -39,12 +33,15 @@
     (v2:vec (viewport-width viewport)
             (viewport-height viewport))))
 
-(u:fn-> ensure-viewport (viewport-manager symbol) viewport)
-(defun ensure-viewport (manager name)
+(u:fn-> ensure-viewport (viewport-manager symbol trait) viewport)
+(defun ensure-viewport (manager name camera)
   (declare (optimize speed))
   (unless (find-viewport manager name)
-    (register-viewport manager name))
-  (values (find-viewport manager name)))
+    (setf (u:href (viewport-manager-table manager) name)
+          (make-viewport name (viewport-manager-window manager))))
+  (let ((viewport (find-viewport manager name)))
+    (setf (viewport-camera viewport) camera)
+    viewport))
 
 (u:fn-> find-viewport-by-coordinates (viewport-manager u:ub16 u:ub16) viewport)
 (defun find-viewport-by-coordinates (manager x y)
@@ -58,6 +55,16 @@
                  (<= vy y (+ vy vh)))
         (return-from find-viewport-by-coordinates v))))
   (viewport-manager-default manager))
+
+(defmacro with-viewport ((core viewport) &body body)
+  (u:with-gensyms (manager)
+    `(let ((,manager (core-viewports ,core)))
+       (unwind-protect
+            (progn
+              (configure-viewport ,viewport)
+              (setf (viewport-manager-active ,manager) ,viewport)
+              ,@body)
+         (setf (viewport-manager-active ,manager) (viewport-manager-default ,manager))))))
 
 (u:fn-> update-viewports (viewport-manager) null)
 (defun update-viewports (manager)

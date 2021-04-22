@@ -127,22 +127,20 @@
       (z::set-initial-free-look-orientation free-look-state world-matrix))
     nil))
 
-(defun make-active (camera)
-  (let ((core (z:trait-core camera)))
-    (setf (z::core-active-camera core) camera)))
-
 (u:fn-> resolve-normal-matrix (z::core z:game-object) m3:mat)
 (defun resolve-normal-matrix (core game-object)
   (declare (optimize speed))
   (let* ((transform-state (z::game-object-transform game-object))
-         (normal-matrix (load-time-value (m4:id))))
-    (u:when-let ((camera (z::core-active-camera core)))
-      (m4:set-translation! normal-matrix
-                           (z::transform-state-world-matrix transform-state)
-                           v3:+zero+)
-      (m4:*! normal-matrix (view camera) normal-matrix)
-      (m4:invert! normal-matrix normal-matrix)
-      (m4:transpose! normal-matrix normal-matrix))
+         (normal-matrix (load-time-value (m4:id)))
+         (viewport-manager (z::core-viewports core))
+         (viewport (z::viewport-manager-active viewport-manager))
+         (camera (z::viewport-camera viewport)))
+    (m4:set-translation! normal-matrix
+                         (z::transform-state-world-matrix transform-state)
+                         v3:+zero+)
+    (m4:*! normal-matrix (view camera) normal-matrix)
+    (m4:invert! normal-matrix normal-matrix)
+    (m4:transpose! normal-matrix normal-matrix)
     (m4:rotation-to-mat3! (z::transform-state-normal-matrix transform-state) normal-matrix)))
 
 ;;; Hooks
@@ -153,10 +151,8 @@
   (let* ((core (z:trait-core camera))
          (viewport-manager (z::core-viewports core)))
     (setf (fov-y camera) (* (fov-y camera) const:+deg+)
-          (viewport camera) (z::ensure-viewport viewport-manager (viewport-name camera)))
-    (unless (z::core-active-camera core)
-      (make-active camera)))
-  nil)
+          (viewport camera) (z::ensure-viewport viewport-manager (viewport-name camera) camera))
+    nil))
 
 (u:fn-> attach (camera) null)
 (defun attach (camera)

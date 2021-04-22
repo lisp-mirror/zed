@@ -5,6 +5,7 @@
             (:predicate nil)
             (:copier nil))
   (data nil :type viewport-data)
+  (camera nil :type (or trait null))
   (window nil :type window)
   (x 0 :type u:ub16)
   (y 0 :type u:ub16)
