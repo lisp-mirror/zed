@@ -39,5 +39,5 @@
          (update-viewport-data ',name ,x ,y ,width ,height)
          (make-viewport-data ',name ,x ,y ,width ,height))))
 
-(define-viewport :default ()
+(define-viewport :full-screen ()
   (:x 0 :y 0 :width 1 :height 1))

@@ -143,6 +143,19 @@
     (m4:transpose! normal-matrix normal-matrix)
     (m4:rotation-to-mat3! (z::transform-state-normal-matrix transform-state) normal-matrix)))
 
+(u:fn-> register (camera) null)
+(defun register (camera)
+  (declare (optimize speed))
+  (let* ((core (z:trait-core camera))
+         (cameras (z::core-cameras core)))
+    (when (zerop (hash-table-count cameras))
+      (let ((viewport-manager (z::core-viewports core))
+            (viewport (viewport camera)))
+        (setf (z::viewport-manager-default viewport-manager) viewport
+              (z::viewport-camera viewport) camera)))
+    (setf (u:href cameras camera) camera)
+    nil))
+
 ;;; Hooks
 
 (u:fn-> setup (camera) null)
@@ -152,6 +165,7 @@
          (viewport-manager (z::core-viewports core)))
     (setf (fov-y camera) (* (fov-y camera) const:+deg+)
           (viewport camera) (z::ensure-viewport viewport-manager (viewport-name camera) camera))
+    (register camera)
     nil))
 
 (u:fn-> attach (camera) null)
