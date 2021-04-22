@@ -50,8 +50,7 @@
    :uniforms (:hit-color (v4:vec 0 1 0 0.75)
               :miss-color (v4:vec 1 0 0 0.75))
    :features (:enable (:line-smooth)
-              :polygon-mode :line
-              :line-width 1.0)))
+              :polygon-mode :line)))
 
 (u:fn-> enable-visibility (collider) null)
 (defun enable-visibility (collider)
