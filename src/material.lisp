@@ -77,15 +77,15 @@
                    `((gl:enable ,@enable)))
                ,@(when disable
                    `((gl:disable ,@disable)))
-               ,@(when blend-mode
+               ,@(when (and blend-mode (not (equal blend-mode +blend-mode+)))
                    `((gl:blend-func ,@blend-mode)))
-               ,@(when depth-mode
+               ,@(when (and depth-mode (not (eq depth-mode +depth-mode+)))
                    `((gl:depth-func ,depth-mode)))
-               ,@(when polygon-mode
+               ,@(when (and polygon-mode (not (eq polygon-mode +polygon-mode+)))
                    `((gl:polygon-mode :front-and-back ,polygon-mode)))
-               ,@(when line-width
+               ,@(when (and line-width (/= line-width 1.0))
                    `((gl:line-width ,line-width)))
-               ,@(when point-size
+               ,@(when (and point-size (/= point-size 1.0))
                    `((gl:point-size ,point-size)))
                (u:do-hash-values (,x (material-uniforms ,material))
                  (resolve-uniform-function ,core ,game-object ,x))
@@ -95,15 +95,15 @@
                    `((gl:enable ,@disable)))
                ,@(when enable
                    `((gl:disable ,@enable)))
-               ,@(when blend-mode
+               ,@(when (and blend-mode (not (equal blend-mode +blend-mode+)))
                    `((gl:blend-func ,@+blend-mode+)))
-               ,@(when depth-mode
+               ,@(when (and depth-mode (not (eq depth-mode +depth-mode+)))
                    `((gl:depth-func ,+depth-mode+)))
-               ,@(when polygon-mode
+               ,@(when (and polygon-mode (not (eq polygon-mode +polygon-mode+)))
                    `((gl:polygon-mode :front-and-back ,+polygon-mode+)))
-               ,@(when line-width
+               ,@(when (and line-width (/= line-width 1.0))
                    `((gl:line-width 1.0)))
-               ,@(when point-size
+               ,@(when (and point-size (/= point-size 1.0))
                    `((gl:point-size 1.0))))))))))
 
 (defmacro define-material (name (&optional master) &body body)
