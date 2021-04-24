@@ -26,11 +26,6 @@
           :type u:f32
           :initarg :zoom
           :initform 1.0)
-   (%viewport-name :reader viewport-name
-                   :inline t
-                   :type symbol
-                   :initarg :viewport
-                   :initform :default)
    (%viewport :accessor viewport
               :inline t
               :type (or z::viewport null)
@@ -61,7 +56,6 @@
              :inline t
              :type frustum:frustum
              :initform (frustum:make-frustum)))
-  (:setup setup)
   (:attach attach)
   (:update update))
 
@@ -158,23 +152,19 @@
 
 ;;; Hooks
 
-(u:fn-> setup (camera) null)
-(defun setup (camera)
-  (declare (optimize speed))
-  (let* ((core (z:trait-core camera))
-         (viewport-manager (z::core-viewports core)))
-    (setf (fov-y camera) (* (fov-y camera) const:+deg+)
-          (viewport camera) (z::ensure-viewport viewport-manager (viewport-name camera) camera))
-    (register camera)
-    nil))
-
 (u:fn-> attach (camera) null)
 (defun attach (camera)
   (declare (optimize speed))
-  (when (free-look-p camera)
-    (let ((game-object (z:trait-owner camera)))
-      (setf (free-look-state camera) (z::make-free-look-state game-object))
-      nil)))
+  (let* ((core (z:trait-core camera))
+         (game-object (z:trait-owner camera))
+         (viewport-name (z::game-object-viewport game-object))
+         (viewport-manager (z::core-viewports core)))
+    (setf (fov-y camera) (* (fov-y camera) const:+deg+)
+          (viewport camera) (z::ensure-viewport viewport-manager viewport-name camera))
+    (register camera)
+    (when (free-look-p camera)
+      (setf (free-look-state camera) (z::make-free-look-state game-object)))
+    nil))
 
 (u:fn-> update (camera) null)
 (defun update (camera)

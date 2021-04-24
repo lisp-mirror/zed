@@ -260,11 +260,14 @@
       (clrhash (prefab-nodes slave))
       (update-prefab slave))))
 
-(defun load-prefab (core name &key parent)
+(defun load-prefab (core name &key parent (viewport :default))
   (let ((prefabs =prefabs=))
     (u:if-let ((prefab (u:href prefabs name)))
       (let* ((factory (prefab-factory prefab))
-             (game-object (funcall (prefab-factory-func factory) core :parent parent)))
+             (game-object (funcall (prefab-factory-func factory)
+                                   core
+                                   :parent parent
+                                   :viewport viewport)))
         (clrhash (prefab-factory-game-objects factory))
         game-object)
       (error "Prefab ~s not defined." name))))
@@ -325,15 +328,16 @@
         (translate new-game-object translation :replace-p t)))
     (v:debug :zed "Recompiled prefab: ~s" data)))
 
-(defun realize-prefab-node (core node root)
+(defun realize-prefab-node (core node root viewport)
   (let* ((factory (prefab-factory (prefab-node-prefab node)))
          (game-objects (prefab-factory-game-objects factory))
          (game-object (u:href game-objects (prefab-node-path node))))
     (spawn-game-object core
                        game-object
-                       (u:if-let ((parent (prefab-node-parent node)))
-                         (u:href game-objects (prefab-node-path parent))
-                         root))
+                       :parent (u:if-let ((parent (prefab-node-parent node)))
+                                 (u:href game-objects (prefab-node-path parent))
+                                 root)
+                       :viewport viewport)
     (u:do-hash (type args (prefab-node-trait-thunked-args node))
       (loop :for (k v) :on (u:hash->plist args) :by #'cddr
             :collect k :into args
@@ -369,7 +373,7 @@
                             (u:href node-options :scale-velocity))))
 
 (defun make-prefab-factory-function (prefab)
-  (lambda (core &key parent)
+  (lambda (core &key parent (viewport :default))
     (let ((factory (prefab-factory prefab))
           (nodes (prefab-nodes prefab)))
       (u:do-hash (path node nodes)
@@ -380,7 +384,7 @@
       (u:do-hash-values (node nodes)
         (setf (prefab-factory-current-node factory) node)
         (with-scope (:prefab-instantiate)
-          (realize-prefab-node core node parent)))
+          (realize-prefab-node core node parent viewport)))
       (setf (prefab-factory-current-node factory) nil)
       (register-prefab-root core prefab))))
 

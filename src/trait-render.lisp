@@ -19,11 +19,6 @@
               :inline t
               :type boolean
               :initform nil)
-   (%viewport-name :reader viewport-name
-                   :inline t
-                   :type symbol
-                   :initarg :viewport
-                   :initform :default)
    (%viewport :accessor viewport
               :inline t
               :type z::viewport
@@ -32,7 +27,6 @@
             :inline t
             :type (or tr.cam:camera null)
             :initform nil))
-  (:setup setup)
   (:attach attach)
   (:detach detach)
   (:render render))
@@ -69,29 +63,26 @@
 
 ;;; Hooks
 
-(u:fn-> setup (render) null)
-(defun setup (render)
-  (declare (optimize speed))
-  (let* ((viewport-name (viewport-name render))
-         (viewport-manager (z::core-viewports (z:trait-core render)))
-         (viewport (z::find-viewport viewport-manager viewport-name)))
-    (unless (z::viewport-camera viewport)
-      (error "Viewport ~s of render trait ~s is not associated with a camera."
-             viewport-name
-             render))
-    (setf (viewport render) viewport
-          (camera render) (z::viewport-camera viewport))
-    nil))
-
 (u:fn-> attach (render) null)
 (defun attach (render)
   (declare (optimize speed))
-  (u:if-let ((material-name (material-name render)))
-    (let ((core (z:trait-core render)))
-      (setf (material render) (z::make-material core material-name))
-      (z::register-draw-order core render)
-      nil)
-    (error "Render trait must have a material specified.")))
+  (let* ((core (z:trait-core render))
+         (owner (z:trait-owner render))
+         (viewport-name (z::game-object-viewport owner))
+         (viewport-manager (z::core-viewports core))
+         (viewport (z::find-viewport viewport-manager viewport-name)))
+    (unless (z::viewport-camera viewport)
+      (error "Viewport ~s of game object ~s is not associated with a camera."
+             viewport-name
+             owner))
+    (setf (viewport render) viewport
+          (camera render) (z::viewport-camera viewport))
+    (u:if-let ((material-name (material-name render)))
+      (progn
+        (setf (material render) (z::make-material core material-name))
+        (z::register-draw-order core render)
+        nil)
+      (error "Render trait must have a material specified."))))
 
 (u:fn-> detach (render) null)
 (defun detach (render)

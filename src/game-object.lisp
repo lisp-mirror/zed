@@ -38,7 +38,10 @@
   (traits-by-type (u:dict #'eq) :type hash-table)
   ;; The name of the root prefab node this game object was created from, or NIL if it was created
   ;; from a child of a prefab, or manually
-  (prefab-name nil :type symbol))
+  (prefab-name nil :type symbol)
+  ;; The name of the viewport this game object and all of its children are rendered to, if they have
+  ;; a render trait.
+  (viewport :default :type symbol))
 
 (u:define-printer (game-object stream :type nil)
   (format stream "GAME-OBJECT: ~a" (game-object-path game-object)))
@@ -51,12 +54,16 @@
 ;; `:ignore`, or `:inherit`, and #their behavior is documented in the struct definition at the top
 ;; of this file.
 (u:fn-> make-game-object
-        (&key (:label string) (:disabled-p boolean) (:pause-mode pause-mode))
+        (&key (:label string) (:disabled-p boolean) (:pause-mode pause-mode) (:viewport symbol))
         game-object)
 (declaim (inline make-game-object))
-(defun make-game-object (&key (label "[NO-LABEL]") disabled-p (pause-mode :inherit))
+(defun make-game-object (&key (label "[NO-LABEL]") disabled-p (pause-mode :inherit)
+                           (viewport :default))
   (declare (optimize speed))
-  (%make-game-object :label label :%enabled-p (not disabled-p) :pause-mode pause-mode))
+  (%make-game-object :label label
+                     :%enabled-p (not disabled-p)
+                     :pause-mode pause-mode
+                     :viewport viewport))
 
 (defun make-root-game-object ()
   (%make-game-object :label "[ROOT]" :path "/" :root-p t :depth 0 :pause-mode :pause))
@@ -236,15 +243,18 @@
 ;; parent is not rooted in the scene tree, in which case the spawned game object is part of that
 ;; parent's disjoint tree until it is connected to the main scene tree. This allows building up
 ;; trees of game objects that are not yet registered with the scene.
-(u:fn-> spawn-game-object (core game-object &optional game-object) game-object)
-(defun spawn-game-object (core game-object &optional parent)
+(u:fn-> spawn-game-object
+        (core game-object &key (:parent game-object) (:viewport symbol))
+        game-object)
+(defun spawn-game-object (core game-object &key parent (viewport :default))
   (declare (optimize speed))
   (with-allowed-scopes spawn-game-object
       (:prelude :prefab-instantiate :trait-setup-hook :trait-destroy-hook
        :trait-attach-hook :trait-detach-hook :trait-physics-hook :trait-update-hook)
     (reparent-game-object core game-object (or parent (core-scene-tree core)))
+    (setf (game-object-viewport game-object) viewport)
     (dolist (child (game-object-children game-object))
-      (spawn-game-object core child game-object))
+      (spawn-game-object core child :parent game-object))
     game-object))
 
 (u:fn-> destroy-game-object (core game-object &key (:reparent-p boolean)) null)
