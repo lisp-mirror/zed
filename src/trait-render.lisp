@@ -56,10 +56,11 @@
     (gl:clear-color 0 0 0 1)
     (gl:clear :color-buffer :depth-buffer)
     (z::with-time-buffer (core :render-phase)
-      (z::map-draw-order draw-order
-                         (lambda (x)
-                           (unless (culled-p x)
-                             (render-game-object x)))))))
+      (z::map-draw-order
+       draw-order
+       (lambda (x)
+         (unless (culled-p x)
+           (render-game-object x)))))))
 
 ;;; Hooks
 

@@ -186,15 +186,14 @@
 (u:fn-> %resolve-game-object-path (game-object game-object) null)
 (defun %resolve-game-object-path (game-object parent)
   (declare (optimize speed))
-  (let ((parent-path (cond
-                       ((and parent (string-equal (game-object-path parent) "[UN-ROOTED]"))
-                        (game-object-label parent))
-                       ((game-object-parent parent)
-                        (game-object-path parent))
-                       (t ""))))
-    (setf (game-object-path game-object) (format nil "~a/~a"
-                                                 parent-path
-                                                 (game-object-label game-object)))
+  (let* ((parent-path (cond
+                        ((and parent (string-equal (game-object-path parent) "[UN-ROOTED]"))
+                         (game-object-label parent))
+                        ((game-object-parent parent)
+                         (game-object-path parent))
+                        (t "")))
+         (path (format nil "~a/~a" parent-path (game-object-label game-object))))
+    (setf (game-object-path game-object) path)
     nil))
 
 ;; Re-parent a game object to be a child of some new parent game object. This is called by
