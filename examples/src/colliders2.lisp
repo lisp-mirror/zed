@@ -16,8 +16,7 @@
    ((left :template 'colliders2/left))
    ((right :template 'colliders2/right)))
   ((test2 :translate (v3:vec 2.0 0.0 0.0))
-   ((left :template 'colliders2/left
-          :scale (v3:vec 1.0 3.0 1.0)))
+   ((left :template 'colliders2/left))
    ((right :template 'colliders2/right
            :scale 0.5)
     (z.collider:collider :volume :sphere))))
