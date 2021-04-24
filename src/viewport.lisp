@@ -10,7 +10,8 @@
   (x 0 :type u:ub16)
   (y 0 :type u:ub16)
   (width 0 :type u:ub16)
-  (height 0 :type u:ub16))
+  (height 0 :type u:ub16)
+  (draw-order nil :type (or draw-order-manager null)))
 
 (u:define-printer (viewport stream :type nil)
   (format stream "VIEWPORT: ~s" (viewport-data-name (viewport-data viewport))))

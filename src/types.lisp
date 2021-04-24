@@ -15,16 +15,6 @@
           (uniform-resolved-type uniform)
           (uniform-value uniform)))
 
-(defstruct (draw-order-manager
-            (:constructor %make-draw-order-manager)
-            (:predicate nil)
-            (:copier nil))
-  (tree nil :type util.rb::tree)
-  (table (u:dict #'eq) :type hash-table))
-
-(u:define-printer (draw-order-manager stream :type nil)
-  (format stream "DRAW-ORDER-MANAGER"))
-
 (defstruct (trait-manager
             (:predicate nil)
             (:copier nil))
@@ -55,7 +45,7 @@
   (materials (u:dict #'eq) :type hash-table)
   (prefabs (u:dict #'eq) :type hash-table)
   (viewports nil :type viewport-manager)
-  (draw-order nil :type (or draw-order-manager null))
+  (draw-order-dirty-objects nil :type list)
   (collision-system nil :type collision-system)
   (cameras (u:dict #'eq) :type hash-table))
 

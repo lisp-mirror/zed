@@ -176,9 +176,8 @@
   (declare (optimize speed))
   (walk-game-object-tree (x game-object)
     (setf (game-object-depth x) (1+ (game-object-depth (game-object-parent x))))
-    ;; When a game object's depth changes, we also have to resort its draw call in the draw order
-    ;; manager.
-    (resort-draw-order core game-object)))
+    (push x (core-draw-order-dirty-objects core)))
+  nil)
 
 ;; Update the game object's path string after it has been spawned or moved in the scene tree. This
 ;; is done by appending the game object's label to the resolved path of its parent game object,

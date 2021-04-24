@@ -16,15 +16,13 @@
                                        :anti-alias-p (config-anti-alias-p config)
                                        :vsync-p vsync-p))
                   (refresh-rate (get-monitor-refresh-rate (window-monitor window)))
-                  (collision-plan (or (config-collision-plan config) :default))
-                  (draw-order (make-draw-order-manager #'tr.ren::draw-order-tree-sort)))
+                  (collision-plan (or (config-collision-plan config) :default)))
              ;; Construct the core with references to the previously constructed state.
              (prog1 (%make-core :running-p t
                                 :clock (make-clock config refresh-rate vsync-p)
                                 :window window
                                 :input-manager (make-input-manager)
                                 :trait-manager (make-trait-manager :order (sort-trait-types))
-                                :draw-order draw-order
                                 :viewports (make-viewport-manager window)
                                 :collision-system (make-collision-system collision-plan))
                ;; Start the audio system.

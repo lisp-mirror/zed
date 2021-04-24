@@ -45,22 +45,30 @@
          (material (material render-trait))
          (func (z::material-data-render-func (z::material-data material))))
     (z::with-debug-group (format nil "Game Object: ~a" (z::game-object-label owner))
-      (z::with-viewport (core (viewport render-trait))
-        (funcall func core owner material)))
+      (funcall func core owner material))
     nil))
+
+(u:fn-> render-viewports (z::core) null)
+(defun render-viewports (core)
+  (declare (optimize speed))
+  (u:do-hash-values (viewport (z::viewport-manager-table (z::core-viewports core)))
+    (z::with-viewport (core viewport)
+      (u:when-let ((draw-order (z::viewport-draw-order viewport)))
+        (z::map-draw-order
+         core
+         draw-order
+         (lambda (x)
+           (unless (culled-p x)
+             (render-game-object x))))))
+    (setf (z::core-draw-order-dirty-objects core) nil)))
 
 (u:fn-> render-frame (z::core) null)
 (defun render-frame (core)
   (declare (optimize speed))
-  (let ((draw-order (z::core-draw-order core)))
-    (gl:clear-color 0 0 0 1)
-    (gl:clear :color-buffer :depth-buffer)
-    (z::with-time-buffer (core :render-phase)
-      (z::map-draw-order
-       draw-order
-       (lambda (x)
-         (unless (culled-p x)
-           (render-game-object x)))))))
+  (gl:clear-color 0 0 0 1)
+  (gl:clear :color-buffer :depth-buffer)
+  (z::with-time-buffer (core :render-phase)
+    (render-viewports core)))
 
 ;;; Hooks
 
@@ -76,21 +84,25 @@
       (error "Viewport ~s of game object ~s is not associated with a camera."
              viewport-name
              owner))
+    (unless (z::viewport-draw-order viewport)
+      (let ((draw-order-manager (z::make-draw-order-manager #'draw-order-tree-sort)))
+        (setf (z::viewport-draw-order viewport) draw-order-manager)))
     (setf (viewport render) viewport
           (camera render) (z::viewport-camera viewport))
     (u:if-let ((material-name (material-name render)))
       (progn
         (setf (material render) (z::make-material core material-name))
-        (z::register-draw-order core render)
+        (z::register-draw-order (z::viewport-draw-order viewport) render)
         nil)
       (error "Render trait must have a material specified."))))
 
 (u:fn-> detach (render) null)
 (defun detach (render)
   (declare (optimize speed))
-  (let ((core (z:trait-core render)))
+  (let ((core (z:trait-core render))
+        (draw-order-manager (z::viewport-draw-order (viewport render))))
     (z::destroy-material core (material render))
-    (z::deregister-draw-order core render)
+    (z::deregister-draw-order draw-order-manager render)
     nil))
 
 (u:fn-> render (render) null)
