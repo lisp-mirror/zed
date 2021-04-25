@@ -59,8 +59,8 @@
          draw-order
          (lambda (x)
            (unless (culled-p x)
-             (render-game-object x))))))
-    (setf (z::core-draw-order-dirty-objects core) nil)))
+             (render-game-object x)))))))
+  (setf (z::core-draw-order-dirty-objects core) nil))
 
 (u:fn-> render-frame (z::core) null)
 (defun render-frame (core)
